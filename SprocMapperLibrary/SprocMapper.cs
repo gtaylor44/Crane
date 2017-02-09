@@ -1,21 +1,20 @@
-﻿namespace SprocMapperLibrary
+﻿using System;
+
+namespace SprocMapperLibrary
 {
-    public class SprocMapper
-    {
-        public MapObject<T> MapObject<T>()
-        {
-            return new MapObject<T>(this);
-        }
-
-        public Select Select(SprocObjectMap objectMap)
-        {
-            return new Select(objectMap);
-        }
-
-    }
 
     public class SprocMapper<T>
     {
+        private Type _type;
+        public MapObject<T> MapObject()
+        {
+            _type = typeof(T);
+            return new MapObject<T>(_type);
+        }
 
+        public Select<T> Select(SprocObjectMap<T> objectMap)
+        {
+            return new Select<T>(objectMap);
+        }
     }
 }

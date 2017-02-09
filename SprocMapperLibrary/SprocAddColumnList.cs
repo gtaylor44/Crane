@@ -34,9 +34,9 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public SprocObjectMap GetMap()
+        public SprocObjectMap<T> GetMap()
         {
-            return new SprocObjectMap()
+            return new SprocObjectMap<T>()
             {
                 Columns = _columns,
                 CustomColumnMappings = _customColumnMappings

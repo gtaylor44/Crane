@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 
 namespace SprocMapperLibrary
 {
@@ -8,6 +9,7 @@ namespace SprocMapperLibrary
     {
         private readonly HashSet<string> _columns;
         private readonly Dictionary<string, string> _customColumnMappings;
+        private readonly Type _type;
         public SprocAddColumn(HashSet<string> columns, Dictionary<string, string> customColumnMappings)
         {
             _columns = columns;
@@ -33,9 +35,9 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public SprocObjectMap GetMap()
+        public SprocObjectMap<T> GetMap()
         {
-            return new SprocObjectMap()
+            return new SprocObjectMap<T>()
             {
                 Columns = _columns,
                 CustomColumnMappings = _customColumnMappings

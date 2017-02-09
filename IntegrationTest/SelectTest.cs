@@ -20,27 +20,28 @@ namespace IntegrationTest
         [TestMethod]
         public void TestMethod1()
         {
-            SprocMapper sprocMapper = new SprocMapper();
+            SprocMapper<President> presidentMapping = new SprocMapper<President>();
+            SprocMapper<President> presidentAssistantMapping = new SprocMapper<President>();
 
             SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString);
 
-            var objectMapping = sprocMapper
-                .MapObject<President>()
+            var objectMapping = presidentMapping
+                .MapObject()
                 .AddAllColumns()
                 .GetMap();
 
-            var objectMapping1 = sprocMapper.MapObject<PresidentAssistant>()
+            var objectMapping1 = presidentAssistantMapping.MapObject()
                 .AddAllColumns()
                 .RemoveColumn(x => x.Id)
                 .CustomColumnMapping(x => x.FirstName, "AssistantFirstName")
                 .CustomColumnMapping(x => x.LastName, "AssistantLastName")
                 .GetMap();
 
-            var result = sprocMapper
+            var result = presidentMapping
                 .Select(objectMapping)
-                .Join("Id", objectMapping1)
-                .ExecuteReaderWithJoin<President, PresidentAssistant>(conn, "dbo.GetPresidentList");
+                .Join(x => x.Id, objectMapping1)
+                .ExecuteReaderWithJoin<PresidentAssistant>(conn, "dbo.GetPresidentList");
 
             Assert.AreEqual(5, result.Count);
 

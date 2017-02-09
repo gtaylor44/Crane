@@ -2,7 +2,7 @@
 
 namespace SprocMapperLibrary
 {
-    public class SprocObjectMap
+    public class SprocObjectMap<T>
     {
         public HashSet<string> Columns;
         public Dictionary<string, string> CustomColumnMappings;

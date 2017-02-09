@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary", "SprocMapperLibrary\SprocMapperLibrary.csproj", "{CCAF87A0-A266-4BE7-BC3C-389F35914E8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{F18E9219-B104-4B23-A0CC-520653D40A43}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CCAF87A0-A266-4BE7-BC3C-389F35914E8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCAF87A0-A266-4BE7-BC3C-389F35914E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCAF87A0-A266-4BE7-BC3C-389F35914E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCAF87A0-A266-4BE7-BC3C-389F35914E8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

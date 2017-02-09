@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,49 +11,48 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(HashSet<string> columns, object obj) 
+        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, string joinKey = null)
         {
+            T targetObj = NewInstance<T>.Instance();
+
             foreach (var column in columns)
             {
-                Type objType = obj.GetType();
+                string actualColumn;
+                if (customColumnMappings.ContainsKey(column))
+                {
+                    actualColumn = customColumnMappings[column];
+                }
+                else
+                {
+                    actualColumn = column;
+                }
+
+                Type objType = targetObj.GetType();
                 PropertyInfo prop = objType.GetProperty(column);
 
-                SetProperty(objType, prop, obj);
-                
-            }
-
-            return default(T);
-        }
-
-        public static void SetProperty(Type objType, PropertyInfo prop, object obj)
-        {
-            if (prop == null)
-                return;
-
-            if (prop.PropertyType == typeof(int))
-            {
-                SetInt(objType, prop, prop.GetValue(obj)?.ToString());
-            }
-
-            if (prop.PropertyType == typeof(int?))
-            {
-                SetInt(objType, prop, prop.GetValue(obj)?.ToString());
-            }
-        }
-
-        public static void SetInt(Type objType, PropertyInfo prop, string valueToParse)
-        {
-            int value;
-
-            if (int.TryParse(valueToParse, out value))
-            {
-                if (prop.CanWrite)
+                if (prop != null)
                 {
-                    prop.SetValue(objType, value);
+                    object readerObj = reader[actualColumn];
+
+                    if (actualColumn.Equals(joinKey) && readerObj == DBNull.Value)
+                    {
+                        return default(T);
+                    }
+
+                    if (readerObj == DBNull.Value)
+                        prop.SetValue(targetObj, null, null);
+                    else
+                        prop.SetValue(targetObj, readerObj, null);
                 }
             }
 
-    
+            return targetObj;
+        }
+
+        internal static class NewInstance<T> 
+        {
+            public static readonly Func<T> Instance = 
+                Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
         }
 
         internal static string GetPropertyName(Expression method)

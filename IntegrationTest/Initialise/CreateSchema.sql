@@ -1,0 +1,22 @@
+﻿DROP TABLE President
+DROP TABLE PresidentAssistant
+
+CREATE TABLE President
+(
+Id INTEGER NOT NULL,
+FirstName NVARCHAR(128) NULL,
+LastName NVARCHAR(128) NULL,
+Fans INTEGER NULL,
+IsHonest BIT NULL,
+PRIMARY KEY(Id)
+)
+
+CREATE TABLE PresidentAssistant
+(
+Id INTEGER NOT NULL,
+PresidentId INTEGER NOT NULL,
+FirstName NVARCHAR(128),
+LastName NVARCHAR(128),
+PRIMARY KEY(Id),
+FOREIGN KEY (PresidentId) REFERENCES President(Id)
+)

@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -11,9 +13,15 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, string joinKey = null)
+        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, string joinKey = null) where T : new()
         {
-            T targetObj = NewInstance<T>.Instance();
+            //T targetObj = NewInstance<T>.Instance();
+
+            //President1 targetObj = new President1();
+
+            //T targetObj = (T)Activator.CreateInstance(typeof(T));
+
+            T targetObj = new T();
 
             foreach (var column in columns)
             {
@@ -29,7 +37,7 @@ namespace SprocMapperLibrary
 
                 Type objType = targetObj.GetType();
                 PropertyInfo prop = objType.GetProperty(column);
-
+               
                 if (prop != null)
                 {
                     object readerObj = reader[actualColumn];
@@ -45,7 +53,6 @@ namespace SprocMapperLibrary
                         prop.SetValue(targetObj, readerObj, null);
                 }
             }
-
             return targetObj;
         }
 
@@ -122,6 +129,24 @@ namespace SprocMapperLibrary
                                                 $"more details.");
 
             return false;
+        }
+    }
+
+    public static class AttributeExtensions
+    {
+        public static TValue GetAttributeValue<TAttribute, TValue>(
+            this Type type,
+            Func<TAttribute, TValue> valueSelector)
+            where TAttribute : Attribute
+        {
+            var att = type.GetCustomAttributes(
+                typeof(TAttribute), true
+            ).FirstOrDefault() as TAttribute;
+            if (att != null)
+            {
+                return valueSelector(att);
+            }
+            return default(TValue);
         }
     }
 }

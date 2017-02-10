@@ -14,6 +14,7 @@ namespace SprocMapperLibrary
         private List<SqlParameter> _paramList;
         private SprocObjectMap<T> _sprocObjectMap;
         private List<SprocObjectMap<T>> _joinList;
+        private List<Type> _join1;
 
         public Select(SprocObjectMap<T> sprocObjectMap)
         {
@@ -32,17 +33,19 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public Select<T> Join(Expression<Func<T, object>> columnName, SprocObjectMap<T> sprocObjectMap)
+        public Select<T> JoinMany<T1>(Expression<Func<T, object>> parentId, Expression<Func<T, object>> collection, SprocObjectMap<T> sprocObjectMap)
         {
             if (sprocObjectMap == null)
                 // ReSharper disable once NotResolvedInText
                 throw new ArgumentNullException("Join can't have null map");
 
             _joinList.Add(sprocObjectMap);
+
+            _join1.Add(typeof(T1));
             return this;
         }
 
-        public List<T> ExecuteReader(SqlConnection sqlConnection, string cmdText, int commandTimeout = 600)
+        public List<T> ExecuteReader<T>(SqlConnection sqlConnection, string cmdText, int commandTimeout = 600) where T : new()
         {
             List<T> result = new List<T>();
             using (SqlConnection conn = sqlConnection)
@@ -75,7 +78,7 @@ namespace SprocMapperLibrary
             return result;
         }
 
-        public List<T> ExecuteReaderWithJoin<T1>(SqlConnection sqlConnection,  string cmdText, int commandTimeout = 600)
+        public List<T> ExecuteReaderWithJoin<T, T1>(SqlConnection sqlConnection,  string cmdText, int commandTimeout = 600) where T1 : new() where T : new()
         {
             using (SqlConnection conn = sqlConnection)
             {

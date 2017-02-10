@@ -40,8 +40,8 @@ namespace IntegrationTest
 
             var result = presidentMapping
                 .Select(objectMapping)
-                .Join(x => x.Id, objectMapping1)
-                .ExecuteReaderWithJoin<PresidentAssistant>(conn, "dbo.GetPresidentList");
+                .JoinMany<PresidentAssistant>(x => x.Id, x => x.PresidentAssistantList, objectMapping1)
+                .ExecuteReaderWithJoin<President, PresidentAssistant>(conn, "dbo.GetPresidentList");
 
             Assert.AreEqual(5, result.Count);
 

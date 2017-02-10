@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SprocMapperLibrary;
 
 namespace Model
 {

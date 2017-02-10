@@ -1,19 +1,47 @@
-﻿using System;
+﻿using System.Data.SqlClient;
 
 namespace SprocMapperLibrary
 {
 
-    public class SprocMapper<T>
+    public static class SprocMapper
     {
-        private Type _type;
-        public MapObject<T> MapObject()
+        public static MapObject<T> MapObject<T>()
         {
-            _type = typeof(T);
-            return new MapObject<T>(_type);
+            return new MapObject<T>();
         }
 
-        public Select<T> Select(SprocObjectMap<T> objectMap)
+        public static Select<T> Select<T>(SprocObjectMap<T> objectMap)
         {
+            return new Select<T>(objectMap);
+        }
+
+        public static Select<T> Select<T>()
+        {
+            var objectMap = MapObject<T>()
+                .AddAllColumns()
+                .GetMap();
+
+            return new Select<T>(objectMap);
+        }
+    }
+
+    public static class SprocMapperExtensions
+    {
+        public static MapObject<T> MapObject<T>(this SqlConnection conn)
+        {
+            return new MapObject<T>();
+        }
+
+        public static Select<T> Select<T>(this SqlConnection conn, SprocObjectMap<T> objectMap)
+        {
+            return new Select<T>(objectMap);
+        }
+        public static Select<T> Select<T>(this SqlConnection conn)
+        {
+            var objectMap = conn.MapObject<T>()
+                .AddAllColumns()
+                .GetMap();
+
             return new Select<T>(objectMap);
         }
     }

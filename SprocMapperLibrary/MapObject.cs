@@ -10,7 +10,7 @@ namespace SprocMapperLibrary
         private HashSet<string> Columns { get; set; }
         private Dictionary<string, string> CustomColumnMappings { get; set; }
 
-        public MapObject(Type type)
+        public MapObject()
         {
             CustomColumnMappings = new Dictionary<string, string>();
             Columns = new HashSet<string>();

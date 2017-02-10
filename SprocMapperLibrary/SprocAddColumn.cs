@@ -9,7 +9,6 @@ namespace SprocMapperLibrary
     {
         private readonly HashSet<string> _columns;
         private readonly Dictionary<string, string> _customColumnMappings;
-        private readonly Type _type;
         public SprocAddColumn(HashSet<string> columns, Dictionary<string, string> customColumnMappings)
         {
             _columns = columns;

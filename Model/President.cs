@@ -10,6 +10,6 @@ namespace Model
         public string LastName { get; set; }
         public int? Fans { get; set; }
         public bool IsHonest { get; set; }
-        public List<PresidentAssistant> PresidentAssistantList { get; set; } = new List<PresidentAssistant>();
+        public List<PresidentAssistant> PresidentAssistantList { get; set; }
     }
 }

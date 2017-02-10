@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
 using System.Data.SqlTypes;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,15 +10,9 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, string joinKey = null) where T : new()
+        public static T GetObject<T>(Type targetObj, HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, string joinKey = null) 
         {
-            //T targetObj = NewInstance<T>.Instance();
-
-            //President1 targetObj = new President1();
-
-            //T targetObj = (T)Activator.CreateInstance(typeof(T));
-
-            T targetObj = new T();
+            T targetObject = (T)Activator.CreateInstance(targetObj);
 
             foreach (var column in columns)
             {
@@ -35,28 +26,52 @@ namespace SprocMapperLibrary
                     actualColumn = column;
                 }
 
-                Type objType = targetObj.GetType();
+                Type objType = targetObject.GetType();
                 PropertyInfo prop = objType.GetProperty(column);
+
                
                 if (prop != null)
                 {
                     object readerObj = reader[actualColumn];
 
-                    if (actualColumn.Equals(joinKey) && readerObj == DBNull.Value)
-                    {
+                    if (readerObj == DBNull.Value && actualColumn.Equals(joinKey))
                         return default(T);
-                    }
 
                     if (readerObj == DBNull.Value)
-                        prop.SetValue(targetObj, null, null);
+                    {
+                        prop.SetValue(targetObject, null, null);
+                    }
+                        
                     else
-                        prop.SetValue(targetObj, readerObj, null);
+                        prop.SetValue(targetObject, readerObj, null);
+
                 }
             }
-            return targetObj;
+
+            return targetObject;
         }
 
-        internal static class NewInstance<T> 
+        public static Dictionary<int, string> GetColumnIndex(Type type, int startIndex)
+        {
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            foreach (var property in type.GetProperties())
+            {
+                dic.Add(startIndex++, property.Name);
+            }
+
+            return dic;
+        }
+
+        public static object GetDefault(Type type)
+        {
+            if (type.IsValueType)
+            {
+                return Activator.CreateInstance(type);
+            }
+            return null;
+        }
+
+        internal static class NewInstance<T>
         {
             public static readonly Func<T> Instance = 
                 Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
@@ -130,23 +145,14 @@ namespace SprocMapperLibrary
 
             return false;
         }
+        public static bool ValidateProperies(HashSet<string> columns, Dictionary<string, string> customColumnMappings)
+        {
+            HashSet<string> propertySet = new HashSet<string>();
+
+            return false;
+        }
+
     }
 
-    public static class AttributeExtensions
-    {
-        public static TValue GetAttributeValue<TAttribute, TValue>(
-            this Type type,
-            Func<TAttribute, TValue> valueSelector)
-            where TAttribute : Attribute
-        {
-            var att = type.GetCustomAttributes(
-                typeof(TAttribute), true
-            ).FirstOrDefault() as TAttribute;
-            if (att != null)
-            {
-                return valueSelector(att);
-            }
-            return default(TValue);
-        }
-    }
+
 }

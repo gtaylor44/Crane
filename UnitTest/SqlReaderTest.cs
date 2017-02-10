@@ -24,7 +24,7 @@ namespace UnitTest
             moq.Setup(x => x["LastName"]).Returns("Trump");
             moq.Setup(x => x["IsHonest"]).Returns(true);
 
-            var result = SprocMapperHelper.GetObject<President>(columns, new Dictionary<string, string>(), moq.Object);
+            var result = SprocMapperHelper.GetObject<President>(typeof(President), columns, new Dictionary<string, string>(), moq.Object);
 
             Assert.AreEqual(5, result.Fans);
             Assert.AreEqual("Donald", result.FirstName);

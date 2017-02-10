@@ -20,31 +20,44 @@ namespace IntegrationTest
         [TestMethod]
         public void TestMethod1()
         {
-            SprocMapper<President> presidentMapping = new SprocMapper<President>();
-            SprocMapper<President> presidentAssistantMapping = new SprocMapper<President>();
+            using (SqlConnection conn =
+                new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
+            {
+                var objectMapping = conn
+                    .MapObject<President>()
+                    .AddAllColumns()
+                    .GetMap();
 
-            SqlConnection conn =
-                new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString);
+                var objectMapping1 = conn
+                    .MapObject<PresidentAssistant>()
+                    .AddAllColumns()
+                    .CustomColumnMapping(x => x.Id, "AssistantId")
+                    .CustomColumnMapping(x => x.FirstName, "AssistantFirstName")
+                    .CustomColumnMapping(x => x.LastName, "AssistantLastName")
+                    .GetMap();
 
-            var objectMapping = presidentMapping
-                .MapObject()
-                .AddAllColumns()
-                .GetMap();
+                var result = conn
+                    .Select(objectMapping)
+                    .JoinMany(objectMapping1, x => x.PresidentAssistantList, x => x.PresidentId)
+                    .SetParentKey(x => x.Id)
+                    .ExecuteReader(conn, "dbo.GetPresidentList");
 
-            var objectMapping1 = presidentAssistantMapping.MapObject()
-                .AddAllColumns()
-                .RemoveColumn(x => x.Id)
-                .CustomColumnMapping(x => x.FirstName, "AssistantFirstName")
-                .CustomColumnMapping(x => x.LastName, "AssistantLastName")
-                .GetMap();
+                Assert.AreEqual(5, result.Count);
+            }
+        }
 
-            var result = presidentMapping
-                .Select(objectMapping)
-                .JoinMany<PresidentAssistant>(x => x.Id, x => x.PresidentAssistantList, objectMapping1)
-                .ExecuteReaderWithJoin<President, PresidentAssistant>(conn, "dbo.GetPresidentList");
+        [TestMethod]
+        public void TestMethod2()
+        {
+            using (SqlConnection conn =
+                new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
+            {
+                var result = conn
+                    .Select<President>()
+                    .ExecuteReader(conn, "dbo.GetPresidentList");
 
-            Assert.AreEqual(5, result.Count);
-
+                Assert.IsNotNull(result);
+            }
         }
     }
 }

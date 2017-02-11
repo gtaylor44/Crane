@@ -31,11 +31,30 @@ namespace SprocMapperLibrary
 
         protected void ValidateProperties()
         {
-            if (!SprocMapperHelper.ValidateProperies1(SprocObjectMapList))
+            HashSet<string> allColumns = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (var map in SprocObjectMapList)
             {
-                throw new SprocMapperException($"Duplicate column not allowed. Ensure that all columns in stored procedure are unique." +
-                                               "Try setting an alias for your column in your stored procedure " +
-                                               "and set up a custom column mapping.");
+                map.Columns.ToList().ForEach(x =>
+                {
+                    if (map.CustomColumnMappings.ContainsKey(x))
+                    {
+                        if (allColumns.Contains(map.CustomColumnMappings[x]))
+                        {
+                            throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(map.CustomColumnMappings[x])?.Name, map.Type.FullName));
+                        }
+
+                        allColumns.Add(map.CustomColumnMappings[x]);
+
+
+                    }
+                    else if (allColumns.Contains(x))
+                    {
+                        throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(x)?.Name, map.Type.FullName));
+                    }
+
+                    allColumns.Add(x);
+                });
             }
         }
 
@@ -177,5 +196,11 @@ namespace SprocMapperLibrary
             }
         }
 
+        private static string GetPropertyValidationExceptionMessage(string propertyName, string className)
+        {
+            return
+                $"Duplicate property detected before execution. The offending property is '{propertyName}' of class '{className}'. Either ignore this property or " +
+                $"add a custom mapping explicitly. Refer to documentation if you need help http://github.com";
+        }
     }
 }

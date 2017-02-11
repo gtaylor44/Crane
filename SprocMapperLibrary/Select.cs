@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+
 namespace SprocMapperLibrary
 {
     public class Select<T> : AbstractSelect
@@ -21,6 +22,7 @@ namespace SprocMapperLibrary
             OpenConn(conn);
 
             List<T> result = new List<T>();
+
 
             using (SqlCommand command = new SqlCommand(procName, conn))
             {
@@ -44,6 +46,51 @@ namespace SprocMapperLibrary
             }
             return result;
 
+        }
+
+        public List<string> GetAbsentProperties(SqlConnection conn, string procName)
+        {
+            OpenConn(conn);
+            using (SqlCommand command = new SqlCommand(procName, conn))
+            {
+
+                //var reader = command.ExecuteReader();
+
+
+
+                command.CommandType = CommandType.StoredProcedure;
+
+
+                var reader = command.ExecuteReader(CommandBehavior.KeyInfo);
+
+                ValidateProperties();
+                RemoveAbsentColumns(reader);
+
+                //Retrieve column schema into a DataTable.
+                var schema = reader.GetSchemaTable();
+
+                HashSet<string> missingColumnSet = new HashSet<string>();
+
+                var occurrences1 = schema?.Rows.Cast<DataRow>();
+
+                if (occurrences1 != null)
+                {
+                    HashSet<string> mappedColumnSet = new HashSet<string>();
+
+                    foreach (var occurence in occurrences1)
+                    {
+                        string schemaColumn = (string)occurence["ColumnName"];
+
+                        foreach (ISprocObjectMap map in SprocObjectMapList)
+                        {
+                            
+                        }
+                    }
+                }
+
+
+                return null;
+            }
         }
 
     }

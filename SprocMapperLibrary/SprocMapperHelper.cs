@@ -138,73 +138,8 @@ namespace SprocMapperLibrary
 
             return false;
         }
-        public static bool ValidateProperies(List<ISprocObjectMap> sprocObjectMapList)
-        {
-            List<string> allColumns = new List<string>();
 
-            foreach (var map in sprocObjectMapList)
-            {
-                map.Columns.ToList().ForEach(x =>
-                {
-                    if (map.CustomColumnMappings.ContainsKey(x))
-                    {
-                        allColumns.Add(map.CustomColumnMappings[x]);
-                        return;
-                    }
-                    allColumns.Add(x);
-                });
-            }
 
-            int allColumnsCount = allColumns.GroupBy(x => x).Count();
-
-            if (allColumnsCount != allColumns.Count)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public static bool ValidateProperies1(List<ISprocObjectMap> sprocObjectMapList)
-        {
-            HashSet<string> allColumns = new HashSet<string>(StringComparer.Ordinal);
-
-            foreach (var map in sprocObjectMapList)
-            {
-                map.Columns.ToList().ForEach(x =>
-                {
-                    if (map.CustomColumnMappings.ContainsKey(x))
-                    {
-                        if (allColumns.Contains(map.CustomColumnMappings[x]))
-                        {
-                            string name = map.Type.GetProperty(map.CustomColumnMappings[x])?.Name;
-                            string className = map.Type.FullName;
-                        }
-                        else
-                        {
-                            allColumns.Add(map.CustomColumnMappings[x]);
-                        }
-                            
-                    }
-                    if (allColumns.Contains(x))
-                    {
-                        string name = map.Type.GetProperty(x)?.Name;
-                        string className = map.Type.FullName;
-                    }
-
-                    allColumns.Add(x);
-                });
-            }
-
-            int allColumnsCount = allColumns.GroupBy(x => x).Count();
-
-            if (allColumnsCount != allColumns.Count)
-            {
-                return false;
-            }
-
-            return true;
-        }
 
     }
 

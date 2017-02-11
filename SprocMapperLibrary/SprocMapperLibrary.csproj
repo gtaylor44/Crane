@@ -42,6 +42,17 @@
   <ItemGroup>
     <Compile Include="Join.cs" />
     <Compile Include="AbstractSelect.cs" />
+    <Compile Include="Select12.cs" />
+    <Compile Include="Select11.cs" />
+    <Compile Include="Select10.cs" />
+    <Compile Include="Select9.cs" />
+    <Compile Include="Select8.cs" />
+    <Compile Include="Select7.cs" />
+    <Compile Include="Select6.cs" />
+    <Compile Include="Select5.cs" />
+    <Compile Include="Select4.cs" />
+    <Compile Include="Select3.cs" />
+    <Compile Include="Select2.cs" />
     <Compile Include="SprocMapper.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="SprocAddColumn.cs" />

@@ -24,8 +24,8 @@ namespace IntegrationTest
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
                 var result = conn
-                    .Select<President>()
-                    .ExecuteReader(conn, "dbo.GetPresidentList");
+                    .Select(PropertyMapper.MapObject<President>().AddAllColumns().RemoveColumn(x => x.IsHonest).GetMap())
+                    .ExecuteReader(conn, "dbo.GetPresidentList2");
 
                 Assert.IsNotNull(result);
             }
@@ -37,23 +37,22 @@ namespace IntegrationTest
             using (SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
-                var objectMapping = conn
-                    .MapObject<President>()
-                    .AddAllColumns()
-                    .GetMap();
-
-                var objectMapping1 = conn
-                    .MapObject<PresidentAssistant>()
-                    .AddAllColumns()
-                    .CustomColumnMapping(x => x.Id, "AssistantId")
-                    .CustomColumnMapping(x => x.FirstName, "AssistantFirstName")
-                    .CustomColumnMapping(x => x.LastName, "AssistantLastName")
-                    .GetMap();
-
                 Dictionary<int,President> dic = new Dictionary<int, President>();
 
                 conn
-                    .Select(objectMapping, objectMapping1)
+                    .Select(
+                    PropertyMapper
+                    .MapObject<President>()
+                    .AddAllColumns()
+                    .GetMap(),
+
+                    PropertyMapper
+                    .MapObject<PresidentAssistant>()
+                    .AddColumn(x => x.Id, "Assistant Id")
+                    .AddColumn(x => x.FirstName, "Assistant First Name")
+                    .AddColumn(x => x.LastName, "Assistant Last Name")
+                    .GetMap())
+
                     .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
                         President president;

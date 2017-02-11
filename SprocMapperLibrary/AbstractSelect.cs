@@ -11,16 +11,49 @@ namespace SprocMapperLibrary
 {
     public abstract class AbstractSelect
     {
-        private List<SqlParameter> _paramList;
-        private List<ISprocObjectMap> _sprocObjectMapList;
-        private List<Join> _joinManyList;
-        private string _parentKey { get; set; }
+        protected List<SqlParameter> ParamList;
+        protected List<ISprocObjectMap> SprocObjectMapList;
 
-        public AbstractSelect(List<ISprocObjectMap> sprocObjectMapList)
+        protected AbstractSelect(List<ISprocObjectMap> sprocObjectMapList)
         {
-            _paramList = new List<SqlParameter>();
-            _joinManyList = new List<Join>();
-            _sprocObjectMapList = sprocObjectMapList;
+            ParamList = new List<SqlParameter>();
+            SprocObjectMapList = sprocObjectMapList;
+        }
+
+        protected void AddSqlParameterList(List<SqlParameter> paramList)
+        {
+            if (paramList == null)
+                // ReSharper disable once NotResolvedInText
+                throw new ArgumentNullException("AddSqlParameterList does not accept null value");
+
+            ParamList = paramList;
+        }
+
+        protected void ValidateProperties()
+        {
+            if (!SprocMapperHelper.ValidateProperies(SprocObjectMapList))
+            {
+                throw new SprocMapperException($"Duplicate column not allowed. Ensure that all columns in stored procedure are unique." +
+                                               "Try setting an alias for your column in your stored procedure " +
+                                               "and set up a custom column mapping.");
+            }
+        }
+
+        protected void OpenConn(SqlConnection conn)
+        {
+            if (conn.State == ConnectionState.Closed)
+            {
+                conn.Open();
+            }
+        }
+
+        protected void SetCommandProps(SqlCommand command, int commandTimeout)
+        {
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandTimeout = commandTimeout;
+
+            if (ParamList != null && ParamList.Any())
+                command.Parameters.AddRange(ParamList.ToArray());
         }
 
     }

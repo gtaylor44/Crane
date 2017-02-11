@@ -10,9 +10,15 @@ namespace SprocMapperLibrary
     {
         public Select(List<ISprocObjectMap> sprocObjectMapList) : base(sprocObjectMapList){ }
 
-        public new Select<T> AddSqlParameterList(IEnumerable<SqlParameter> paramList)
+        public Select<T> AddSqlParameter(SqlParameter item)
         {
-            base.AddSqlParameterList(paramList);
+            ParamList.Add(item);
+            return this;
+        }
+
+        public Select<T> AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        {
+            ParamList.Add(new SqlParameter(parameterName, dbType) {Value = value});
             return this;
         }
 
@@ -30,8 +36,10 @@ namespace SprocMapperLibrary
 
                 var reader = command.ExecuteReader();
 
-                ValidateSchema(reader);
-                RemoveAbsentColumns(reader);
+                DataTable schema = reader.GetSchemaTable();
+
+                ValidateSchema(schema);
+                RemoveAbsentColumns(schema);
 
                 if (!reader.HasRows)
                     return default(List<T>);

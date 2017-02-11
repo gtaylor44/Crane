@@ -11,24 +11,15 @@ namespace SprocMapperLibrary
 {
     public abstract class AbstractSelect
     {
-        protected IEnumerable<SqlParameter> ParamList;
+        protected ICollection<SqlParameter> ParamList;
         protected List<ISprocObjectMap> SprocObjectMapList;
-        private HashSet<string> AllColumnSet;
+        private readonly HashSet<string> _allColumnSet;
 
         protected AbstractSelect(List<ISprocObjectMap> sprocObjectMapList)
         {
             ParamList = new List<SqlParameter>();
             SprocObjectMapList = sprocObjectMapList;
-            AllColumnSet = new HashSet<string>(StringComparer.Ordinal);
-        }
-
-        protected void AddSqlParameterList(IEnumerable<SqlParameter> paramList)
-        {
-            if (paramList == null)
-                // ReSharper disable once NotResolvedInText
-                throw new ArgumentNullException("AddSqlParameterList does not accept null value");
-
-            ParamList = paramList;
+            _allColumnSet = new HashSet<string>(StringComparer.Ordinal);
         }
 
         protected void ValidateProperties()
@@ -40,21 +31,21 @@ namespace SprocMapperLibrary
                 {
                     if (map.CustomColumnMappings.ContainsKey(x))
                     {
-                        if (AllColumnSet.Contains(map.CustomColumnMappings[x]))
+                        if (_allColumnSet.Contains(map.CustomColumnMappings[x]))
                         {
                             throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(map.CustomColumnMappings[x])?.Name, map.Type.FullName));
                         }
 
-                        AllColumnSet.Add(map.CustomColumnMappings[x]);
+                        _allColumnSet.Add(map.CustomColumnMappings[x]);
 
 
                     }
-                    else if (AllColumnSet.Contains(x))
+                    else if (_allColumnSet.Contains(x))
                     {
                         throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(x)?.Name, map.Type.FullName));
                     }
 
-                    AllColumnSet.Add(x);
+                    _allColumnSet.Add(x);
                 });
             }
         }
@@ -76,10 +67,9 @@ namespace SprocMapperLibrary
                 command.Parameters.AddRange(ParamList.ToArray());
         }
 
-        protected void RemoveAbsentColumns(SqlDataReader reader)
+        protected void RemoveAbsentColumns(DataTable schema)
         {
             HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
-            DataTable schema = reader.GetSchemaTable();
 
             var occurrences1 = schema?.Rows.Cast<DataRow>();
 
@@ -128,7 +118,7 @@ namespace SprocMapperLibrary
             HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
             foreach (var selectParam in schemaColumnSet)
             {
-                if (!AllColumnSet.Contains(selectParam))
+                if (!_allColumnSet.Contains(selectParam))
                     unmatchedParams.Add(selectParam);
             }
 
@@ -139,11 +129,8 @@ namespace SprocMapperLibrary
             }
         }
 
-        protected void ValidateSchema(SqlDataReader reader)
+        protected void ValidateSchema(DataTable schema)
         {
-            // Get the schema which represents the columns in the reader
-            DataTable schema = reader.GetSchemaTable();
-
             var occurrences1 = schema?.Rows.Cast<DataRow>();
 
             if (occurrences1 != null)
@@ -160,7 +147,7 @@ namespace SprocMapperLibrary
                                 if (map.CustomColumnMappings[x].Equals(schemaColumn,
                                     StringComparison.Ordinal))
                                 {
-                                    ValidateColumn(map, schemaColumn, occurence);                                 
+                                    ValidateColumn(map, schemaColumn, occurence);
                                 }
                             }
                             else if (x.Equals(schemaColumn,

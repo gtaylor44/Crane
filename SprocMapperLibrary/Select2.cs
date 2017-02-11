@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 namespace SprocMapperLibrary
 {
@@ -7,11 +8,18 @@ namespace SprocMapperLibrary
     {
         public Select2(List<ISprocObjectMap> sprocObjectMapList) : base(sprocObjectMapList){}
 
-        public new Select2<T> AddSqlParameterList(IEnumerable<SqlParameter> paramList)
+        public Select2<T> AddSqlParameter(SqlParameter item)
         {
-            base.AddSqlParameterList(paramList);
+            ParamList.Add(item);
             return this;
         }
+
+        public Select2<T> AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        {
+            ParamList.Add(new SqlParameter(parameterName, dbType) { Value = value });
+            return this;
+        }
+
 
         public List<T> ExecuteReader<T1, T2>(SqlConnection conn, string procName, Func<T1, T2, T> callBack,
             int commandTimeout = 600)
@@ -26,8 +34,10 @@ namespace SprocMapperLibrary
 
                 var reader = command.ExecuteReader();
 
-                ValidateSchema(reader);
-                RemoveAbsentColumns(reader);
+                DataTable schema = reader.GetSchemaTable();
+
+                ValidateSchema(schema);
+                RemoveAbsentColumns(schema);
 
                 if (!reader.HasRows)
                     return default(List<T>);

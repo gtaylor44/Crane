@@ -25,6 +25,8 @@ namespace SprocMapperLibrary
 
                 var reader = command.ExecuteReader();
 
+                ValidateSchema(reader);
+
                 if (!reader.HasRows)
                     return default(List<T>);
 

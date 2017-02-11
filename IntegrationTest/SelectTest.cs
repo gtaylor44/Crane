@@ -24,7 +24,14 @@ namespace IntegrationTest
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
                 var result = conn
-                    .Select(PropertyMapper.MapObject<President>().AddAllColumns().RemoveColumn(x => x.IsHonest).GetMap())
+                    .Select
+                    (
+                    PropertyMapper.MapObject<President>()
+                    .AddAllColumns()
+                    .GetMap()
+
+                    
+                    )
                     .ExecuteReader(conn, "dbo.GetPresidentList2");
 
                 Assert.IsNotNull(result);

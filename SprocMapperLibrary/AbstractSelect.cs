@@ -56,5 +56,81 @@ namespace SprocMapperLibrary
                 command.Parameters.AddRange(ParamList.ToArray());
         }
 
+        protected void ValidateSchema(SqlDataReader reader)
+        {
+            // Get the schema which represents the columns in the reader
+            DataTable schema = reader.GetSchemaTable();
+
+            // Find all columns in the schema which match the name we're looking for.
+            // schema is a table and each row is a column from our reader.
+            var occurrences = schema?.Rows.Cast<DataRow>().Where(r => string.Equals((string)r["ColumnName"], "IsHonest", StringComparison.Ordinal));
+
+            // Get the nthOccurrence.  Will throw if occurrences is empty.
+            // reader.GetOrdinal will also throw if a column is not present, but you may want to
+            // have this throw a more meaningful exception
+            var occurrence = occurrences?.Skip(1 - 1).FirstOrDefault();
+
+            if (occurrence != null)
+            {
+
+                // return the ordinal
+                int test = (int)occurrence["ColumnOrdinal"];
+
+                Type type = (Type)occurrence["DataType"];
+            }
+
+            var occurrences1 = schema?.Rows.Cast<DataRow>();
+
+            if (occurrences1 != null)
+            {
+                foreach (var occurence in occurrences1)
+                {
+                    string schemaColumn = (string)occurence["ColumnName"];
+                    foreach (var map in SprocObjectMapList)
+                    {
+                        map.Columns.ToList().ForEach(x =>
+                        {
+                            if (map.CustomColumnMappings.ContainsKey(x))
+                            {
+                                if (map.CustomColumnMappings[x].Equals(schemaColumn,
+                                    StringComparison.Ordinal))
+                                {
+                                    ValidateColumn(map, schemaColumn, occurence);                                 
+                                }
+                            }
+                            else if (x.Equals(schemaColumn,
+                                StringComparison.Ordinal))
+                            {
+                                ValidateColumn(map, schemaColumn, occurence);
+
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        private void ValidateColumn(ISprocObjectMap map, string schemaColumn, DataRow occurence)
+        {
+            var property = map.Type.GetProperty(schemaColumn);
+
+            if (property != null)
+            {
+
+                var schemaProperty = (Type)occurence["DataType"];
+
+                Type nullableType;
+                if ((nullableType = Nullable.GetUnderlyingType(property.PropertyType)) != null && schemaProperty != nullableType)
+                {
+                    throw new SprocMapperException($"Type mismatch for column {property.Name}. Expected type of {schemaProperty} but is instead of type {property.PropertyType}");
+                }
+
+                if (schemaProperty != property.PropertyType && nullableType == null)
+                {
+                    throw new SprocMapperException($"Type mismatch for column {property.Name}. Expected type of {schemaProperty} but is instead of type {property.PropertyType}");
+                }
+            }
+        }
+
     }
 }

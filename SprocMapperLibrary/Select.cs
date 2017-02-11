@@ -22,16 +22,13 @@ namespace SprocMapperLibrary
 
             List<T> result = new List<T>();
 
-            if (conn.State == ConnectionState.Closed)
-            {
-                conn.Open();
-            }
-
             using (SqlCommand command = new SqlCommand(cmdText, conn))
             {
                 SetCommandProps(command, commandTimeout);
 
                 var reader = command.ExecuteReader();
+
+                ValidateSchema(reader);
 
                 if (!reader.HasRows)
                     return default(List<T>);

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 namespace SprocMapperLibrary
 {
     public class Select2<T> : AbstractSelect
@@ -27,6 +25,8 @@ namespace SprocMapperLibrary
                 SetCommandProps(command, commandTimeout);
 
                 var reader = command.ExecuteReader();
+
+                ValidateSchema(reader);
 
                 if (!reader.HasRows)
                     return default(List<T>);

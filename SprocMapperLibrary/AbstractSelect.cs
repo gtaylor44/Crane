@@ -31,7 +31,7 @@ namespace SprocMapperLibrary
 
         protected void ValidateProperties()
         {
-            if (!SprocMapperHelper.ValidateProperies(SprocObjectMapList))
+            if (!SprocMapperHelper.ValidateProperies1(SprocObjectMapList))
             {
                 throw new SprocMapperException($"Duplicate column not allowed. Ensure that all columns in stored procedure are unique." +
                                                "Try setting an alias for your column in your stored procedure " +

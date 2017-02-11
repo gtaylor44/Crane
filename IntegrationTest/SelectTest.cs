@@ -46,7 +46,7 @@ namespace IntegrationTest
 
                     PropertyMapper
                     .MapObject<PresidentAssistant>()     
-                    .CustomColumnMapping(x => x.Id, "Assistant Id")               
+                    //.CustomColumnMapping(x => x.Id, "Assistant Id")               
                     .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
                     .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
 

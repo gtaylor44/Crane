@@ -165,6 +165,47 @@ namespace SprocMapperLibrary
             return true;
         }
 
+        public static bool ValidateProperies1(List<ISprocObjectMap> sprocObjectMapList)
+        {
+            HashSet<string> allColumns = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (var map in sprocObjectMapList)
+            {
+                map.Columns.ToList().ForEach(x =>
+                {
+                    if (map.CustomColumnMappings.ContainsKey(x))
+                    {
+                        if (allColumns.Contains(map.CustomColumnMappings[x]))
+                        {
+                            string name = map.Type.GetProperty(map.CustomColumnMappings[x])?.Name;
+                            string className = map.Type.FullName;
+                        }
+                        else
+                        {
+                            allColumns.Add(map.CustomColumnMappings[x]);
+                        }
+                            
+                    }
+                    if (allColumns.Contains(x))
+                    {
+                        string name = map.Type.GetProperty(x)?.Name;
+                        string className = map.Type.FullName;
+                    }
+
+                    allColumns.Add(x);
+                });
+            }
+
+            int allColumnsCount = allColumns.GroupBy(x => x).Count();
+
+            if (allColumnsCount != allColumns.Count)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
     }
 
 

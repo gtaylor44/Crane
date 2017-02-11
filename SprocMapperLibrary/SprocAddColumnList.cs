@@ -20,19 +20,6 @@ namespace SprocMapperLibrary
             _customColumnMappings.Add(propertyName, destination);
             return this;
         }
-        public SprocAddColumnList<T> RemoveColumn(Expression<Func<T, object>> columnName)
-        {
-            var propertyName = SprocMapperHelper.GetPropertyName(columnName);
-            if (_columns.Contains(propertyName))
-                _columns.Remove(propertyName);
-
-            else
-                throw new SprocMapperException("Could not remove the column with name "
-                    + columnName +
-                    ". This could be because it's not a value or string type and therefore not included.");
-
-            return this;
-        }
 
         public SprocObjectMap<T> GetMap()
         {

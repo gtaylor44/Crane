@@ -13,20 +13,21 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public List<T> ExecuteReader<T1, T2>(SqlConnection conn, string cmdText, Func<T1, T2, T> customMethod,
+        public List<T> ExecuteReader<T1, T2>(SqlConnection conn, string procName, Func<T1, T2, T> callBack,
             int commandTimeout = 600)
         {
             ValidateProperties();
             OpenConn(conn);
 
             List<T> result = new List<T>();
-            using (SqlCommand command = new SqlCommand(cmdText, conn))
+            using (SqlCommand command = new SqlCommand(procName, conn))
             {
                 SetCommandProps(command, commandTimeout);
 
                 var reader = command.ExecuteReader();
 
                 ValidateSchema(reader);
+                RemoveAbsentColumns(reader);
 
                 if (!reader.HasRows)
                     return default(List<T>);
@@ -38,7 +39,7 @@ namespace SprocMapperLibrary
                     T2 obj2 = SprocMapperHelper.GetObject<T2>(SprocObjectMapList[1].Columns,
                         SprocObjectMapList[1].CustomColumnMappings, reader);
 
-                    T obj = customMethod.Invoke(obj1, obj2);
+                    T obj = callBack.Invoke(obj1, obj2);
 
                     result.Add(obj);
                 }

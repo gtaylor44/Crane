@@ -15,20 +15,21 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public List<T> ExecuteReader(SqlConnection conn, string cmdText, int commandTimeout = 600)
+        public List<T> ExecuteReader(SqlConnection conn, string procName, int commandTimeout = 600)
         {
             ValidateProperties();
             OpenConn(conn);
 
             List<T> result = new List<T>();
 
-            using (SqlCommand command = new SqlCommand(cmdText, conn))
+            using (SqlCommand command = new SqlCommand(procName, conn))
             {
                 SetCommandProps(command, commandTimeout);
 
                 var reader = command.ExecuteReader();
 
                 ValidateSchema(reader);
+                RemoveAbsentColumns(reader);
 
                 if (!reader.HasRows)
                     return default(List<T>);

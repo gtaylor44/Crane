@@ -56,6 +56,51 @@ namespace SprocMapperLibrary
                 command.Parameters.AddRange(ParamList.ToArray());
         }
 
+        protected void RemoveAbsentColumns(SqlDataReader reader)
+        {
+            HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
+            DataTable schema = reader.GetSchemaTable();
+
+            var occurrences1 = schema?.Rows.Cast<DataRow>();
+
+            if (occurrences1 != null)
+            {
+                foreach (var occurence in occurrences1)
+                {
+                    string schemaColumn = (string)occurence["ColumnName"];
+
+                    if (columns.Contains(schemaColumn))
+                    {
+                        throw new SprocMapperException(
+                            $"Duplicate column not allowed. Ensure that all columns in stored procedure are unique." +
+                            "Try setting an alias for your column in your stored procedure " +
+                            "and set up a custom column mapping.");
+                    }
+
+                    columns.Add(schemaColumn);
+                }
+            }
+
+            foreach (var map in SprocObjectMapList)
+            {
+                map.Columns.ToList().ForEach(x =>
+                {
+                    if (map.CustomColumnMappings.ContainsKey(x))
+                    {
+                        if (!columns.Contains(map.CustomColumnMappings[x]))
+                        {
+                            map.CustomColumnMappings.Remove(map.CustomColumnMappings[x]);
+                        }
+                    }
+                    else if (!columns.Contains(x))
+                    {
+
+                        map.Columns.Remove(x);
+                    }
+                });
+            }
+        }
+
         protected void ValidateSchema(SqlDataReader reader)
         {
             // Get the schema which represents the columns in the reader

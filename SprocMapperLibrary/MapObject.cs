@@ -8,42 +8,52 @@ namespace SprocMapperLibrary
     public class MapObject<T>
     {
         private HashSet<string> Columns { get; set; }
+        private HashSet<string> IgnoreColumns { get; set; }
         private Dictionary<string, string> CustomColumnMappings { get; set; }
-
         public MapObject()
         {
             CustomColumnMappings = new Dictionary<string, string>();
             Columns = new HashSet<string>();
+            IgnoreColumns = new HashSet<string>();
         }
 
-        public SprocAddColumn<T> AddColumn(Expression<Func<T, object>> columnName)
-        {
-            var propertyName = SprocMapperHelper.GetPropertyName(columnName);
-            Columns.Add(propertyName);
-            return new SprocAddColumn<T>(Columns, CustomColumnMappings);
-        }
-
-        public SprocAddColumn<T> AddColumn(Expression<Func<T, object>> columnName, string destination)
-        {
-            if (destination == null)
-                throw new ArgumentNullException(nameof(destination));
-
-            var propertyName = SprocMapperHelper.GetPropertyName(columnName);
-            Columns.Add(propertyName);
-
-            CustomColumnMappings.Add(propertyName, destination);
-
-            return new SprocAddColumn<T>(Columns, CustomColumnMappings);
-        }
+        //public MapObject(HashSet<string> columns, Dictionary<string, string> customColumnMappings)
+        //{
+        //    CustomColumnMappings = customColumnMappings;
+        //    Columns = columns;
+        //}
 
         /// <summary>
         /// Adds all properties in model that are either value, string, char[] or byte[] type. 
         /// </summary>
         /// <returns></returns>
-        public SprocAddColumnList<T> AddAllColumns()
+        internal MapObject<T> AddAllColumns()
         {
-            Columns = SprocMapperHelper.GetAllValueTypeAndStringColumns(typeof(T));
-            return new SprocAddColumnList<T>(Columns, CustomColumnMappings);
+            Columns = SprocMapperHelper.GetAllValueTypeAndStringColumns(typeof(T), IgnoreColumns);
+            return this;
+        }
+
+        public MapObject<T> IgnoreColumn(Expression<Func<T, object>> source)
+        {
+            var propertyName = SprocMapperHelper.GetPropertyName(source);
+            IgnoreColumns.Add(propertyName);
+            return this;
+        }
+
+        public MapObject<T> CustomColumnMapping(Expression<Func<T, object>> source, string destination)
+        {
+            var propertyName = SprocMapperHelper.GetPropertyName(source);
+            CustomColumnMappings.Add(propertyName, destination);
+            return this;
+        }
+
+        internal SprocObjectMap<T> GetMap()
+        {
+            return new SprocObjectMap<T>()
+            {
+                Columns = Columns,
+                CustomColumnMappings = CustomColumnMappings
+            };
         }
     }
 

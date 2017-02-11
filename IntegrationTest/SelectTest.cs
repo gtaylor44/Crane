@@ -24,14 +24,7 @@ namespace IntegrationTest
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
                 var result = conn
-                    .Select
-                    (
-                    PropertyMapper.MapObject<President>()
-                    .AddAllColumns()
-                    .GetMap()
-
-                    
-                    )
+                    .Select<President>()
                     .ExecuteReader(conn, "dbo.GetPresidentList2");
 
                 Assert.IsNotNull(result);
@@ -47,18 +40,15 @@ namespace IntegrationTest
                 Dictionary<int,President> dic = new Dictionary<int, President>();
 
                 conn
-                    .Select(
-                    PropertyMapper
-                    .MapObject<President>()
-                    .AddAllColumns()
-                    .GetMap(),
+                    .Select<President, PresidentAssistant>(
+
+                    null,
 
                     PropertyMapper
-                    .MapObject<PresidentAssistant>()
-                    .AddColumn(x => x.Id, "Assistant Id")
-                    .AddColumn(x => x.FirstName, "Assistant First Name")
-                    .AddColumn(x => x.LastName, "Assistant Last Name")
-                    .GetMap())
+                    .MapObject<PresidentAssistant>()     
+                    .CustomColumnMapping(x => x.Id, "Assistant Id")               
+                    .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
+                    .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
 
                     .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {

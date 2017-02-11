@@ -94,7 +94,7 @@ namespace SprocMapperLibrary
             return memberExpr.Member.Name;
         }
 
-        internal static HashSet<string> GetAllValueTypeAndStringColumns(Type type)
+        internal static HashSet<string> GetAllValueTypeAndStringColumns(Type type, HashSet<string> ignoreColumns)
         {
             HashSet<string> columns = new HashSet<string>();
 
@@ -103,7 +103,7 @@ namespace SprocMapperLibrary
 
             for (int i = 0; i < props.Length; i++)
             {
-                if (CheckForValidDataType(props[i].PropertyType))
+                if (CheckForValidDataType(props[i].PropertyType) && !ignoreColumns.Contains(props[i].Name))
                 {
                     columns.Add(props[i].Name);
                 }

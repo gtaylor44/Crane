@@ -13,11 +13,13 @@ namespace SprocMapperLibrary
     {
         protected IEnumerable<SqlParameter> ParamList;
         protected List<ISprocObjectMap> SprocObjectMapList;
+        private HashSet<string> AllColumnSet;
 
         protected AbstractSelect(List<ISprocObjectMap> sprocObjectMapList)
         {
             ParamList = new List<SqlParameter>();
             SprocObjectMapList = sprocObjectMapList;
+            AllColumnSet = new HashSet<string>(StringComparer.Ordinal);
         }
 
         protected void AddSqlParameterList(IEnumerable<SqlParameter> paramList)
@@ -31,7 +33,6 @@ namespace SprocMapperLibrary
 
         protected void ValidateProperties()
         {
-            HashSet<string> allColumns = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (var map in SprocObjectMapList)
             {
@@ -39,21 +40,21 @@ namespace SprocMapperLibrary
                 {
                     if (map.CustomColumnMappings.ContainsKey(x))
                     {
-                        if (allColumns.Contains(map.CustomColumnMappings[x]))
+                        if (AllColumnSet.Contains(map.CustomColumnMappings[x]))
                         {
                             throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(map.CustomColumnMappings[x])?.Name, map.Type.FullName));
                         }
 
-                        allColumns.Add(map.CustomColumnMappings[x]);
+                        AllColumnSet.Add(map.CustomColumnMappings[x]);
 
 
                     }
-                    else if (allColumns.Contains(x))
+                    else if (AllColumnSet.Contains(x))
                     {
                         throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(x)?.Name, map.Type.FullName));
                     }
 
-                    allColumns.Add(x);
+                    AllColumnSet.Add(x);
                 });
             }
         }
@@ -127,28 +128,7 @@ namespace SprocMapperLibrary
             HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
             foreach (var selectParam in schemaColumnSet)
             {
-                bool found = false;
-
-                foreach (var map in SprocObjectMapList)
-                {
-                    map.Columns.ToList().ForEach(x =>
-                    {
-                        if (map.CustomColumnMappings.ContainsKey(x))
-                        {
-                            if (map.CustomColumnMappings[x] == selectParam)
-                            {
-                                found = true;
-                            }
-                        }
-                        else if (x == selectParam)
-                        {
-                            found = true;
-
-                        }
-                    });
-                }
-
-                if (!found)
+                if (!AllColumnSet.Contains(selectParam))
                     unmatchedParams.Add(selectParam);
             }
 

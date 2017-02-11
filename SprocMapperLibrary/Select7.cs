@@ -7,7 +7,7 @@ namespace SprocMapperLibrary
     {
         public Select7(List<ISprocObjectMap> sprocObjectMapList) : base(sprocObjectMapList){}
 
-        public new Select7<T> AddSqlParameterList(List<SqlParameter> paramList)
+        public new Select7<T> AddSqlParameterList(IEnumerable<SqlParameter> paramList)
         {
             base.AddSqlParameterList(paramList);
             return this;

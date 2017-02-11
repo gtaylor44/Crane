@@ -10,7 +10,7 @@ namespace SprocMapperLibrary
     {
         public Select(List<ISprocObjectMap> sprocObjectMapList) : base(sprocObjectMapList){ }
 
-        public new Select<T> AddSqlParameterList(List<SqlParameter> paramList)
+        public new Select<T> AddSqlParameterList(IEnumerable<SqlParameter> paramList)
         {
             base.AddSqlParameterList(paramList);
             return this;
@@ -47,52 +47,6 @@ namespace SprocMapperLibrary
             return result;
 
         }
-
-        public List<string> GetAbsentProperties(SqlConnection conn, string procName)
-        {
-            OpenConn(conn);
-            using (SqlCommand command = new SqlCommand(procName, conn))
-            {
-
-                //var reader = command.ExecuteReader();
-
-
-
-                command.CommandType = CommandType.StoredProcedure;
-
-
-                var reader = command.ExecuteReader(CommandBehavior.KeyInfo);
-
-                ValidateProperties();
-                RemoveAbsentColumns(reader);
-
-                //Retrieve column schema into a DataTable.
-                var schema = reader.GetSchemaTable();
-
-                HashSet<string> missingColumnSet = new HashSet<string>();
-
-                var occurrences1 = schema?.Rows.Cast<DataRow>();
-
-                if (occurrences1 != null)
-                {
-                    HashSet<string> mappedColumnSet = new HashSet<string>();
-
-                    foreach (var occurence in occurrences1)
-                    {
-                        string schemaColumn = (string)occurence["ColumnName"];
-
-                        foreach (ISprocObjectMap map in SprocObjectMapList)
-                        {
-                            
-                        }
-                    }
-                }
-
-
-                return null;
-            }
-        }
-
     }
 
 }

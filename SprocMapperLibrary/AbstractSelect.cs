@@ -11,7 +11,7 @@ namespace SprocMapperLibrary
 {
     public abstract class AbstractSelect
     {
-        protected List<SqlParameter> ParamList;
+        protected IEnumerable<SqlParameter> ParamList;
         protected List<ISprocObjectMap> SprocObjectMapList;
 
         protected AbstractSelect(List<ISprocObjectMap> sprocObjectMapList)
@@ -20,7 +20,7 @@ namespace SprocMapperLibrary
             SprocObjectMapList = sprocObjectMapList;
         }
 
-        protected void AddSqlParameterList(List<SqlParameter> paramList)
+        protected void AddSqlParameterList(IEnumerable<SqlParameter> paramList)
         {
             if (paramList == null)
                 // ReSharper disable once NotResolvedInText
@@ -118,30 +118,51 @@ namespace SprocMapperLibrary
                     }
                 });
             }
+
+            ValidateSelectParams(columns);
+        }
+
+        private void ValidateSelectParams(HashSet<string> schemaColumnSet)
+        {
+            HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var selectParam in schemaColumnSet)
+            {
+                bool found = false;
+
+                foreach (var map in SprocObjectMapList)
+                {
+                    map.Columns.ToList().ForEach(x =>
+                    {
+                        if (map.CustomColumnMappings.ContainsKey(x))
+                        {
+                            if (map.CustomColumnMappings[x] == selectParam)
+                            {
+                                found = true;
+                            }
+                        }
+                        else if (x == selectParam)
+                        {
+                            found = true;
+
+                        }
+                    });
+                }
+
+                if (!found)
+                    unmatchedParams.Add(selectParam);
+            }
+
+            if (unmatchedParams.Count > 0)
+            {
+                string message = string.Join(", ", unmatchedParams.ToList());
+                throw new SprocMapperException($"The following select params were not mapped: {message}");
+            }
         }
 
         protected void ValidateSchema(SqlDataReader reader)
         {
             // Get the schema which represents the columns in the reader
             DataTable schema = reader.GetSchemaTable();
-
-            // Find all columns in the schema which match the name we're looking for.
-            // schema is a table and each row is a column from our reader.
-            var occurrences = schema?.Rows.Cast<DataRow>().Where(r => string.Equals((string)r["ColumnName"], "IsHonest", StringComparison.Ordinal));
-
-            // Get the nthOccurrence.  Will throw if occurrences is empty.
-            // reader.GetOrdinal will also throw if a column is not present, but you may want to
-            // have this throw a more meaningful exception
-            var occurrence = occurrences?.Skip(1 - 1).FirstOrDefault();
-
-            if (occurrence != null)
-            {
-
-                // return the ordinal
-                int test = (int)occurrence["ColumnOrdinal"];
-
-                Type type = (Type)occurrence["DataType"];
-            }
 
             var occurrences1 = schema?.Rows.Cast<DataRow>();
 

@@ -31,18 +31,6 @@ namespace IntegrationTest
         }
 
         [TestMethod]
-        public void TestMethod4()
-        {
-            using (SqlConnection conn =
-                new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
-            {
-                var result = conn.Select<President>().GetAbsentProperties(conn, "dbo.GetPresidentList2");
-
-                Assert.IsNotNull(result);
-            }
-        }
-
-        [TestMethod]
         public void TestMethod3()
         {
             using (SqlConnection conn =

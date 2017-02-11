@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
 using System.Data.SqlClient;
+using System.Reflection;
 using Model;
 using Moq;
 
@@ -24,7 +26,9 @@ namespace UnitTest
             moq.Setup(x => x["LastName"]).Returns("Trump");
             moq.Setup(x => x["IsHonest"]).Returns(true);
 
-            var result = SprocMapperHelper.GetObject<President>(columns, new Dictionary<string, string>(), moq.Object);
+            ConcurrentDictionary<string, PropertyInfo> concurrentDic = new ConcurrentDictionary<string, PropertyInfo>();
+
+            var result = SprocMapperHelper.GetObject<President>(columns, new Dictionary<string, string>(), moq.Object, concurrentDic);
 
             Assert.AreEqual(5, result.Fans);
             Assert.AreEqual("Donald", result.FirstName);

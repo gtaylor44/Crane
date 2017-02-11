@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
@@ -10,14 +11,9 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader) 
+        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, ConcurrentDictionary<string, PropertyInfo> objPropertyCache) 
         {
             T targetObject = NewInstance<T>.Instance();
-
-            //foreach (var prop in targetObject.GetType().GetProperties())
-            //{
-            //    var propTest = prop;
-            //}
 
             foreach (var column in columns)
             {
@@ -31,10 +27,15 @@ namespace SprocMapperLibrary
                     actualColumn = column;
                 }
 
-                Type objType = targetObject.GetType();
-                PropertyInfo prop = objType.GetProperty(column);
+                PropertyInfo prop;
+                if (!objPropertyCache.TryGetValue(column, out prop))
+                {
+                    PropertyInfo propInfo = targetObject.GetType().GetProperty(column);
+                    objPropertyCache.TryAdd(column, propInfo);
 
-               
+                    prop = propInfo;
+                }
+        
                 if (prop != null)
                 {
                     object readerObj = reader[actualColumn];

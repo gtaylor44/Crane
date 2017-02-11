@@ -1,8 +1,8 @@
-﻿using System;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
+using System.Reflection;
 
 namespace SprocMapperLibrary
 {
@@ -22,13 +22,12 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public List<T> ExecuteReader(SqlConnection conn, string procName, int commandTimeout = 600)
+        public IEnumerable<T> ExecuteReader(SqlConnection conn, string procName, int commandTimeout = 600)
         {
             ValidateProperties();
             OpenConn(conn);
 
             List<T> result = new List<T>();
-
 
             using (SqlCommand command = new SqlCommand(procName, conn))
             {
@@ -44,10 +43,12 @@ namespace SprocMapperLibrary
                 if (!reader.HasRows)
                     return default(List<T>);
 
+                ConcurrentDictionary<string, PropertyInfo> objPropertyCache = new ConcurrentDictionary<string, PropertyInfo>();
+
                 while (reader.Read())
                 {
                     T obj = SprocMapperHelper.GetObject<T>(SprocObjectMapList[0].Columns,
-                        SprocObjectMapList[0].CustomColumnMappings, reader);
+                        SprocObjectMapList[0].CustomColumnMappings, reader, objPropertyCache);
                     result.Add(obj);
                 }
 

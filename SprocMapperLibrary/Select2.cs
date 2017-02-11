@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
+
 namespace SprocMapperLibrary
 {
     public class Select2<T> : AbstractSelect
@@ -21,7 +24,7 @@ namespace SprocMapperLibrary
         }
 
 
-        public List<T> ExecuteReader<T1, T2>(SqlConnection conn, string procName, Func<T1, T2, T> callBack,
+        public IEnumerable<T> ExecuteReader<T1, T2>(SqlConnection conn, string procName, Func<T1, T2, T> callBack,
             int commandTimeout = 600)
         {
             ValidateProperties();
@@ -42,12 +45,15 @@ namespace SprocMapperLibrary
                 if (!reader.HasRows)
                     return default(List<T>);
 
+                ConcurrentDictionary<string, PropertyInfo> objPropertyCache = new ConcurrentDictionary<string, PropertyInfo>();
+                ConcurrentDictionary<string, PropertyInfo> obj2PropertyCache = new ConcurrentDictionary<string, PropertyInfo>();
+
                 while (reader.Read())
                 {
                     T1 obj1 = SprocMapperHelper.GetObject<T1>(SprocObjectMapList[0].Columns,
-                        SprocObjectMapList[0].CustomColumnMappings, reader);
+                        SprocObjectMapList[0].CustomColumnMappings, reader, objPropertyCache);
                     T2 obj2 = SprocMapperHelper.GetObject<T2>(SprocObjectMapList[1].Columns,
-                        SprocObjectMapList[1].CustomColumnMappings, reader);
+                        SprocObjectMapList[1].CustomColumnMappings, reader, obj2PropertyCache);
 
                     T obj = callBack.Invoke(obj1, obj2);
 

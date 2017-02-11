@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace SprocMapperLibrary
 {
@@ -125,7 +122,7 @@ namespace SprocMapperLibrary
             if (unmatchedParams.Count > 0)
             {
                 string message = string.Join(", ", unmatchedParams.ToList());
-                throw new SprocMapperException($"The following select params were not mapped: {message}");
+                throw new SprocMapperException($"The following select params are not mapped: {message}");
             }
         }
 

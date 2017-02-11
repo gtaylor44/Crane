@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Join.cs" />
+    <Compile Include="AbstractSelect.cs" />
     <Compile Include="SprocMapper.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="SprocAddColumn.cs" />

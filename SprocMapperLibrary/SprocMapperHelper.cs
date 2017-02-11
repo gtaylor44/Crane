@@ -10,9 +10,14 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(Type targetObj, HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, string joinKey = null) 
+        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader) 
         {
-            T targetObject = (T)Activator.CreateInstance(targetObj);
+            T targetObject = NewInstance<T>.Instance();
+
+            //foreach (var prop in targetObject.GetType().GetProperties())
+            //{
+            //    var propTest = prop;
+            //}
 
             foreach (var column in columns)
             {
@@ -33,9 +38,6 @@ namespace SprocMapperLibrary
                 if (prop != null)
                 {
                     object readerObj = reader[actualColumn];
-
-                    if (readerObj == DBNull.Value && actualColumn.Equals(joinKey))
-                        return default(T);
 
                     if (readerObj == DBNull.Value)
                     {
@@ -60,15 +62,6 @@ namespace SprocMapperLibrary
             }
 
             return dic;
-        }
-
-        public static object GetDefault(Type type)
-        {
-            if (type.IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-            return null;
         }
 
         internal static class NewInstance<T>
@@ -145,11 +138,31 @@ namespace SprocMapperLibrary
 
             return false;
         }
-        public static bool ValidateProperies(HashSet<string> columns, Dictionary<string, string> customColumnMappings)
+        public static bool ValidateProperies(List<ISprocObjectMap> sprocObjectMapList)
         {
-            HashSet<string> propertySet = new HashSet<string>();
+            List<string> allColumns = new List<string>();
 
-            return false;
+            foreach (var map in sprocObjectMapList)
+            {
+                map.Columns.ToList().ForEach(x =>
+                {
+                    if (map.CustomColumnMappings.ContainsKey(x))
+                    {
+                        allColumns.Add(map.CustomColumnMappings[x]);
+                        return;
+                    }
+                    allColumns.Add(x);
+                });
+            }
+
+            int allColumnsCount = allColumns.GroupBy(x => x).Count();
+
+            if (allColumnsCount != allColumns.Count)
+            {
+                return false;
+            }
+
+            return true;
         }
 
     }

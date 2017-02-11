@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using IntegrationTest.Initialise;
@@ -18,7 +18,21 @@ namespace IntegrationTest
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void TestMethod2()
+        {
+            using (SqlConnection conn =
+                new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
+            {
+                var result = conn
+                    .Select<President>()
+                    .ExecuteReader(conn, "dbo.GetPresidentList");
+
+                Assert.IsNotNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void TestMethod3()
         {
             using (SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
@@ -36,27 +50,29 @@ namespace IntegrationTest
                     .CustomColumnMapping(x => x.LastName, "AssistantLastName")
                     .GetMap();
 
-                var result = conn
-                    .Select(objectMapping)
-                    .JoinMany(objectMapping1, x => x.PresidentAssistantList, x => x.PresidentId)
-                    .SetParentKey(x => x.Id)
-                    .ExecuteReader(conn, "dbo.GetPresidentList");
+                Dictionary<int,President> dic = new Dictionary<int, President>();
 
-                Assert.AreEqual(5, result.Count);
-            }
-        }
+                conn
+                    .Select(objectMapping, objectMapping1)
+                    .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
+                    {
+                        President president;
+                        if (!dic.TryGetValue(p.Id, out president))
+                        {
+                            p.PresidentAssistantList = new List<PresidentAssistant>();
+                            dic.Add(p.Id, p);                          
+                        }
 
-        [TestMethod]
-        public void TestMethod2()
-        {
-            using (SqlConnection conn =
-                new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
-            {
-                var result = conn
-                    .Select<President>()
-                    .ExecuteReader(conn, "dbo.GetPresidentList");
+                        president = dic[p.Id];
 
-                Assert.IsNotNull(result);
+                        if (pa.Id != default(int))
+                        {
+                            president.PresidentAssistantList.Add(pa);
+                        }
+                        return p;
+                    });
+
+                Assert.IsNotNull(dic.Values);
             }
         }
     }

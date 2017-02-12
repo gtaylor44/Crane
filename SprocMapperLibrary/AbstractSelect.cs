@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using FastMember;
 
 namespace SprocMapperLibrary
 {
@@ -154,13 +155,13 @@ namespace SprocMapperLibrary
                                 if (map.CustomColumnMappings[x].Equals(schemaColumn,
                                     StringComparison.Ordinal))
                                 {
-                                    ValidateColumn(map, schemaColumn, occurence);
+                                    ValidateColumn(map, x, occurence);
                                 }
                             }
                             else if (x.Equals(schemaColumn,
                                 StringComparison.Ordinal))
                             {
-                                ValidateColumn(map, schemaColumn, occurence);
+                                ValidateColumn(map, x, occurence);
 
                             }
                         });
@@ -171,23 +172,24 @@ namespace SprocMapperLibrary
 
         private void ValidateColumn(ISprocObjectMap map, string schemaColumn, DataRow occurence)
         {
-            var property = map.Type.GetProperty(schemaColumn);
-
-            if (property != null)
+            Member member;
+            
+            if (!map.MemberInfoCache.TryGetValue(schemaColumn, out member))
             {
+                throw new KeyNotFoundException($"Could not get schema property {schemaColumn}");
+            }
+            
+            var schemaProperty = (Type)occurence["DataType"];
 
-                var schemaProperty = (Type)occurence["DataType"];
+            Type nullableType;
+            if ((nullableType = Nullable.GetUnderlyingType(member.Type)) != null && schemaProperty != nullableType)
+            {
+                throw new SprocMapperException($"Type mismatch for column {member.Name}. Expected type of {schemaProperty} but is instead of type {member.Type}");
+            }
 
-                Type nullableType;
-                if ((nullableType = Nullable.GetUnderlyingType(property.PropertyType)) != null && schemaProperty != nullableType)
-                {
-                    throw new SprocMapperException($"Type mismatch for column {property.Name}. Expected type of {schemaProperty} but is instead of type {property.PropertyType}");
-                }
-
-                if (schemaProperty != property.PropertyType && nullableType == null)
-                {
-                    throw new SprocMapperException($"Type mismatch for column {property.Name}. Expected type of {schemaProperty} but is instead of type {property.PropertyType}");
-                }
+            if (schemaProperty != member.Type && nullableType == null)
+            {
+                throw new SprocMapperException($"Type mismatch for column {member.Name}. Expected type of {schemaProperty} but is instead of type {member.Type}");
             }
         }
 

@@ -4,21 +4,24 @@ using System.Configuration;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
+using FastMember;
 
 namespace SprocMapperLibrary
 {
     public class MapObject<T>
     {
-        private HashSet<string> Columns { get; set; }
-        private HashSet<string> IgnoreColumns { get; set; }
-        private Dictionary<string, string> CustomColumnMappings { get; set; }
-        private Dictionary<string, PropertyInfo> PropertyInfoCache { get; set; }
+        internal HashSet<string> Columns { get; set; }
+        internal HashSet<string> IgnoreColumns { get; set; }
+        internal Dictionary<string, string> CustomColumnMappings { get; set; }
+        internal Dictionary<string, Member> MemberInfoCache { get; set; }
+        internal TypeAccessor TypeAccessor { get; set; }
+
         public MapObject()
         {
             CustomColumnMappings = new Dictionary<string, string>();
             Columns = new HashSet<string>();
             IgnoreColumns = new HashSet<string>();
-            PropertyInfoCache = new Dictionary<string, PropertyInfo>();
+            MemberInfoCache = new Dictionary<string, Member>();
         }
 
         /// <summary>
@@ -27,7 +30,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         internal MapObject<T> AddAllColumns()
         {
-            Columns = SprocMapperHelper.GetAllValueTypeAndStringColumns(typeof(T), IgnoreColumns, PropertyInfoCache);
+            Columns = SprocMapperHelper.GetAllValueTypeAndStringColumns(this);
             return this;
         }
 
@@ -51,7 +54,8 @@ namespace SprocMapperLibrary
             {
                 Columns = Columns,
                 CustomColumnMappings = CustomColumnMappings,
-                PropertyInfoCache = PropertyInfoCache        
+                MemberInfoCache = MemberInfoCache,
+                TypeAccessor = TypeAccessor
             };
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FastMember;
 
 namespace SprocMapperLibrary
 {
@@ -8,7 +9,7 @@ namespace SprocMapperLibrary
     {
         public SprocObjectMap()
         {
-            PropertyInfoCache = new Dictionary<string, PropertyInfo>();
+            MemberInfoCache = new Dictionary<string, Member>();
             CustomColumnMappings = new Dictionary<string, string>();
             Columns = new HashSet<string>();
             Type = typeof(T);
@@ -16,7 +17,8 @@ namespace SprocMapperLibrary
         public Type Type { get; set; }
         public HashSet<string> Columns { get; set; }
         public Dictionary<string, string> CustomColumnMappings { get; set; }
-        public Dictionary<string, PropertyInfo> PropertyInfoCache { get; set; }
+        public Dictionary<string, Member> MemberInfoCache { get; set; }
+        public TypeAccessor TypeAccessor { get; set; }
     }
 
     public interface ISprocObjectMap
@@ -24,6 +26,7 @@ namespace SprocMapperLibrary
         Type Type { get; set; }
         HashSet<string> Columns { get; set; }
         Dictionary<string, string> CustomColumnMappings { get; set; }
-        Dictionary<string, PropertyInfo> PropertyInfoCache { get; set; }
+        Dictionary<string, Member> MemberInfoCache { get; set; }
+        TypeAccessor TypeAccessor { get; set; }
     }
 }

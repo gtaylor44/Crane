@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using FastMember;
@@ -11,56 +12,43 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader) 
+        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)
         {
             T targetObject = NewInstance<T>.Instance();
 
             foreach (var column in sprocObjectMap.Columns)
             {
-                string actualColumn;
-                if (sprocObjectMap.CustomColumnMappings.ContainsKey(column))
+                var actualColumn = sprocObjectMap.CustomColumnMappings.ContainsKey(column)
+                    ? sprocObjectMap.CustomColumnMappings[column] : column;
+
+                Member member;
+                if (!sprocObjectMap.MemberInfoCache.TryGetValue(column, out member))
                 {
-                    actualColumn = sprocObjectMap.CustomColumnMappings[column];
+                    throw new KeyNotFoundException($"Could not get property for column {column}");
                 }
+
+
+                object readerObj = reader[actualColumn];
+
+                if (readerObj == DBNull.Value)
+                {
+                    sprocObjectMap.TypeAccessor[targetObject, member.Name] = GetDefaultValue(member);
+                }
+
                 else
                 {
-                    actualColumn = column;
+                    sprocObjectMap.TypeAccessor[targetObject, member.Name] = readerObj;
                 }
 
-                PropertyInfo prop;
-                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out prop))
-                {
-                    PropertyInfo propInfo = targetObject.GetType().GetProperty(column);
-                    sprocObjectMap.PropertyInfoCache.Add(column, propInfo);
-
-                    prop = propInfo;
-                }
-
-                if (prop != null)
-                {
-                    object readerObj = reader[actualColumn];
-
-                    if (readerObj == DBNull.Value)
-                    {
-                        var accessor = TypeAccessor.Create(targetObject.GetType());
-                        accessor[targetObject, prop.Name] = GetDefaultValue(prop);
-                    }
-
-                    else
-                    {
-                        var accessor = TypeAccessor.Create(targetObject.GetType());
-                        accessor[targetObject, prop.Name] = readerObj;
-                    }
-                }
             }
 
             return targetObject;
         }
 
-        static object GetDefaultValue(PropertyInfo prop)
+        static object GetDefaultValue(Member member)
         {
-            if (prop.PropertyType.IsValueType)
-                return Activator.CreateInstance(prop.PropertyType);
+            if (member.Type.IsValueType)
+                return Activator.CreateInstance(member.Type);
             return null;
         }
 
@@ -77,7 +65,7 @@ namespace SprocMapperLibrary
 
         internal static class NewInstance<T>
         {
-            public static readonly Func<T> Instance = 
+            public static readonly Func<T> Instance =
                 Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
         }
 
@@ -105,19 +93,22 @@ namespace SprocMapperLibrary
             return memberExpr.Member.Name;
         }
 
-        internal static HashSet<string> GetAllValueTypeAndStringColumns(Type type, HashSet<string> ignoreColumns, Dictionary<string, PropertyInfo> propertyInfoCache)
+        internal static HashSet<string> GetAllValueTypeAndStringColumns<T>(MapObject<T> mapObject)
         {
             HashSet<string> columns = new HashSet<string>();
 
-            //Get all the properties
-            PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var typeAccessor = TypeAccessor.Create(typeof(T));
+            mapObject.TypeAccessor = typeAccessor;
 
-            for (int i = 0; i < props.Length; i++)
+            //Get all properties
+            MemberSet members = typeAccessor.GetMembers();
+
+            foreach (var member in members)
             {
-                if (CheckForValidDataType(props[i].PropertyType) && !ignoreColumns.Contains(props[i].Name))
+                if (CheckForValidDataType(member.Type) && !mapObject.IgnoreColumns.Contains(member.Name))
                 {
-                    columns.Add(props[i].Name);
-                    propertyInfoCache.Add(props[i].Name, props[i]);
+                    columns.Add(member.Name);
+                    mapObject.MemberInfoCache.Add(member.Name, member);
                 }
             }
 

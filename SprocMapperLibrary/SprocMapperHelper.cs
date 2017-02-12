@@ -11,16 +11,16 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, Dictionary<string, PropertyInfo> objPropertyCache) 
+        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader) 
         {
             T targetObject = NewInstance<T>.Instance();
 
-            foreach (var column in columns)
+            foreach (var column in sprocObjectMap.Columns)
             {
                 string actualColumn;
-                if (customColumnMappings.ContainsKey(column))
+                if (sprocObjectMap.CustomColumnMappings.ContainsKey(column))
                 {
-                    actualColumn = customColumnMappings[column];
+                    actualColumn = sprocObjectMap.CustomColumnMappings[column];
                 }
                 else
                 {
@@ -28,14 +28,14 @@ namespace SprocMapperLibrary
                 }
 
                 PropertyInfo prop;
-                if (!objPropertyCache.TryGetValue(column, out prop))
+                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out prop))
                 {
                     PropertyInfo propInfo = targetObject.GetType().GetProperty(column);
-                    objPropertyCache.Add(column, propInfo);
+                    sprocObjectMap.PropertyInfoCache.Add(column, propInfo);
 
                     prop = propInfo;
                 }
-        
+
                 if (prop != null)
                 {
                     object readerObj = reader[actualColumn];

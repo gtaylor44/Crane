@@ -28,7 +28,12 @@ namespace UnitTest
 
             Dictionary<string, PropertyInfo> concurrentDic = new Dictionary<string, PropertyInfo>();
 
-            var result = SprocMapperHelper.GetObject<President>(columns, new Dictionary<string, string>(), moq.Object, concurrentDic);
+            ISprocObjectMap objectMap = new SprocObjectMap<President>()
+            {
+                Columns = columns
+            };
+
+            var result = SprocMapperHelper.GetObject<President>(objectMap, moq.Object);
 
             Assert.AreEqual(5, result.Fans);
             Assert.AreEqual("Donald", result.FirstName);

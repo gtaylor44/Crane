@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FastMember, Version=1.0.0.9, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FastMember.1.1.0\lib\net40\FastMember.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,12 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractSelect.cs" />
-    <Compile Include="FastMember\CallSiteCache.cs" />
-    <Compile Include="FastMember\MemberSet.cs" />
-    <Compile Include="FastMember\ObjectAccessor.cs" />
-    <Compile Include="FastMember\ObjectReader.cs" />
-    <Compile Include="FastMember\TypeAccessor.cs" />
-    <Compile Include="FastMember\TypeHelpers.cs" />
     <Compile Include="Select12.cs" />
     <Compile Include="Select11.cs" />
     <Compile Include="Select10.cs" />
@@ -65,6 +63,9 @@
     <Compile Include="SprocMapperException.cs" />
     <Compile Include="SprocMapperHelper.cs" />
     <Compile Include="SprocObjectMap.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

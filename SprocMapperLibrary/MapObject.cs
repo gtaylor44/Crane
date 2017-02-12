@@ -17,12 +17,6 @@ namespace SprocMapperLibrary
             IgnoreColumns = new HashSet<string>();
         }
 
-        //public MapObject(HashSet<string> columns, Dictionary<string, string> customColumnMappings)
-        //{
-        //    CustomColumnMappings = customColumnMappings;
-        //    Columns = columns;
-        //}
-
         /// <summary>
         /// Adds all properties in model that are either value, string, char[] or byte[] type. 
         /// </summary>

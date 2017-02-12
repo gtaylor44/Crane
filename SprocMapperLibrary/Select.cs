@@ -43,12 +43,10 @@ namespace SprocMapperLibrary
                 if (!reader.HasRows)
                     return default(List<T>);
 
-                Dictionary<string, PropertyInfo> objPropertyCache = new Dictionary<string, PropertyInfo>();
-
                 while (reader.Read())
                 {
-                    T obj = SprocMapperHelper.GetObject<T>(SprocObjectMapList[0].Columns,
-                        SprocObjectMapList[0].CustomColumnMappings, reader, objPropertyCache);
+                    T obj = SprocMapperHelper.GetObject<T>(SprocObjectMapList[0], reader);
+
                     result.Add(obj);
                 }
 

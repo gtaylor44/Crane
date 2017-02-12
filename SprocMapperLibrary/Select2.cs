@@ -45,15 +45,10 @@ namespace SprocMapperLibrary
                 if (!reader.HasRows)
                     return default(List<T>);
 
-                Dictionary<string, PropertyInfo> objPropertyCache = new Dictionary<string, PropertyInfo>();
-                Dictionary<string, PropertyInfo> obj2PropertyCache = new Dictionary<string, PropertyInfo>();
-
                 while (reader.Read())
                 {
-                    T1 obj1 = SprocMapperHelper.GetObject<T1>(SprocObjectMapList[0].Columns,
-                        SprocObjectMapList[0].CustomColumnMappings, reader, objPropertyCache);
-                    T2 obj2 = SprocMapperHelper.GetObject<T2>(SprocObjectMapList[1].Columns,
-                        SprocObjectMapList[1].CustomColumnMappings, reader, obj2PropertyCache);
+                    T1 obj1 = SprocMapperHelper.GetObject<T1>(SprocObjectMapList[0], reader);
+                    T2 obj2 = SprocMapperHelper.GetObject<T2>(SprocObjectMapList[1], reader);
 
                     T obj = callBack.Invoke(obj1, obj2);
 

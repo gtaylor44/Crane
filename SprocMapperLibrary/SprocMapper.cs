@@ -35,14 +35,10 @@ namespace SprocMapperLibrary
             return new Select<T>(objectMapList);
         }
 
-        public static Select<T> Select<T, T1>(this IDbConnection conn, MapObject<T> objectMap = null, MapObject<T1> objectMap2 = null)
+        public static Select<T> Select<T, T1>(this IDbConnection conn)
         {
-            List<ISprocObjectMap> objectMapList = new List<ISprocObjectMap>();
 
-            MapObject(objectMap, objectMapList);
-            MapObject(objectMap2, objectMapList);
-
-            return new Select<T>(objectMapList);
+            return new Select<T>(null);
         }
 
         public static Select<T> Select<T, T1, T2>(this IDbConnection conn, MapObject<T> objectMap = null, MapObject<T1> objectMap2 = null, 

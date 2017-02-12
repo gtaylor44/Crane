@@ -57,8 +57,15 @@ namespace SprocMapperLibrary
         }
 
         public IEnumerable<T> ExecuteReader<T1, T2>(SqlConnection conn, string procName, Func<T1, T2, T> callBack,
+            MapObject<T1> objectMap = null, MapObject<T2> objectMap2 = null,
             int commandTimeout = 600)
         {
+            SprocObjectMapList = new List<ISprocObjectMap>();
+            //List<ISprocObjectMap> objectMapList = new List<ISprocObjectMap>();
+
+            MapObject(objectMap, SprocObjectMapList);
+            MapObject(objectMap2, SprocObjectMapList);
+
             ValidateProperties();
             OpenConn(conn);
 
@@ -494,6 +501,16 @@ int commandTimeout = 600)
 
             }
             return result;
+        }
+
+        private static void MapObject<T>(MapObject<T> map, List<ISprocObjectMap> mapList)
+        {
+            if (map == null)
+                map = PropertyMapper.MapObject<T>();
+
+            map.AddAllColumns();
+
+            mapList.Add(map.GetMap());
         }
     }
 

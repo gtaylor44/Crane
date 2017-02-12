@@ -39,15 +39,7 @@ namespace IntegrationTest
             {
                 Dictionary<int, President> dic = new Dictionary<int, President>();
 
-                conn.Select<President, PresidentAssistant>(
-
-                        null,
-
-                        PropertyMapper
-                            .MapObject<PresidentAssistant>()
-                            .CustomColumnMapping(x => x.Id, "Assistant Id")
-                            .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
-                            .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
+                conn.Select<President, PresidentAssistant>()
 
                     .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
@@ -65,7 +57,15 @@ namespace IntegrationTest
                             president.PresidentAssistantList.Add(pa);
                         }
                         return p;
-                    });
+                    },
+                       null,
+
+                        PropertyMapper
+                            .MapObject<PresidentAssistant>()
+                            .CustomColumnMapping(x => x.Id, "Assistant Id")
+                            .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
+                            .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
+                    );
 
                 Assert.IsNotNull(dic.Values);
             }

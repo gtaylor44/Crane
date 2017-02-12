@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FastMember, Version=1.0.0.9, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FastMember.1.1.0\lib\net40\FastMember.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Join.cs" />
     <Compile Include="AbstractSelect.cs" />
     <Compile Include="Select12.cs" />
     <Compile Include="Select11.cs" />
@@ -55,13 +58,14 @@
     <Compile Include="Select2.cs" />
     <Compile Include="SprocMapper.cs" />
     <Compile Include="Select.cs" />
-    <Compile Include="SprocAddColumn.cs" />
-    <Compile Include="SprocAddColumnList.cs" />
     <Compile Include="MapObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SprocMapperException.cs" />
     <Compile Include="SprocMapperHelper.cs" />
     <Compile Include="SprocObjectMap.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -44,10 +44,10 @@ namespace SprocMapperLibrary
                 if (!reader.HasRows)
                     return default(List<T>);
 
-                ConcurrentDictionary<string, PropertyInfo> objPropertyCache = new ConcurrentDictionary<string, PropertyInfo>();
-                ConcurrentDictionary<string, PropertyInfo> objPropertyCache2 = new ConcurrentDictionary<string, PropertyInfo>();
-                ConcurrentDictionary<string, PropertyInfo> objPropertyCache3 = new ConcurrentDictionary<string, PropertyInfo>();
-                ConcurrentDictionary<string, PropertyInfo> objPropertyCache4 = new ConcurrentDictionary<string, PropertyInfo>();
+                Dictionary<string, PropertyInfo> objPropertyCache = new Dictionary<string, PropertyInfo>();
+                Dictionary<string, PropertyInfo> objPropertyCache2 = new Dictionary<string, PropertyInfo>();
+                Dictionary<string, PropertyInfo> objPropertyCache3 = new Dictionary<string, PropertyInfo>();
+                Dictionary<string, PropertyInfo> objPropertyCache4 = new Dictionary<string, PropertyInfo>();
 
                 while (reader.Read())
                 {

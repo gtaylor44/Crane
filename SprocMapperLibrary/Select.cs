@@ -43,7 +43,7 @@ namespace SprocMapperLibrary
                 if (!reader.HasRows)
                     return default(List<T>);
 
-                ConcurrentDictionary<string, PropertyInfo> objPropertyCache = new ConcurrentDictionary<string, PropertyInfo>();
+                Dictionary<string, PropertyInfo> objPropertyCache = new Dictionary<string, PropertyInfo>();
 
                 while (reader.Read())
                 {

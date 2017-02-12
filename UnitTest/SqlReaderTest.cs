@@ -26,7 +26,7 @@ namespace UnitTest
             moq.Setup(x => x["LastName"]).Returns("Trump");
             moq.Setup(x => x["IsHonest"]).Returns(true);
 
-            ConcurrentDictionary<string, PropertyInfo> concurrentDic = new ConcurrentDictionary<string, PropertyInfo>();
+            Dictionary<string, PropertyInfo> concurrentDic = new Dictionary<string, PropertyInfo>();
 
             var result = SprocMapperHelper.GetObject<President>(columns, new Dictionary<string, string>(), moq.Object, concurrentDic);
 

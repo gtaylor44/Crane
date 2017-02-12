@@ -3,15 +3,15 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using FastMember;
 
 namespace SprocMapperLibrary
 {
     public static class SprocMapperHelper
     {
-        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, ConcurrentDictionary<string, PropertyInfo> objPropertyCache) 
+        public static T GetObject<T>(HashSet<string> columns, Dictionary<string, string> customColumnMappings, IDataReader reader, Dictionary<string, PropertyInfo> objPropertyCache) 
         {
             T targetObject = NewInstance<T>.Instance();
 
@@ -31,7 +31,7 @@ namespace SprocMapperLibrary
                 if (!objPropertyCache.TryGetValue(column, out prop))
                 {
                     PropertyInfo propInfo = targetObject.GetType().GetProperty(column);
-                    objPropertyCache.TryAdd(column, propInfo);
+                    objPropertyCache.Add(column, propInfo);
 
                     prop = propInfo;
                 }
@@ -42,16 +42,26 @@ namespace SprocMapperLibrary
 
                     if (readerObj == DBNull.Value)
                     {
-                        prop.SetValue(targetObject, null, null);
+                        var accessor = TypeAccessor.Create(targetObject.GetType());
+                        accessor[targetObject, prop.Name] = GetDefaultValue(prop);
                     }
-                        
-                    else
-                        prop.SetValue(targetObject, readerObj, null);
 
+                    else
+                    {
+                        var accessor = TypeAccessor.Create(targetObject.GetType());
+                        accessor[targetObject, prop.Name] = readerObj;
+                    }
                 }
             }
 
             return targetObject;
+        }
+
+        static object GetDefaultValue(PropertyInfo prop)
+        {
+            if (prop.PropertyType.IsValueType)
+                return Activator.CreateInstance(prop.PropertyType);
+            return null;
         }
 
         public static Dictionary<int, string> GetColumnIndex(Type type, int startIndex)
@@ -143,6 +153,5 @@ namespace SprocMapperLibrary
 
 
     }
-
 
 }

@@ -10,39 +10,40 @@ namespace SprocMapperLibrary
     {
         protected ICollection<SqlParameter> ParamList;
         protected List<ISprocObjectMap> SprocObjectMapList;
-        private readonly HashSet<string> _allColumnSet;
 
         protected AbstractSelect(List<ISprocObjectMap> sprocObjectMapList)
         {
             ParamList = new List<SqlParameter>();
             SprocObjectMapList = sprocObjectMapList;
-            _allColumnSet = new HashSet<string>(StringComparer.Ordinal);
         }
 
+        /// <summary>
+        /// Validates that all properties in mapping are unqiue
+        /// </summary>
         protected void ValidateProperties()
         {
-
+            HashSet<string> allColumnSet = new HashSet<string>(StringComparer.Ordinal);
             foreach (var map in SprocObjectMapList)
             {
                 map.Columns.ToList().ForEach(x =>
                 {
                     if (map.CustomColumnMappings.ContainsKey(x))
                     {
-                        if (_allColumnSet.Contains(map.CustomColumnMappings[x]))
+                        if (allColumnSet.Contains(map.CustomColumnMappings[x]))
                         {
-                            throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(map.CustomColumnMappings[x])?.Name, map.Type.FullName));
+                            throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(x)?.Name, map.Type.FullName));
                         }
 
-                        _allColumnSet.Add(map.CustomColumnMappings[x]);
+                        allColumnSet.Add(map.CustomColumnMappings[x]);
 
 
                     }
-                    else if (_allColumnSet.Contains(x))
+                    else if (allColumnSet.Contains(x))
                     {
                         throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(x)?.Name, map.Type.FullName));
                     }
 
-                    _allColumnSet.Add(x);
+                    allColumnSet.Add(x);
                 });
             }
         }
@@ -88,6 +89,7 @@ namespace SprocMapperLibrary
                 }
             }
 
+            HashSet<string> allColumns = new HashSet<string>();
             foreach (var map in SprocObjectMapList)
             {
                 map.Columns.ToList().ForEach(x =>
@@ -98,24 +100,32 @@ namespace SprocMapperLibrary
                         {
                             map.CustomColumnMappings.Remove(map.CustomColumnMappings[x]);
                         }
+                        else
+                        {
+                            allColumns.Add(map.CustomColumnMappings[x]);
+                        }
                     }
                     else if (!columns.Contains(x))
                     {
 
                         map.Columns.Remove(x);
                     }
+                    else
+                    {
+                        allColumns.Add(x);
+                    }
                 });
             }
 
-            ValidateSelectParams(columns);
+            ValidateSelectParams(columns, allColumns);
         }
 
-        private void ValidateSelectParams(HashSet<string> schemaColumnSet)
+        private void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns)
         {
             HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
             foreach (var selectParam in schemaColumnSet)
             {
-                if (!_allColumnSet.Contains(selectParam))
+                if (!allColumns.Contains(selectParam))
                     unmatchedParams.Add(selectParam);
             }
 

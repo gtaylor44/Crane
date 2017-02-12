@@ -40,31 +40,31 @@ namespace IntegrationTest
 
                 conn.Select<President, PresidentAssistant>(
 
-                null,
+                        null,
 
-                PropertyMapper
-                .MapObject<PresidentAssistant>()
-                .CustomColumnMapping(x => x.Id, "Assistant Id")
-                .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
-                .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
+                        PropertyMapper
+                            .MapObject<PresidentAssistant>()
+                            .CustomColumnMapping(x => x.Id, "Assistant Id")
+                            .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
+                            .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
 
-                .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
-                {
-                    President president;
-                    if (!dic.TryGetValue(p.Id, out president))
+                    .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
-                        p.PresidentAssistantList = new List<PresidentAssistant>();
-                        dic.Add(p.Id, p);
-                    }
+                        President president;
+                        if (!dic.TryGetValue(p.Id, out president))
+                        {
+                            p.PresidentAssistantList = new List<PresidentAssistant>();
+                            dic.Add(p.Id, p);
+                        }
 
-                    president = dic[p.Id];
+                        president = dic[p.Id];
 
-                    if (pa.Id != default(int))
-                    {
-                        president.PresidentAssistantList.Add(pa);
-                    }
-                    return p;
-                });
+                        if (pa.Id != default(int))
+                        {
+                            president.PresidentAssistantList.Add(pa);
+                        }
+                        return p;
+                    });
 
                 Assert.IsNotNull(dic.Values);
             }

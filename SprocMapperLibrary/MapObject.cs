@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 
 namespace SprocMapperLibrary
@@ -10,11 +12,13 @@ namespace SprocMapperLibrary
         private HashSet<string> Columns { get; set; }
         private HashSet<string> IgnoreColumns { get; set; }
         private Dictionary<string, string> CustomColumnMappings { get; set; }
+        private Dictionary<string, PropertyInfo> PropertyInfoCache { get; set; }
         public MapObject()
         {
             CustomColumnMappings = new Dictionary<string, string>();
             Columns = new HashSet<string>();
             IgnoreColumns = new HashSet<string>();
+            PropertyInfoCache = new Dictionary<string, PropertyInfo>();
         }
 
         /// <summary>
@@ -23,7 +27,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         internal MapObject<T> AddAllColumns()
         {
-            Columns = SprocMapperHelper.GetAllValueTypeAndStringColumns(typeof(T), IgnoreColumns);
+            Columns = SprocMapperHelper.GetAllValueTypeAndStringColumns(typeof(T), IgnoreColumns, PropertyInfoCache);
             return this;
         }
 
@@ -46,7 +50,8 @@ namespace SprocMapperLibrary
             return new SprocObjectMap<T>()
             {
                 Columns = Columns,
-                CustomColumnMappings = CustomColumnMappings
+                CustomColumnMappings = CustomColumnMappings,
+                PropertyInfoCache = PropertyInfoCache        
             };
         }
     }

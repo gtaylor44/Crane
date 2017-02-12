@@ -39,9 +39,8 @@ namespace IntegrationTest
             {
                 Dictionary<int, President> dic = new Dictionary<int, President>();
 
-                conn.Select<President, PresidentAssistant>()
-
-                    .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
+                conn.Select()
+                    .ExecuteReader<President, PresidentAssistant, President>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
                         President president;
                         if (!dic.TryGetValue(p.Id, out president))
@@ -59,8 +58,7 @@ namespace IntegrationTest
                         return p;
                     },
                        null,
-
-                        PropertyMapper
+                       PropertyMapper
                             .MapObject<PresidentAssistant>()
                             .CustomColumnMapping(x => x.Id, "Assistant Id")
                             .CustomColumnMapping(x => x.FirstName, "Assistant First Name")

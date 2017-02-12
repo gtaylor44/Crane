@@ -13,17 +13,17 @@ namespace SprocMapperLibrary
     }
     public static class SprocMapperExtensions
     {
-        public static Select<T> Select<T>(this IDbConnection conn)
+        public static Select Select(this IDbConnection conn)
         {
-            List<ISprocObjectMap> objectMapList = new List<ISprocObjectMap>();
+            //List<ISprocObjectMap> objectMapList = new List<ISprocObjectMap>();
 
-            var objectMap = PropertyMapper.MapObject<T>()
-                .AddAllColumns()
-                .GetMap();
+            //var objectMap = PropertyMapper.MapObject<T>()
+            //    .AddAllColumns()
+            //    .GetMap();
 
-            objectMapList.Add(objectMap);
+            //objectMapList.Add(objectMap);
 
-            return new Select<T>(objectMapList);
+            return new Select(null);
         }
 
         public static Select<T> Select<T>(this IDbConnection conn, MapObject<T> objectMap)
@@ -35,11 +35,11 @@ namespace SprocMapperLibrary
             return new Select<T>(objectMapList);
         }
 
-        public static Select<T> Select<T, T1>(this IDbConnection conn)
-        {
+        //public static Select<T> Select<T, T1>(this IDbConnection conn)
+        //{
 
-            return new Select<T>(null);
-        }
+        //    return new Select<T>(null);
+        //}
 
         public static Select<T> Select<T, T1, T2>(this IDbConnection conn, MapObject<T> objectMap = null, MapObject<T1> objectMap2 = null, 
             MapObject<T2> objectMap3 = null)

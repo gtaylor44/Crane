@@ -7,6 +7,77 @@ using System.Reflection;
 
 namespace SprocMapperLibrary
 {
+    public class Select : AbstractSelect
+    {
+        public Select(List<ISprocObjectMap> sprocObjectMapList) : base(sprocObjectMapList)
+        {
+        }
+
+        public Select AddSqlParameter(SqlParameter item)
+        {
+            ParamList.Add(item);
+            return this;
+        }
+
+        public Select AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        {
+            ParamList.Add(new SqlParameter(parameterName, dbType) {Value = value});
+            return this;
+        }
+
+        public IEnumerable<T> ExecuteReader<T1, T2, T>(SqlConnection conn, string procName, Func<T1, T2, T> callBack,
+    MapObject<T1> objectMap = null, MapObject<T2> objectMap2 = null,
+    int commandTimeout = 600)
+        {
+            SprocObjectMapList = new List<ISprocObjectMap>();
+            //List<ISprocObjectMap> objectMapList = new List<ISprocObjectMap>();
+
+            MapObject(objectMap, SprocObjectMapList);
+            MapObject(objectMap2, SprocObjectMapList);
+
+            ValidateProperties();
+            OpenConn(conn);
+
+            List<T> result = new List<T>();
+            using (SqlCommand command = new SqlCommand(procName, conn))
+            {
+                SetCommandProps(command, commandTimeout);
+
+                var reader = command.ExecuteReader();
+
+                DataTable schema = reader.GetSchemaTable();
+
+                ValidateSchema(schema);
+                RemoveAbsentColumns(schema);
+
+                if (!reader.HasRows)
+                    return default(List<T>);
+
+                while (reader.Read())
+                {
+                    T1 obj1 = SprocMapperHelper.GetObject<T1>(SprocObjectMapList[0], reader);
+                    T2 obj2 = SprocMapperHelper.GetObject<T2>(SprocObjectMapList[1], reader);
+
+                    T obj = callBack.Invoke(obj1, obj2);
+
+                    result.Add(obj);
+                }
+
+            }
+            return result;
+        }
+
+        private static void MapObject<T>(MapObject<T> map, List<ISprocObjectMap> mapList)
+        {
+            if (map == null)
+                map = PropertyMapper.MapObject<T>();
+
+            map.AddAllColumns();
+
+            mapList.Add(map.GetMap());
+        }
+    }
+
     public class Select<T> : AbstractSelect
     {
         public Select(List<ISprocObjectMap> sprocObjectMapList) : base(sprocObjectMapList){ }

@@ -24,6 +24,7 @@ namespace IntegrationTest
             using (SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
+
                 var result = conn.Select<President>().ExecuteReader(conn, "dbo.GetPresidentList2");
 
                 Assert.IsNotNull(result);

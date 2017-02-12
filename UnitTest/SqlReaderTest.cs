@@ -25,20 +25,17 @@ namespace UnitTest
             moq.Setup(x => x["FirstName"]).Returns("Donald");
             moq.Setup(x => x["LastName"]).Returns("Trump");
             moq.Setup(x => x["IsHonest"]).Returns(true);
+            moq.Setup(x => x["Id"]).Returns(1);
 
-            Dictionary<string, PropertyInfo> concurrentDic = new Dictionary<string, PropertyInfo>();
-
-            ISprocObjectMap objectMap = new SprocObjectMap<President>()
-            {
-                Columns = columns
-            };
+            var objectMap = PropertyMapper.MapObject<President>()
+                .AddAllColumns()
+                .GetMap();
 
             var result = SprocMapperHelper.GetObject<President>(objectMap, moq.Object);
 
             Assert.AreEqual(5, result.Fans);
             Assert.AreEqual("Donald", result.FirstName);
             Assert.AreEqual(true, result.IsHonest);
-            Assert.IsNull(result.LastName);
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.CompilerServices;
 using FastMember;
 
+[assembly: InternalsVisibleTo("IntegrationTest")]
+[assembly: InternalsVisibleTo("UnitTest")]
 namespace SprocMapperLibrary
-{
+{    
     public class MapObject<T>
     {
         internal HashSet<string> Columns { get; set; }

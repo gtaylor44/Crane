@@ -12,10 +12,9 @@ namespace SprocMapperLibrary
         protected ICollection<SqlParameter> ParamList;
         protected List<ISprocObjectMap> SprocObjectMapList;
 
-        protected AbstractSelect(List<ISprocObjectMap> sprocObjectMapList)
+        protected AbstractSelect()
         {
             ParamList = new List<SqlParameter>();
-            SprocObjectMapList = sprocObjectMapList;
         }
 
         /// <summary>

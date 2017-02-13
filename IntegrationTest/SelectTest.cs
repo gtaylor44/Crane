@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
 using IntegrationTest.Initialise;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Model;
@@ -24,9 +23,7 @@ namespace IntegrationTest
             using (SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
-
-                var result = conn.Select<President>().ExecuteReader(conn, "dbo.GetPresidentList2");
-
+                var result = conn.Select().ExecuteReader<President>(conn, "dbo.GetPresidentList2");
                 Assert.IsNotNull(result);
             }
         }
@@ -40,7 +37,7 @@ namespace IntegrationTest
                 Dictionary<int, President> dic = new Dictionary<int, President>();
 
                 conn.Select()
-                    .ExecuteReader<President, PresidentAssistant, President>(conn, "dbo.GetPresidentList", (p, pa) =>
+                    .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
                         President president;
                         if (!dic.TryGetValue(p.Id, out president))
@@ -55,7 +52,6 @@ namespace IntegrationTest
                         {
                             president.PresidentAssistantList.Add(pa);
                         }
-                        return p;
                     },
                        null,
                        PropertyMapper

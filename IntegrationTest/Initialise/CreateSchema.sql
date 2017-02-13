@@ -1,4 +1,6 @@
-﻿DROP TABLE President
+﻿USE [SprocMapperTest]
+
+DROP TABLE President
 DROP TABLE PresidentAssistant
 
 CREATE TABLE President
@@ -21,7 +23,6 @@ PRIMARY KEY(Id),
 FOREIGN KEY (PresidentId) REFERENCES President(Id)
 )
 
-USE [SprocMapperTest]
 GO
 /****** Object:  StoredProcedure [dbo].[GetPresidentList]    Script Date: 9/02/2017 9:13:30 PM ******/
 SET ANSI_NULLS ON
@@ -33,7 +34,7 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-ALTER PROCEDURE [dbo].[GetPresidentList] 
+CREATE PROCEDURE [dbo].[GetPresidentList] 
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -45,4 +46,27 @@ BEGIN
 	FROM dbo.President p
 	LEFT JOIN dbo.PresidentAssistant pa
 	ON p.Id = pa.PresidentId
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[GetPresidentList]    Script Date: 9/02/2017 9:13:30 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetPresidentList2] 
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT *
+	FROM dbo.President p
 END

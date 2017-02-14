@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SprocMapperLibrary
+namespace SprocMapperLibrary.CustomException
 {
     internal class SprocMapperException : Exception
     {

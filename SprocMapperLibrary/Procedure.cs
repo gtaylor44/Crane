@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace SprocMapperLibrary
 {
@@ -20,6 +21,8 @@ namespace SprocMapperLibrary
         public int ExecuteNonQuery(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
         {
             int affectedRecords;
+
+            conn.Open();
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);
@@ -29,14 +32,43 @@ namespace SprocMapperLibrary
             return affectedRecords;
         }
 
+        public async Task<int> ExecuteNonQueryAsync(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
+        {
+            int affectedRecords;
+
+            await conn.OpenAsync();
+            using (SqlCommand command = new SqlCommand(storedProcedure, conn))
+            {
+                SetCommandProps(command, commandTimeout);
+                affectedRecords = await command.ExecuteNonQueryAsync();
+            }
+
+            return affectedRecords;
+        }
+
         public T ExecuteScalar<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
         {
             T obj = default(T);
 
+            conn.Open();
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);
                 obj = (T)command.ExecuteScalar();
+            }
+
+            return obj;
+        }
+
+        public async Task<T> ExecuteScalarAsync<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
+        {
+            T obj = default(T);
+
+            await conn.OpenAsync();
+            using (SqlCommand command = new SqlCommand(storedProcedure, conn))
+            {
+                SetCommandProps(command, commandTimeout);
+                obj = (T)await command.ExecuteScalarAsync();
             }
 
             return obj;

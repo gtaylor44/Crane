@@ -46,11 +46,12 @@
   <ItemGroup>
     <Compile Include="AbstractQuery.cs" />
     <Compile Include="Procedure.cs" />
-    <Compile Include="SprocMapper.cs" />
+    <Compile Include="PropertyMapper.cs" />
+    <Compile Include="SprocMapperExtensions.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="MapObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SprocMapperException.cs" />
+    <Compile Include="CustomException\SprocMapperException.cs" />
     <Compile Include="SprocMapperHelper.cs" />
     <Compile Include="SprocObjectMap.cs" />
   </ItemGroup>

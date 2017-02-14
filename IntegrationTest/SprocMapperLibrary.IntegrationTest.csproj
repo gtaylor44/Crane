@@ -78,6 +78,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Initialise\CreateSchema.sql" />
+    <Content Include="Initialise\Sample Database ERD.png" />
+    <Content Include="Initialise\sample-data.sql" />
+    <Content Include="Initialise\sample-model.sql" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

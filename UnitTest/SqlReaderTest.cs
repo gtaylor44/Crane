@@ -1,11 +1,8 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
 using Model;
 using Moq;
 
@@ -17,26 +14,35 @@ namespace UnitTest
 
         [TestMethod]
         public void TestMethod3()
-        {
+        {          
             HashSet<string> columns = new HashSet<string>() {"Fans",  "FirstName", "IsHonest"};
+
+
+            Select select = new Select();
+
+
  
             var moq = new Mock<IDataReader>();
 
-            moq.Setup(x => x["Fans"]).Returns(5);
-            moq.Setup(x => x["FirstName"]).Returns("Donald");
-            moq.Setup(x => x["LastName"]).Returns("Trump");
-            moq.Setup(x => x["IsHonest"]).Returns(true);
-            moq.Setup(x => x["Id"]).Returns(1);
+            moq.Setup(x => x[4]).Returns(5);
+            moq.Setup(x => x[1]).Returns("Donald");
+            moq.Setup(x => x[2]).Returns("Trump");
+            moq.Setup(x => x[0]).Returns(1);
+            moq.Setup(x => x[5]).Returns(true);
 
             var objectMap = PropertyMapper.MapObject<President>()
                 .AddAllColumns()
                 .GetMap();
 
+            var dataTable = GetTestSchema();
+
+            select.SetOrdinal(dataTable, new List<ISprocObjectMap>() {objectMap});
+
             var result = SprocMapperHelper.GetObject<President>(objectMap, moq.Object);
 
             Assert.AreEqual(5, result.Fans);
             Assert.AreEqual("Donald", result.FirstName);
-            Assert.AreEqual(true, result.IsHonest);
+            Assert.IsTrue(result.IsHonest);
         }
 
         [TestMethod]
@@ -61,7 +67,7 @@ namespace UnitTest
 
             sel.SetOrdinal(schemaTable, list);
 
-            Assert.AreEqual(6, list.ElementAt(1).ColumnOrdinalDic["PresidentId"]);
+            Assert.AreEqual(7, list.ElementAt(1).ColumnOrdinalDic["PresidentId"]);
         }
 
         [TestMethod]
@@ -87,7 +93,7 @@ namespace UnitTest
             sel.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(0, list.ElementAt(0).ColumnOrdinalDic["Id"]);
-            Assert.AreEqual(5, list.ElementAt(1).ColumnOrdinalDic["Id"]);
+            Assert.AreEqual(6, list.ElementAt(1).ColumnOrdinalDic["Id"]);
         }
 
         [TestMethod]
@@ -127,10 +133,11 @@ namespace UnitTest
             tab.Rows.Add("LastName", 2);
             tab.Rows.Add("Last Name", 3);
             tab.Rows.Add("Fans", 4);
+            tab.Rows.Add("IsHonest", 5);
 
-            tab.Rows.Add("Id", 5);
-            tab.Rows.Add("PresidentId", 6);
-            tab.Rows.Add("FirstName", 7);
+            tab.Rows.Add("Id", 6);
+            tab.Rows.Add("PresidentId", 7);
+            tab.Rows.Add("FirstName", 8);
             tab.Rows.Add("Assistant Last Name", 9);
 
             return tab;

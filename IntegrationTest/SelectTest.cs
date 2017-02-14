@@ -23,7 +23,9 @@ namespace IntegrationTest
             using (SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
-                var result = conn.Select().ExecuteReader<President>(conn, "dbo.GetPresidentList2");
+                var result = conn.Select()
+                    .ExecuteReader<President>(conn, "dbo.GetPresidentList2");
+
                 Assert.IsNotNull(result);
             }
         }
@@ -42,7 +44,6 @@ namespace IntegrationTest
                             .CustomColumnMapping(x => x.Id, "Assistant Id")
                             .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
                             .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
-                    .AddMapping(PropertyMapper.MapObject<President>().CustomColumnMapping(x => x.LastName, "President Last Name"))
                     .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
                         President president;

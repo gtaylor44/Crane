@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractQuery.cs" />
+    <Compile Include="Procedure.cs" />
     <Compile Include="SprocMapper.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="MapObject.cs" />

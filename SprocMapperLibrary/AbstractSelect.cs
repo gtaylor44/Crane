@@ -17,40 +17,9 @@ namespace SprocMapperLibrary
             ParamList = new List<SqlParameter>();
         }
 
-        /// <summary>
-        /// Validates that all properties in mapping are unqiue
-        /// </summary>
-        protected void ValidateProperties()
-        {
-            HashSet<string> allColumnSet = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var map in SprocObjectMapList)
-            {
-                map.Columns.ToList().ForEach(x =>
-                {
-                    if (map.CustomColumnMappings.ContainsKey(x))
-                    {
-                        if (allColumnSet.Contains(map.CustomColumnMappings[x]))
-                        {
-                            throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(x)?.Name, map.Type.FullName));
-                        }
-
-                        allColumnSet.Add(map.CustomColumnMappings[x]);
-
-
-                    }
-                    else if (allColumnSet.Contains(x))
-                    {
-                        throw new SprocMapperException(GetPropertyValidationExceptionMessage(map.Type.GetProperty(x)?.Name, map.Type.FullName));
-                    }
-
-                    allColumnSet.Add(x);
-                });
-            }
-        }
-
         protected void OpenConn(SqlConnection conn)
         {
-            if (conn.State == ConnectionState.Closed)
+            if (conn.State != ConnectionState.Open)
             {
                 conn.Open();
             }
@@ -65,15 +34,15 @@ namespace SprocMapperLibrary
                 command.Parameters.AddRange(ParamList.ToArray());
         }
 
-        protected void RemoveAbsentColumns(DataTable schema)
+        protected void DoStrictValidation(DataTable schema)
         {
             HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
 
-            var occurrences1 = schema?.Rows.Cast<DataRow>();
+            var rowList = schema?.Rows.Cast<DataRow>();
 
-            if (occurrences1 != null)
+            if (rowList != null)
             {
-                foreach (var occurence in occurrences1)
+                foreach (var occurence in rowList)
                 {
                     string schemaColumn = (string)occurence["ColumnName"];
 
@@ -118,6 +87,54 @@ namespace SprocMapperLibrary
             }
 
             ValidateSelectParams(columns, allColumns);
+        }
+
+        internal void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList)
+        {
+            var rowList = schema?.Rows.Cast<DataRow>().ToList();
+
+            if (rowList == null)
+                return;
+
+            Dictionary<string, int> columnOccurenceDic = new Dictionary<string, int>();
+
+            for (int i = 0; i < sprocObjectMapList.Count; i++)
+            {
+
+                foreach (var column in sprocObjectMapList[i].Columns)
+                {
+                    string actualColumn = column;
+
+                    if (sprocObjectMapList[i].CustomColumnMappings.ContainsKey(actualColumn))
+                        actualColumn = sprocObjectMapList[i].CustomColumnMappings[actualColumn];
+
+                    int count;
+                    if (!columnOccurenceDic.TryGetValue(actualColumn, out count))
+                    {
+                        columnOccurenceDic.Add(actualColumn, 1);
+                    }
+                    else
+                    {
+                        columnOccurenceDic[actualColumn] = ++count;
+                    }
+
+                    var occurrences = rowList.Where(r => string.Equals((string)r["ColumnName"], actualColumn, StringComparison.Ordinal));
+
+                    int occurrenceCount = columnOccurenceDic[actualColumn];
+                    var occurrence = occurrences.Skip(occurrenceCount - 1).FirstOrDefault();                  
+
+                    if (occurrence != null)
+                    {
+
+                        int ordinalAsInt = int.Parse(occurrence["ColumnOrdinal"].ToString());
+                        if (!sprocObjectMapList[i].ColumnOrdinalDic.ContainsKey(actualColumn))
+                        {
+                            sprocObjectMapList[i].ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
+                        } 
+                    }
+                }
+
+            }
         }
 
         private void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns)

@@ -18,7 +18,7 @@ namespace IntegrationTest
         }
 
         [TestMethod]
-        public void TestMethod2()
+        public void SelectSingleTable()
         {
             using (SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
@@ -29,7 +29,7 @@ namespace IntegrationTest
         }
 
         [TestMethod]
-        public void TestMethod3()
+        public void SelectWithJoin()
         {
             using (SqlConnection conn =
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
@@ -37,6 +37,11 @@ namespace IntegrationTest
                 Dictionary<int, President> dic = new Dictionary<int, President>();
 
                 conn.Select()
+                    .AddMapping(PropertyMapper
+                            .MapObject<PresidentAssistant>()
+                            .CustomColumnMapping(x => x.Id, "Assistant Id")
+                            .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
+                            .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
                     .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
                         President president;
@@ -52,14 +57,7 @@ namespace IntegrationTest
                         {
                             president.PresidentAssistantList.Add(pa);
                         }
-                    },
-                       null,
-                       PropertyMapper
-                            .MapObject<PresidentAssistant>()
-                            .CustomColumnMapping(x => x.Id, "Assistant Id")
-                            .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
-                            .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
-                    );
+                    });
 
                 Assert.IsNotNull(dic.Values);
             }

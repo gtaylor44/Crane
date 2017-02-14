@@ -11,6 +11,7 @@ namespace SprocMapperLibrary
         {
             MemberInfoCache = new Dictionary<string, Member>();
             CustomColumnMappings = new Dictionary<string, string>();
+            ColumnOrdinalDic = new Dictionary<string, int>();
             Columns = new HashSet<string>();
             Type = typeof(T);
         }
@@ -19,6 +20,7 @@ namespace SprocMapperLibrary
         public Dictionary<string, string> CustomColumnMappings { get; set; }
         public Dictionary<string, Member> MemberInfoCache { get; set; }
         public TypeAccessor TypeAccessor { get; set; }
+        public Dictionary<string, int> ColumnOrdinalDic { get; set; }
     }
 
     public interface ISprocObjectMap
@@ -28,5 +30,6 @@ namespace SprocMapperLibrary
         Dictionary<string, string> CustomColumnMappings { get; set; }
         Dictionary<string, Member> MemberInfoCache { get; set; }
         TypeAccessor TypeAccessor { get; set; }
+        Dictionary<string, int> ColumnOrdinalDic { get; set; }
     }
 }

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using FastMember;
 
 namespace SprocMapperLibrary
@@ -21,6 +18,10 @@ namespace SprocMapperLibrary
                 var actualColumn = sprocObjectMap.CustomColumnMappings.ContainsKey(column)
                     ? sprocObjectMap.CustomColumnMappings[column] : column;
 
+                int ordinal;
+                if (!sprocObjectMap.ColumnOrdinalDic.TryGetValue(actualColumn, out ordinal))
+                    continue;
+
                 Member member;
                 if (!sprocObjectMap.MemberInfoCache.TryGetValue(column, out member))
                 {
@@ -28,7 +29,7 @@ namespace SprocMapperLibrary
                 }
 
 
-                object readerObj = reader[actualColumn];
+                object readerObj = reader[ordinal];
 
                 if (readerObj == DBNull.Value)
                 {

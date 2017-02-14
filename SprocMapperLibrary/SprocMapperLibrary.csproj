@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractSelect.cs" />
+    <Compile Include="AbstractQuery.cs" />
     <Compile Include="SprocMapper.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="MapObject.cs" />

@@ -58,6 +58,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Initialise\Seed.cs" />
+    <Compile Include="SelectAsyncTest.cs" />
     <Compile Include="SelectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

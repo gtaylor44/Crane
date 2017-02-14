@@ -31,7 +31,7 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public IEnumerable<T> ExecuteReaderSynchronously<T>(Action<SqlDataReader, List<T>> getObjectDel, SqlConnection conn, string procName,
+        internal IEnumerable<T> ExecuteReaderSynchronously<T>(Action<SqlDataReader, List<T>> getObjectDel, SqlConnection conn, string procName,
             int commandTimeout, bool strictValidation)
         {
             OpenConn(conn);
@@ -64,7 +64,7 @@ namespace SprocMapperLibrary
             return result;
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsynchronously<T>(Action<SqlDataReader, List<T>> getObjectDel, SqlConnection conn, string procName,
+        internal async Task<IEnumerable<T>> ExecuteReaderAsynchronously<T>(Action<SqlDataReader, List<T>> getObjectDel, SqlConnection conn, string procName,
             int commandTimeout, bool strictValidation)
         {
             await OpenConnAsync(conn);

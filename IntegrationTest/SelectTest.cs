@@ -42,6 +42,7 @@ namespace IntegrationTest
                             .CustomColumnMapping(x => x.Id, "Assistant Id")
                             .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
                             .CustomColumnMapping(x => x.LastName, "Assistant Last Name"))
+                    .AddMapping(PropertyMapper.MapObject<President>().CustomColumnMapping(x => x.LastName, "President Last Name"))
                     .ExecuteReader<President, PresidentAssistant>(conn, "dbo.GetPresidentList", (p, pa) =>
                     {
                         President president;

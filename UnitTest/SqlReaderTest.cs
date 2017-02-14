@@ -13,15 +13,9 @@ namespace UnitTest
     {
 
         [TestMethod]
-        public void TestMethod3()
+        public void TestGetObject()
         {          
-            HashSet<string> columns = new HashSet<string>() {"Fans",  "FirstName", "IsHonest"};
-
-
             Select select = new Select();
-
-
- 
             var moq = new Mock<IDataReader>();
 
             moq.Setup(x => x[4]).Returns(5);

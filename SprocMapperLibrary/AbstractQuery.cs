@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SprocMapperLibrary
 {
@@ -20,6 +21,14 @@ namespace SprocMapperLibrary
             if (conn.State != ConnectionState.Open)
             {
                 conn.Open();
+            }
+        }
+
+        protected async Task OpenConnAsync(SqlConnection conn)
+        {
+            if (conn.State != ConnectionState.Open)
+            {
+                await conn.OpenAsync();
             }
         }
 

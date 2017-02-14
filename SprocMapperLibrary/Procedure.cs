@@ -23,9 +23,6 @@ namespace SprocMapperLibrary
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);
-
-                command.CommandType = CommandType.StoredProcedure;
-
                 affectedRecords = command.ExecuteNonQuery();                
             }
 
@@ -39,9 +36,6 @@ namespace SprocMapperLibrary
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);
-
-                command.CommandType = CommandType.StoredProcedure;
-
                 obj = (T)command.ExecuteScalar();
             }
 

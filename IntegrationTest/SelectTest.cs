@@ -76,7 +76,7 @@ namespace IntegrationTest
             {
                 var products = conn.Select()
                     .AddMapping(PropertyMapper.MapObject<Product>().CustomColumnMapping(x => x.Id, "Product Id"))
-                    .ExecuteReader<Product>(conn, "dbo.GetProducts", strictValidation: true);
+                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
 
                 Assert.IsNotNull(products);
             }
@@ -123,12 +123,11 @@ namespace IntegrationTest
             {
                 product = conn.Select()
                     .AddMapping(PropertyMapper.MapObject<Product>().CustomColumnMapping(x => x.Id, "ProductId"))
-                    .AddMapping(PropertyMapper.MapObject<Supplier>().CustomColumnMapping(x => x.Id, "SupplierId"))
                     .AddSqlParameter("@Id", SqlDbType.Int, productId)
                     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
                         p.Supplier = s;
-                    }).First();
+                    }, strictValidation:true).First();
             }
 
             Assert.AreEqual("Tarte au sucre", product.ProductName);

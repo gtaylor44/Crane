@@ -27,7 +27,7 @@ namespace SprocMapperLibrary
 
         public Select AddSqlParameter(string parameterName, SqlDbType dbType, object value)
         {
-            ParamList.Add(new SqlParameter(parameterName, dbType) {Value = value});
+            ParamList.Add(new SqlParameter(parameterName, dbType) { Value = value });
             return this;
         }
 
@@ -44,12 +44,10 @@ namespace SprocMapperLibrary
                 using (var reader = command.ExecuteReader())
                 {
                     DataTable schema = reader.GetSchemaTable();
-
-                    SetOrdinal(schema, _sprocObjectMapList);
+                  
                     ValidateSchema(schema);
-
-                    if (strictValidation)
-                        DoStrictValidation(schema);
+                    ValidateSelectColumns(schema);
+                    SetOrdinal(schema, _sprocObjectMapList);
 
                     if (!reader.HasRows)
                         return (IEnumerable<T>)Activator.CreateInstance(typeof(IEnumerable<T>));
@@ -78,11 +76,9 @@ namespace SprocMapperLibrary
                 {
                     DataTable schema = reader.GetSchemaTable();
 
-                    SetOrdinal(schema, _sprocObjectMapList);
                     ValidateSchema(schema);
-
-                    if (strictValidation)
-                        DoStrictValidation(schema);
+                    ValidateSelectColumns(schema);
+                    SetOrdinal(schema, _sprocObjectMapList);
 
                     if (!reader.HasRows)
                         return (IEnumerable<T>)Activator.CreateInstance(typeof(IEnumerable<T>));
@@ -128,7 +124,7 @@ namespace SprocMapperLibrary
             }, conn, procName, commandTimeout, strictValidation);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2>(SqlConnection conn, string procName, Action<T, T1, T2> callBack, 
+        public IEnumerable<T> ExecuteReader<T, T1, T2>(SqlConnection conn, string procName, Action<T, T1, T2> callBack,
             int commandTimeout = 600, bool strictValidation = false)
         {
             MapObject<T>();
@@ -148,7 +144,7 @@ namespace SprocMapperLibrary
             }, conn, procName, commandTimeout, strictValidation);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3>(SqlConnection conn, string procName, Action<T, T1, T2, T3> callBack, 
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3>(SqlConnection conn, string procName, Action<T, T1, T2, T3> callBack,
             int commandTimeout = 600, bool strictValidation = false)
         {
             MapObject<T>();
@@ -170,7 +166,7 @@ namespace SprocMapperLibrary
             }, conn, procName, commandTimeout, strictValidation);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4> callBack, 
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4> callBack,
             int commandTimeout = 600, bool strictValidation = false)
         {
             MapObject<T>();
@@ -194,7 +190,7 @@ namespace SprocMapperLibrary
             }, conn, procName, commandTimeout, strictValidation);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4, T5> callBack, 
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4, T5> callBack,
             int commandTimeout = 600, bool strictValidation = false)
         {
             MapObject<T>();
@@ -220,7 +216,7 @@ namespace SprocMapperLibrary
             }, conn, procName, commandTimeout, strictValidation);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4, T5, T6> callBack, 
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4, T5, T6> callBack,
             int commandTimeout = 600, bool strictValidation = false)
         {
             MapObject<T>();
@@ -248,7 +244,7 @@ namespace SprocMapperLibrary
             }, conn, procName, commandTimeout, strictValidation);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6, T7>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4, T5, T6, T7> callBack, 
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6, T7>(SqlConnection conn, string procName, Action<T, T1, T2, T3, T4, T5, T6, T7> callBack,
             int commandTimeout = 600, bool strictValidation = false)
         {
 
@@ -466,16 +462,23 @@ namespace SprocMapperLibrary
             if (propertyMap == null)
                 throw new NullReferenceException(nameof(propertyMap));
 
+            if (typeof(T).IsValueType)
+                throw new SprocMapperException("An error occured in AddMapping<T>. Map can't be value type, must be custom.");
+
             if (!_sprocObjectMapDic.ContainsKey(typeof(T)))
             {
                 propertyMap.AddAllColumns();
                 _sprocObjectMapDic.Add(typeof(T), propertyMap.GetMap());
             }
+            else
+            {
+                throw new SprocMapperException($"An error occured in AddMapping<T>. Map already exists for type {typeof(T).Name}");
+            }
 
             return this;
         }
 
-        internal void DoStrictValidation(DataTable schema)
+        internal void ValidateSelectColumns(DataTable schema)
         {
             HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
 
@@ -490,108 +493,118 @@ namespace SprocMapperLibrary
                     if (columns.Contains(schemaColumn))
                     {
                         throw new SprocMapperException(
-                            $"Duplicate column not allowed. Ensure that all columns in stored procedure are unique." +
+                            $"Duplicate column in select not allowed. Ensure that all columns in stored procedure are unique. " +
                             "Try setting an alias for your column in your stored procedure " +
-                            "and set up a custom column mapping.");
+                            $"and set up a custom column mapping. The offending column is '{schemaColumn}'");
                     }
 
                     columns.Add(schemaColumn);
                 }
             }
 
-            HashSet<string> allColumns = new HashSet<string>();
-            foreach (var map in _sprocObjectMapList)
-            {
-                map.Columns.ToList().ForEach(x =>
-                {
-                    if (map.CustomColumnMappings.ContainsKey(x))
-                    {
-                        if (!columns.Contains(map.CustomColumnMappings[x]))
-                        {
-                            map.CustomColumnMappings.Remove(map.CustomColumnMappings[x]);
-                        }
-                        else
-                        {
-                            allColumns.Add(map.CustomColumnMappings[x]);
-                        }
-                    }
-                    else if (!columns.Contains(x))
-                    {
+            //HashSet<string> allColumns = new HashSet<string>();
+            //foreach (var map in _sprocObjectMapList)
+            //{
+            //    map.Columns.ToList().ForEach(x =>
+            //    {
+            //        if (map.CustomColumnMappings.ContainsKey(x))
+            //        {
+            //            if (!columns.Contains(map.CustomColumnMappings[x]))
+            //            {
+            //                map.CustomColumnMappings.Remove(map.CustomColumnMappings[x]);
+            //            }
+            //            else
+            //            {
+            //                allColumns.Add(map.CustomColumnMappings[x]);
+            //            }
+            //        }
+            //        else if (!columns.Contains(x))
+            //        {
 
-                        map.Columns.Remove(x);
-                    }
-                    else
-                    {
-                        allColumns.Add(x);
-                    }
-                });
-            }
+            //            map.Columns.Remove(x);
+            //        }
+            //        else
+            //        {
+            //            allColumns.Add(x);
+            //        }
+            //    });
+            //}
 
-            ValidateSelectParams(columns, allColumns);
+            //ValidateSelectParams(columns, allColumns);
         }
 
-        private void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns)
-        {
-            HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var selectParam in schemaColumnSet)
-            {
-                if (!allColumns.Contains(selectParam))
-                    unmatchedParams.Add(selectParam);
-            }
+        //private void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns)
+        //{
+        //    HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
+        //    foreach (var selectParam in schemaColumnSet)
+        //    {
+        //        if (!allColumns.Contains(selectParam))
+        //            unmatchedParams.Add(selectParam);
+        //    }
 
-            if (unmatchedParams.Count > 0)
-            {
-                string message = string.Join(", ", unmatchedParams.ToList());
-                throw new SprocMapperException($"The following select params are not mapped: {message}");
-            }
-        }
+        //    if (unmatchedParams.Count > 0)
+        //    {
+        //        string message = string.Join(", ", unmatchedParams.ToList());
+        //        throw new SprocMapperException($"The following select params are not mapped: {message}");
+        //    }
+        //}
 
         internal void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList)
         {
-            var rowList = schema?.Rows.Cast<DataRow>().ToList();
+            var rowDic = schema?.Rows.Cast<DataRow>().ToDictionary(x => x["ColumnName"].ToString().ToLower());
 
-            if (rowList == null)
+            if (rowDic == null)
                 return;
 
-            Dictionary<string, int> columnOccurenceDic = new Dictionary<string, int>();
 
-            for (int i = 0; i < sprocObjectMapList.Count; i++)
+            foreach (var map in sprocObjectMapList)
             {
-
-                foreach (var column in sprocObjectMapList[i].Columns)
+                foreach (var column in map.Columns)
                 {
                     string actualColumn = column;
 
-                    if (sprocObjectMapList[i].CustomColumnMappings.ContainsKey(actualColumn))
-                        actualColumn = sprocObjectMapList[i].CustomColumnMappings[actualColumn];
+                    if (map.CustomColumnMappings.ContainsKey(actualColumn))
+                        actualColumn = map.CustomColumnMappings[actualColumn];
 
-                    int count;
-                    if (!columnOccurenceDic.TryGetValue(actualColumn, out count))
+                    DataRow dataRow;
+
+                    if (rowDic.TryGetValue(actualColumn.ToLower(), out dataRow))
                     {
-                        columnOccurenceDic.Add(actualColumn, 1);
-                    }
-                    else
-                    {
-                        columnOccurenceDic[actualColumn] = ++count;
-                    }
+                        int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
 
-                    var occurrences = rowList.Where(r => string.Equals((string)r["ColumnName"], actualColumn, StringComparison.Ordinal));
-
-                    int occurrenceCount = columnOccurenceDic[actualColumn];
-                    var occurrence = occurrences.Skip(occurrenceCount - 1).FirstOrDefault();
-
-                    if (occurrence != null)
-                    {
-
-                        int ordinalAsInt = int.Parse(occurrence["ColumnOrdinal"].ToString());
-                        if (!sprocObjectMapList[i].ColumnOrdinalDic.ContainsKey(actualColumn))
+                        if (!map.ColumnOrdinalDic.ContainsKey(actualColumn))
                         {
-                            sprocObjectMapList[i].ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
+                            map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+        // Validate that no custom column mapping is mapped to 
+        public bool ValidateCustomColumnMappings(List<ISprocObjectMap> sprocObjectMapList)
+        {
+            foreach (var map in sprocObjectMapList)
+            {
+                foreach (var column in map.CustomColumnMappings)
+                {
+                    foreach (var mapping in sprocObjectMapList)
+                    {
+                        if (mapping.Columns.Contains(column.Value)
+                            || mapping.CustomColumnMappings.ContainsValue(column.Value))
+                        {
+                            return false;
                         }
                     }
                 }
             }
+
+            return true;
         }
+
+
         private void ValidateSchema(DataTable schema)
         {
             var dataRowLIst = schema?.Rows.Cast<DataRow>();

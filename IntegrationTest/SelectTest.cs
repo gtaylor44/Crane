@@ -122,12 +122,14 @@ namespace IntegrationTest
             using (SqlConnection conn = SqlConnectionFactory())
             {
                 product = conn.Select()
-                    .AddMapping(PropertyMapper.MapObject<Product>().CustomColumnMapping(x => x.Id, "ProductId"))
+                    .AddMapping(PropertyMapper.MapObject<Product>()
+                    .IgnoreColumn(x => x.Id))
+
                     .AddSqlParameter("@Id", SqlDbType.Int, productId)
                     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
                         p.Supplier = s;
-                    }, strictValidation:true).First();
+                    }).First();
             }
 
             Assert.AreEqual("Tarte au sucre", product.ProductName);

@@ -463,7 +463,7 @@ namespace SprocMapperLibrary
                 throw new NullReferenceException(nameof(propertyMap));
 
             if (typeof(T).IsValueType)
-                throw new SprocMapperException("An error occured in AddMapping<T>. Map can't be value type, must be custom.");
+                throw new SprocMapperException("An error occurred in AddMapping<T>. Map can't be value type, must be custom.");
 
             if (!_sprocObjectMapDic.ContainsKey(typeof(T)))
             {
@@ -472,7 +472,7 @@ namespace SprocMapperLibrary
             }
             else
             {
-                throw new SprocMapperException($"An error occured in AddMapping<T>. Map already exists for type {typeof(T).Name}");
+                throw new SprocMapperException($"An error occurred in AddMapping<T>. Map already exists for type {typeof(T).Name}");
             }
 
             return this;
@@ -572,7 +572,7 @@ namespace SprocMapperLibrary
                     {
                         int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
 
-                        if (!map.ColumnOrdinalDic.ContainsKey(actualColumn))
+                        if (ValidateOrdinal(sprocObjectMapList, actualColumn))
                         {
                             map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
                         }
@@ -581,6 +581,21 @@ namespace SprocMapperLibrary
                 }
 
             }
+        }
+
+        internal bool ValidateOrdinal(List<ISprocObjectMap> sprocObjectMapList, string key)
+        {
+            foreach (var map in sprocObjectMapList)
+            {
+                if (map.ColumnOrdinalDic.ContainsKey(key))
+                {                    
+                    throw new SprocMapperException($"\n\nThe column '{key}' can't be mapped twice. " +
+                                                   $"Ignore this column from the model(s) that is not using this column. The model that currently has this property mapped is " +
+                                                   $"'{map.Type.Name}' You can ignore columns using the AddMapping method. Example: AddMapping({typeof(PropertyMapper).Name}.MapObject<{map.Type.Name}>().IgnoreColumn(x => x.{key}))\n\n");
+                }
+            }
+
+            return true;
         }
 
         // Validate that no custom column mapping is mapped to 

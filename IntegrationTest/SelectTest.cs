@@ -26,7 +26,7 @@ namespace IntegrationTest
                 new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
                 var result = conn.Select()
-                    .ExecuteReader<President>(conn, "dbo.GetPresidentList2");
+                    .ExecuteReader<President>(conn, "dbo.GetPresidentList2", pedanticValidation: true);
 
                 Assert.IsNotNull(result);
             }
@@ -67,6 +67,9 @@ namespace IntegrationTest
             }
         }
 
+        // Returns all products. 
+        // Id has an alias of 'Product Id'
+
         [TestMethod]
         public void GetProducts()
         {
@@ -82,37 +85,38 @@ namespace IntegrationTest
             }
         }
 
+
+        // 1:M relationship example
         [TestMethod]
         public void SelectSingleCustomerAndOrders()
         {
-            string customerFirstName = "Thomas";
-            string customerLastName = "Hardy";
-
             Customer cust = null;
 
             using (SqlConnection conn = SqlConnectionFactory())
             {
                
                 conn.Select()
-                    .AddSqlParameter("@FirstName", SqlDbType.NVarChar, customerFirstName)
-                    .AddSqlParameter("@LastName", SqlDbType.NVarChar, customerLastName)
+                    .AddSqlParameter("@FirstName", SqlDbType.NVarChar, "Thomas")
+                    .AddSqlParameter("@LastName", SqlDbType.NVarChar, "Hardy")
                     .AddMapping(PropertyMapper.MapObject<Order>().CustomColumnMapping(x => x.Id, "OrderId"))
                     .ExecuteReader<Customer, Order>(conn, "dbo.GetCustomerAndOrders", (c, o) =>
                     {
                         if (cust == null)
                         {
                             cust = c;
-                            if (cust.CustomerOrders == null)
-                                cust.CustomerOrders = new List<Order>();
+                            cust.CustomerOrders = new List<Order>();
                         }
                         
-                        cust.CustomerOrders.Add(o);
-                    }, strictValidation:true);
+                        if (o.Id != default(int))
+                            cust.CustomerOrders.Add(o);
+
+                    });
             }
 
             Assert.IsNotNull(cust);
         }
 
+        // 1:1 relationship example
         [TestMethod]
         public void GetProductAndSupplier()
         {
@@ -129,6 +133,7 @@ namespace IntegrationTest
                     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
                         p.Supplier = s;
+
                     }).First();
             }
 

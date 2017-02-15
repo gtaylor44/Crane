@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractQuery.cs" />
+    <Compile Include="NoMap.cs" />
     <Compile Include="Procedure.cs" />
     <Compile Include="PropertyMapper.cs" />
     <Compile Include="SprocMapperExtensions.cs" />

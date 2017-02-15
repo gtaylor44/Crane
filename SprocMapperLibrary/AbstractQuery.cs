@@ -9,7 +9,7 @@ namespace SprocMapperLibrary
 {
     public abstract class AbstractQuery
     {
-        protected ICollection<SqlParameter> ParamList;       
+        protected List<SqlParameter> ParamList;       
 
         protected AbstractQuery()
         {

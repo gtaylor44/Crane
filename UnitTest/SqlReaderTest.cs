@@ -15,7 +15,6 @@ namespace UnitTest
         [TestMethod]
         public void TestGetObject()
         {          
-            Select select = new Select();
             var moq = new Mock<IDataReader>();
 
             moq.Setup(x => x[4]).Returns(5);
@@ -28,11 +27,11 @@ namespace UnitTest
                 .AddAllColumns()
                 .GetMap();
 
-            var dataTable = GetTestSchema();
+            var dataTable = GetTestSchemaTwoTables();
 
-            select.SetOrdinal(dataTable, new List<ISprocObjectMap>() {objectMap});
+            Select.SetOrdinal(dataTable, new List<ISprocObjectMap>() {objectMap});
 
-            var result = SprocMapperHelper.GetObject<President>(objectMap, moq.Object);
+            var result = Select.GetObject<President>(objectMap, moq.Object);
 
             Assert.AreEqual(5, result.Fans);
             Assert.AreEqual("Donald", result.FirstName);
@@ -42,9 +41,7 @@ namespace UnitTest
         [TestMethod]
         public void TestOrdinal()
         {
-            DataTable schemaTable = GetTestSchema();
-
-            Select sel = new Select();
+            DataTable schemaTable = GetTestSchemaTwoTables();
 
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
 
@@ -59,7 +56,7 @@ namespace UnitTest
             list.Add(presidentObjectMap);
             list.Add(assPresidentObjectMap);
 
-            sel.SetOrdinal(schemaTable, list);
+            Select.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(7, list.ElementAt(1).ColumnOrdinalDic["PresidentId"]);
         }
@@ -67,9 +64,7 @@ namespace UnitTest
         [TestMethod]
         public void TestOrdinalForId()
         {
-            DataTable schemaTable = GetTestSchema();
-
-            Select sel = new Select();
+            DataTable schemaTable = GetTestSchemaTwoTables();
 
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
 
@@ -84,7 +79,7 @@ namespace UnitTest
             list.Add(presidentObjectMap);
             list.Add(assPresidentObjectMap);
 
-            sel.SetOrdinal(schemaTable, list);
+            Select.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(0, list.ElementAt(0).ColumnOrdinalDic["Id"]);
             Assert.AreEqual(6, list.ElementAt(1).ColumnOrdinalDic["Id"]);
@@ -93,9 +88,7 @@ namespace UnitTest
         [TestMethod]
         public void TestOrdinalForCustomMapping()
         {
-            DataTable schemaTable = GetTestSchema();
-
-            Select sel = new Select();
+            DataTable schemaTable = GetTestSchemaTwoTables();
 
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
 
@@ -111,12 +104,12 @@ namespace UnitTest
             list.Add(presidentObjectMap);
             list.Add(assPresidentObjectMap);
 
-            sel.SetOrdinal(schemaTable, list);
+            Select.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(9, list.ElementAt(1).ColumnOrdinalDic["Assistant Last Name"]);
         }
 
-        private DataTable GetTestSchema()
+        private DataTable GetTestSchemaTwoTables()
         {
             DataTable tab = new DataTable("Test") { };
             tab.Columns.Add("ColumnName");

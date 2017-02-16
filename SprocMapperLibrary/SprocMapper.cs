@@ -136,7 +136,7 @@ namespace SprocMapperLibrary
                 if (map.ColumnOrdinalDic.ContainsKey(key))
                 {
                     throw new SprocMapperException($"\n\nThe column '{key}' can't be mapped twice. " +
-                                                   $"Ignore or set up a custom mapping for each other model that has a property named '{key}'. The model that currently has this property mapped is " +
+                                                   $"Ignore or set up a custom mapping for each model included in multi-map that has a property named '{key}'. The model that currently has this property mapped is " +
                                                    $"'{map.Type.Name}' You can ignore columns and setup custom mappings using the AddMapping method. See documentation for more info.\n");
                 }
             }

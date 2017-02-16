@@ -104,12 +104,12 @@ namespace IntegrationTest
 
                 MapObject<Product> productMapping =
                     PropertyMapper.MapObject<Product>()
-                        .IgnoreColumn(x => x.Id)
+                        //.IgnoreColumn(x => x.Id)
                         .CustomColumnMapping(x => x.UnitPrice, "Price");
 
                 MapObject<OrderItem> orderItemMapping =
-                    PropertyMapper.MapObject<OrderItem>()
-                        .IgnoreColumn(x => x.Id);
+                    PropertyMapper.MapObject<OrderItem>();
+                        //.IgnoreColumn(x => x.Id);
 
                 conn.Select()
                 .AddSqlParameter("@OrderId", orderId)

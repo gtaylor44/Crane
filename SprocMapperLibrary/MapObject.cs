@@ -85,7 +85,7 @@ namespace SprocMapperLibrary
             return memberExpr.Member.Name;
         }
 
-        internal static HashSet<string> GetAllValueTypeAndStringColumns<T>(MapObject<T> mapObject)
+        internal static HashSet<string> GetAllValueTypeAndStringColumns<TObj>(MapObject<TObj> mapObject)
         {
             HashSet<string> columns = new HashSet<string>();
 

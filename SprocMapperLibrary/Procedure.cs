@@ -12,9 +12,15 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public Procedure AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        public Procedure AddSqlParameter(string parameterName, object value)
         {
-            ParamList.Add(new SqlParameter(parameterName, dbType) { Value = value });
+            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName });
+            return this;
+        }
+
+        public Procedure AddSqlParameter(string parameterName, object value, SqlDbType dbType)
+        {
+            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName, SqlDbType = dbType});
             return this;
         }
 
@@ -22,7 +28,8 @@ namespace SprocMapperLibrary
         {
             int affectedRecords;
 
-            conn.Open();
+            OpenConn(conn);
+
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);
@@ -36,7 +43,7 @@ namespace SprocMapperLibrary
         {
             int affectedRecords;
 
-            await conn.OpenAsync();
+            await OpenConnAsync(conn);
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);
@@ -50,7 +57,7 @@ namespace SprocMapperLibrary
         {
             T obj = default(T);
 
-            conn.Open();
+            OpenConn(conn);
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);
@@ -64,7 +71,7 @@ namespace SprocMapperLibrary
         {
             T obj = default(T);
 
-            await conn.OpenAsync();
+            await OpenConnAsync(conn);
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
             {
                 SetCommandProps(command, commandTimeout);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -26,12 +27,21 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public Select AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        public Select AddSqlParameter(string parameterName, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
 
-            ParamList.Add(new SqlParameter(parameterName, dbType) { Value = value });
+            ParamList.Add(new SqlParameter() { ParameterName = parameterName, Value = value });
+            return this;
+        }
+
+        public Select AddSqlParameter(string parameterName, object value, SqlDbType dbType)
+        {
+            if (parameterName == null)
+                throw new NullReferenceException(nameof(parameterName));
+
+            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName, SqlDbType = dbType});
             return this;
         }
 
@@ -60,8 +70,9 @@ namespace SprocMapperLibrary
                 {
                     DataTable schema = reader.GetSchemaTable();
 
-                    SetOrdinal(schema, _sprocObjectMapList);
                     ValidateDuplicateSelectAliases(schema, pedanticValidation);
+                    SetOrdinal(schema, _sprocObjectMapList);
+                    
                     ValidateSchema(schema);
                                         
                     if (!reader.HasRows)
@@ -94,9 +105,8 @@ namespace SprocMapperLibrary
                 {
                     DataTable schema = reader.GetSchemaTable();
 
-                    SetOrdinal(schema, _sprocObjectMapList);
-
                     ValidateDuplicateSelectAliases(schema, pedanticValidation);
+                    SetOrdinal(schema, _sprocObjectMapList);                   
                     ValidateSchema(schema);
 
                     if (!reader.HasRows)
@@ -520,6 +530,7 @@ namespace SprocMapperLibrary
 
         internal static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList)
         {
+
             var rowDic = schema?.Rows.Cast<DataRow>().ToDictionary(x => x["ColumnName"].ToString().ToLower());
 
             if (rowDic == null)
@@ -559,8 +570,8 @@ namespace SprocMapperLibrary
                 if (map.ColumnOrdinalDic.ContainsKey(key))
                 {                    
                     throw new SprocMapperException($"\n\nThe column '{key}' can't be mapped twice. " +
-                                                   $"Ignore this column from the model(s) that is not using this column. The model that currently has this property mapped is " +
-                                                   $"'{map.Type.Name}' You can ignore columns using the AddMapping method. Example: AddMapping({typeof(PropertyMapper).Name}.MapObject<{map.Type.Name}>().IgnoreColumn(x => x.{key}))\n\n");
+                                                   $"Ignore or set up a custom mapping for each other model that has a property named '{key}'. The model that currently has this property mapped is " +
+                                                   $"'{map.Type.Name}' You can ignore columns and setup custom mappings using the AddMapping method. See documentation for more info.\n");
                 }
             }
 

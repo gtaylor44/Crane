@@ -55,7 +55,7 @@ namespace SprocMapperLibrary
 
         public T ExecuteScalar<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
         {
-            T obj = default(T);
+            T obj;
 
             OpenConn(conn);
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))
@@ -69,7 +69,7 @@ namespace SprocMapperLibrary
 
         public async Task<T> ExecuteScalarAsync<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
         {
-            T obj = default(T);
+            T obj;
 
             await OpenConnAsync(conn);
             using (SqlCommand command = new SqlCommand(storedProcedure, conn))

@@ -7,6 +7,7 @@ using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Model;
 using SprocMapperLibrary;
+using SprocMapperLibrary.Core;
 
 namespace IntegrationTest
 {

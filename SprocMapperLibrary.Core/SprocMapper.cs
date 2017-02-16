@@ -4,17 +4,14 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FastMember;
-using SprocMapperLibrary.CustomException;
 
-namespace SprocMapperLibrary
+namespace SprocMapperLibrary.Core
 {
     public static class SprocMapper
     {
-        internal static bool ValidateDuplicateSelectAliases(DataTable schema, bool pedanticValidation, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
+        public static bool ValidateDuplicateSelectAliases(DataTable schema, bool pedanticValidation, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
         {
             HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
 
@@ -46,7 +43,7 @@ namespace SprocMapperLibrary
             return true;
         }
 
-        internal static void ClearUnusedMaps(HashSet<string> columns, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
+        public static void ClearUnusedMaps(HashSet<string> columns, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
         {
             HashSet<string> allColumns = new HashSet<string>();
             foreach (var map in sprocObjectMapList)
@@ -79,7 +76,7 @@ namespace SprocMapperLibrary
             ValidateSelectParams(columns, allColumns, storedProcedure);
         }
 
-        internal static void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns, string storedProcedureName)
+        public static void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns, string storedProcedureName)
         {
             HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
             foreach (var selectParam in schemaColumnSet)
@@ -97,7 +94,7 @@ namespace SprocMapperLibrary
             }
         }
 
-        internal static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string partitionOn)
+        public static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string partitionOn)
         {
 
             var rowDic = schema?.Rows.Cast<DataRow>().ToDictionary(x => x["ColumnName"].ToString().ToLower());
@@ -130,7 +127,8 @@ namespace SprocMapperLibrary
 
                         if (partitionOnOrdinal != null)
                         {
-                            if (currMap == sprocObjectMapList.Count - 1 || ordinalAsInt < partitionOnOrdinal[currMap + 1])
+                            if (currMap == sprocObjectMapList.Count - 1 || 
+                                (ordinalAsInt < partitionOnOrdinal[currMap + 1] && ordinalAsInt >= partitionOnOrdinal[currMap]))
                             {
                                 map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
                             }
@@ -154,7 +152,7 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn"></param>
         /// <param name="mapCount"></param>
         /// <returns></returns>
-        internal static int[] GetOrdinalPartition(DataTable schema, string partitionOn, int mapCount)
+        public static int[] GetOrdinalPartition(DataTable schema, string partitionOn, int mapCount)
         {
 
             List<int> result = new List<int>();
@@ -197,20 +195,18 @@ namespace SprocMapperLibrary
 
         }
 
-        internal static void ValidatePartitionOn(string partitionOn)
+        public static void ValidatePartitionOn(string partitionOn)
         {
             if (partitionOn == null)
-                return;
+                throw new ArgumentNullException(nameof(partitionOn));
 
             var validPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]+(?:\|[a-zA-Z_][a-zA-Z0-9_]*)*$");
 
             if (!validPattern.IsMatch(partitionOn))
                 throw new SprocMapperException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'Id|Id'");
         }
-            
 
-        // Validate that no custom column mapping is mapped to 
-        internal static bool ValidateCustomColumnMappings(List<ISprocObjectMap> sprocObjectMapList)
+        public static bool ValidateCustomColumnMappings(List<ISprocObjectMap> sprocObjectMapList)
         {
             foreach (var map in sprocObjectMapList)
             {
@@ -230,8 +226,7 @@ namespace SprocMapperLibrary
             return true;
         }
 
-
-        internal static void ValidateSchema(DataTable schema, List<ISprocObjectMap> sprocObjectMapList)
+        public static void ValidateSchema(DataTable schema, List<ISprocObjectMap> sprocObjectMapList)
         {
             var dataRowLIst = schema?.Rows.Cast<DataRow>();
 
@@ -264,7 +259,7 @@ namespace SprocMapperLibrary
             }
         }
 
-        internal static void ValidateColumn(ISprocObjectMap map, string schemaColumn, DataRow occurence)
+        public static void ValidateColumn(ISprocObjectMap map, string schemaColumn, DataRow occurence)
         {
             Member member;
 
@@ -287,7 +282,7 @@ namespace SprocMapperLibrary
             }
         }
 
-        internal static void MapObject<T, T1, T2, T3, T4, T5, T6, T7>(Dictionary<Type, ISprocObjectMap> sprocObjectMapDic, List<ISprocObjectMap> sprocObjectMapList)
+        public static void MapObject<T, T1, T2, T3, T4, T5, T6, T7>(Dictionary<Type, ISprocObjectMap> sprocObjectMapDic, List<ISprocObjectMap> sprocObjectMapList)
         {
             if (typeof(T) != typeof(NoMap))
                 MapObject<T>(sprocObjectMapDic, sprocObjectMapList);
@@ -314,7 +309,7 @@ namespace SprocMapperLibrary
                 MapObject<T7>(sprocObjectMapDic, sprocObjectMapList);
         }
 
-        internal static void MapObject<T>(Dictionary<Type, ISprocObjectMap> sprocObjectMapDic, List<ISprocObjectMap> sprocObjectMapList)
+        public static void MapObject<T>(Dictionary<Type, ISprocObjectMap> sprocObjectMapDic, List<ISprocObjectMap> sprocObjectMapList)
         {
             ISprocObjectMap objMap;
             if (!sprocObjectMapDic.TryGetValue(typeof(T), out objMap))
@@ -328,7 +323,7 @@ namespace SprocMapperLibrary
             sprocObjectMapList.Add(objMap);
         }
 
-        internal static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)
+        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)
         {
             T targetObject = NewInstance<T>.Instance();
 
@@ -365,7 +360,7 @@ namespace SprocMapperLibrary
             return targetObject;
         }
 
-        internal static object GetDefaultValue(Member member)
+        public static object GetDefaultValue(Member member)
         {
             if (member.Type.IsValueType)
                 return Activator.CreateInstance(member.Type);
@@ -373,13 +368,13 @@ namespace SprocMapperLibrary
         }
 
 
-        internal static class NewInstance<T>
+        public static class NewInstance<T>
         {
             public static readonly Func<T> Instance =
                 Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
         }
 
-        internal static string GetPropertyName(Expression method)
+        public static string GetPropertyName(Expression method)
         {
             LambdaExpression lambda = method as LambdaExpression;
             if (lambda == null)
@@ -403,7 +398,7 @@ namespace SprocMapperLibrary
             return memberExpr.Member.Name;
         }
 
-        internal static bool CheckForValidDataType(Type type)
+        public static bool CheckForValidDataType(Type type)
         {
             if (type.IsValueType ||
                 type == typeof(string) ||

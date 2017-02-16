@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using FastMember;
 
 [assembly: InternalsVisibleTo("UnitTest")]
-namespace SprocMapperLibrary
+namespace SprocMapperLibrary.Core
 {    
     public class MapObject<T>
     {
@@ -27,7 +27,7 @@ namespace SprocMapperLibrary
         /// Adds all properties in model that are either value, string, char[] or byte[] type. 
         /// </summary>
         /// <returns></returns>
-        internal MapObject<T> AddAllColumns()
+        public MapObject<T> AddAllColumns()
         {
             Columns = GetAllValueTypeAndStringColumns(this);
             return this;
@@ -47,7 +47,7 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        internal SprocObjectMap<T> GetMap()
+        public SprocObjectMap<T> GetMap()
         {
             return new SprocObjectMap<T>()
             {
@@ -58,7 +58,7 @@ namespace SprocMapperLibrary
             };
         }
 
-        internal static HashSet<string> GetAllValueTypeAndStringColumns<TObj>(MapObject<TObj> mapObject)
+        public static HashSet<string> GetAllValueTypeAndStringColumns<TObj>(MapObject<TObj> mapObject)
         {
             HashSet<string> columns = new HashSet<string>();
 

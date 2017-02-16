@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SprocMapperLibrary.CustomException
+namespace SprocMapperLibrary.Core
 {
-    internal class SprocMapperException : Exception
+    public class SprocMapperException : Exception
     {
         public SprocMapperException(string message) : base(message)
         {

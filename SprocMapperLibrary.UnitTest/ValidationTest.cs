@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SprocMapperLibrary.CustomException;
 using SprocMapperLibrary;
+using SprocMapperLibrary.Core;
 using SprocMapperLibrary.TestCommon;
 
 namespace UnitTest
@@ -15,8 +15,7 @@ namespace UnitTest
                             "and set up a custom column mapping. The offending column is 'Id'")]
         public void ValidateDuplicateSelectAliases_ThrowsException_WhenHasDuplicateColumns()
         {
-            Select select = new Select();
-            DataTable table = GetInvalidSchema();
+            DataTable table = DataTableFactory.GetInvalidSchema();
 
             SprocMapper.ValidateDuplicateSelectAliases(table, false, null, null);
 
@@ -25,39 +24,11 @@ namespace UnitTest
         [TestMethod]
         public void ValidateDuplicateSelectAliases_IsValid()
         {
-            DataTable table = GetValidSchema();
+            DataTable table = DataTableFactory.GetValidSchema();
 
             var result = SprocMapper.ValidateDuplicateSelectAliases(table, false, null, null);
 
             Assert.IsTrue(result);
-        }
-
-
-        private DataTable GetInvalidSchema()
-        {
-            DataTable tab = new DataTable("Test") { };
-            tab.Columns.Add("ColumnName");
-            tab.Columns.Add("ColumnOrdinal");
-
-            tab.Rows.Add("Id", 0);
-            tab.Rows.Add("FirstName", 1);
-            tab.Rows.Add("Last Name", 2);
-            tab.Rows.Add("Id", 3);
-
-            return tab;
-        }
-
-        private DataTable GetValidSchema()
-        {
-            DataTable tab = new DataTable("Test") { };
-            tab.Columns.Add("ColumnName");
-            tab.Columns.Add("ColumnOrdinal");
-
-            tab.Rows.Add("Id", 0);
-            tab.Rows.Add("FirstName", 1);
-            tab.Rows.Add("Last Name", 2);
-
-            return tab;
         }
     }
 }

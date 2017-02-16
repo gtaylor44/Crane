@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FastMember;
 
-namespace SprocMapperLibrary
+namespace SprocMapperLibrary.Core
 {
     public class SprocObjectMap<T> : ISprocObjectMap
     {

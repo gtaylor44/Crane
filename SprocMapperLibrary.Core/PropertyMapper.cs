@@ -1,4 +1,4 @@
-﻿namespace SprocMapperLibrary
+﻿namespace SprocMapperLibrary.Core
 {
     public static class PropertyMapper
     {

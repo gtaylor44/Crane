@@ -84,8 +84,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Initialise\SampleERD.png" />
-    <Content Include="Initialise\SampleData.sql" />
+    <Content Include="Seed\SampleERD.png" />
+    <Content Include="Seed\SampleData.sql" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -50,6 +50,9 @@ namespace UnitTest
                 .GetMap();
 
             var assPresidentObjectMap = PropertyMapper.MapObject<PresidentAssistant>()
+                .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
+                .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
+                .IgnoreColumn(x => x.Id)
                 .AddAllColumns()
                 .GetMap();
 
@@ -58,7 +61,7 @@ namespace UnitTest
 
             Select.SetOrdinal(schemaTable, list);
 
-            Assert.AreEqual(7, list.ElementAt(1).ColumnOrdinalDic["PresidentId"]);
+            Assert.AreEqual(6, list.ElementAt(1).ColumnOrdinalDic["PresidentId"]);
         }
 
         [TestMethod]
@@ -72,17 +75,11 @@ namespace UnitTest
                 .AddAllColumns()
                 .GetMap();
 
-            var assPresidentObjectMap = PropertyMapper.MapObject<PresidentAssistant>()
-                .AddAllColumns()
-                .GetMap();
-
             list.Add(presidentObjectMap);
-            list.Add(assPresidentObjectMap);
 
             Select.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(0, list.ElementAt(0).ColumnOrdinalDic["Id"]);
-            Assert.AreEqual(6, list.ElementAt(1).ColumnOrdinalDic["Id"]);
         }
 
         [TestMethod]
@@ -98,6 +95,8 @@ namespace UnitTest
 
             var assPresidentObjectMap = PropertyMapper.MapObject<PresidentAssistant>()
                 .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
+                .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
+                .IgnoreColumn(x => x.Id)
                 .AddAllColumns()
                 .GetMap();
 
@@ -106,7 +105,7 @@ namespace UnitTest
 
             Select.SetOrdinal(schemaTable, list);
 
-            Assert.AreEqual(9, list.ElementAt(1).ColumnOrdinalDic["Assistant Last Name"]);
+            Assert.AreEqual(8, list.ElementAt(1).ColumnOrdinalDic["Assistant Last Name"]);
         }
 
         private DataTable GetTestSchemaTwoTables()
@@ -121,12 +120,9 @@ namespace UnitTest
             tab.Rows.Add("Last Name", 3);
             tab.Rows.Add("Fans", 4);
             tab.Rows.Add("IsHonest", 5);
-
-            tab.Rows.Add("Id", 6);
-            tab.Rows.Add("PresidentId", 7);
-            tab.Rows.Add("FirstName", 8);
-            tab.Rows.Add("Assistant Last Name", 9);
-
+            tab.Rows.Add("PresidentId", 6);
+            tab.Rows.Add("Assistant First Name", 7);
+            tab.Rows.Add("Assistant Last Name", 8);
             return tab;
         }
     }

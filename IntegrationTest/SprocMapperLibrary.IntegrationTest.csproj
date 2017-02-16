@@ -57,7 +57,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Initialise\Seed.cs" />
     <Compile Include="SelectAsyncTest.cs" />
     <Compile Include="SelectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,10 +76,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Initialise\CreateSchema.sql" />
-    <Content Include="Initialise\Sample Database ERD.png" />
-    <Content Include="Initialise\sample-data.sql" />
-    <Content Include="Initialise\sample-model.sql" />
+    <Content Include="Initialise\SampleERD.png" />
+    <Content Include="Initialise\SampleData.sql" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

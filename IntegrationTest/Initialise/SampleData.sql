@@ -1,4 +1,313 @@
-﻿SET IDENTITY_INSERT Customer ON
+﻿USE [SprocMapperTest]
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('"Order"') and o.name = 'FK_ORDER_REFERENCE_CUSTOMER')
+alter table "Order"
+   drop constraint FK_ORDER_REFERENCE_CUSTOMER
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('OrderItem') and o.name = 'FK_ORDERITE_REFERENCE_ORDER')
+alter table OrderItem
+   drop constraint FK_ORDERITE_REFERENCE_ORDER
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('OrderItem') and o.name = 'FK_ORDERITE_REFERENCE_PRODUCT')
+alter table OrderItem
+   drop constraint FK_ORDERITE_REFERENCE_PRODUCT
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('Product') and o.name = 'FK_PRODUCT_REFERENCE_SUPPLIER')
+alter table Product
+   drop constraint FK_PRODUCT_REFERENCE_SUPPLIER
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('Customer')
+            and   name  = 'IndexCustomerName'
+            and   indid > 0
+            and   indid < 255)
+   drop index Customer.IndexCustomerName
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('Customer')
+            and   type = 'U')
+   drop table Customer
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('"Order"')
+            and   name  = 'IndexOrderOrderDate'
+            and   indid > 0
+            and   indid < 255)
+   drop index "Order".IndexOrderOrderDate
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('"Order"')
+            and   name  = 'IndexOrderCustomerId'
+            and   indid > 0
+            and   indid < 255)
+   drop index "Order".IndexOrderCustomerId
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('"Order"')
+            and   type = 'U')
+   drop table "Order"
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('OrderItem')
+            and   name  = 'IndexOrderItemProductId'
+            and   indid > 0
+            and   indid < 255)
+   drop index OrderItem.IndexOrderItemProductId
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('OrderItem')
+            and   name  = 'IndexOrderItemOrderId'
+            and   indid > 0
+            and   indid < 255)
+   drop index OrderItem.IndexOrderItemOrderId
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('OrderItem')
+            and   type = 'U')
+   drop table OrderItem
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('Product')
+            and   name  = 'IndexProductName'
+            and   indid > 0
+            and   indid < 255)
+   drop index Product.IndexProductName
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('Product')
+            and   name  = 'IndexProductSupplierId'
+            and   indid > 0
+            and   indid < 255)
+   drop index Product.IndexProductSupplierId
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('Product')
+            and   type = 'U')
+   drop table Product
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('Supplier')
+            and   name  = 'IndexSupplierCountry'
+            and   indid > 0
+            and   indid < 255)
+   drop index Supplier.IndexSupplierCountry
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('Supplier')
+            and   name  = 'IndexSupplierName'
+            and   indid > 0
+            and   indid < 255)
+   drop index Supplier.IndexSupplierName
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('Supplier')
+            and   type = 'U')
+   drop table Supplier
+go
+
+/*==============================================================*/
+/* Table: Customer                                              */
+/*==============================================================*/
+create table Customer (
+   Id                   int                  identity,
+   FirstName            nvarchar(40)         not null,
+   LastName             nvarchar(40)         not null,
+   City                 nvarchar(40)         null,
+   Country              nvarchar(40)         null,
+   Phone                nvarchar(20)         null,
+   constraint PK_CUSTOMER primary key (Id)
+)
+go
+
+/*==============================================================*/
+/* Index: IndexCustomerName                                     */
+/*==============================================================*/
+create index IndexCustomerName on Customer (
+LastName ASC,
+FirstName ASC
+)
+go
+
+/*==============================================================*/
+/* Table: "Order"                                               */
+/*==============================================================*/
+create table "Order" (
+   Id                   int                  identity,
+   OrderDate            datetime             not null default getdate(),
+   OrderNumber          nvarchar(10)         null,
+   CustomerId           int                  not null,
+   TotalAmount          decimal(12,2)        null default 0,
+   constraint PK_ORDER primary key (Id)
+)
+go
+
+/*==============================================================*/
+/* Index: IndexOrderCustomerId                                  */
+/*==============================================================*/
+create index IndexOrderCustomerId on "Order" (
+CustomerId ASC
+)
+go
+
+/*==============================================================*/
+/* Index: IndexOrderOrderDate                                   */
+/*==============================================================*/
+create index IndexOrderOrderDate on "Order" (
+OrderDate ASC
+)
+go
+
+/*==============================================================*/
+/* Table: OrderItem                                             */
+/*==============================================================*/
+create table OrderItem (
+   Id                   int                  identity,
+   OrderId              int                  not null,
+   ProductId            int                  not null,
+   UnitPrice            decimal(12,2)        not null default 0,
+   Quantity             int                  not null default 1,
+   constraint PK_ORDERITEM primary key (Id)
+)
+go
+
+/*==============================================================*/
+/* Index: IndexOrderItemOrderId                                 */
+/*==============================================================*/
+create index IndexOrderItemOrderId on OrderItem (
+OrderId ASC
+)
+go
+
+/*==============================================================*/
+/* Index: IndexOrderItemProductId                               */
+/*==============================================================*/
+create index IndexOrderItemProductId on OrderItem (
+ProductId ASC
+)
+go
+
+/*==============================================================*/
+/* Table: Product                                               */
+/*==============================================================*/
+create table Product (
+   Id                   int                  identity,
+   ProductName          nvarchar(50)         not null,
+   SupplierId           int                  not null,
+   UnitPrice            decimal(12,2)        null default 0,
+   Package              nvarchar(30)         null,
+   IsDiscontinued       bit                  not null default 0,
+   constraint PK_PRODUCT primary key (Id)
+)
+go
+
+/*==============================================================*/
+/* Index: IndexProductSupplierId                                */
+/*==============================================================*/
+create index IndexProductSupplierId on Product (
+SupplierId ASC
+)
+go
+
+/*==============================================================*/
+/* Index: IndexProductName                                      */
+/*==============================================================*/
+create index IndexProductName on Product (
+ProductName ASC
+)
+go
+
+/*==============================================================*/
+/* Table: Supplier                                              */
+/*==============================================================*/
+create table Supplier (
+   Id                   int                  identity,
+   CompanyName          nvarchar(40)         not null,
+   ContactName          nvarchar(50)         null,
+   ContactTitle         nvarchar(40)         null,
+   City                 nvarchar(40)         null,
+   Country              nvarchar(40)         null,
+   Phone                nvarchar(30)         null,
+   Fax                  nvarchar(30)         null,
+   constraint PK_SUPPLIER primary key (Id)
+)
+go
+
+/*==============================================================*/
+/* Index: IndexSupplierName                                     */
+/*==============================================================*/
+create index IndexSupplierName on Supplier (
+CompanyName ASC
+)
+go
+
+/*==============================================================*/
+/* Index: IndexSupplierCountry                                  */
+/*==============================================================*/
+create index IndexSupplierCountry on Supplier (
+Country ASC
+)
+go
+
+alter table "Order"
+   add constraint FK_ORDER_REFERENCE_CUSTOMER foreign key (CustomerId)
+      references Customer (Id)
+go
+
+alter table OrderItem
+   add constraint FK_ORDERITE_REFERENCE_ORDER foreign key (OrderId)
+      references "Order" (Id)
+go
+
+alter table OrderItem
+   add constraint FK_ORDERITE_REFERENCE_PRODUCT foreign key (ProductId)
+      references Product (Id)
+go
+
+alter table Product
+   add constraint FK_PRODUCT_REFERENCE_SUPPLIER foreign key (SupplierId)
+      references Supplier (Id)
+go
+
+SET IDENTITY_INSERT Customer ON
 INSERT INTO [Customer] ([Id],[FirstName],[LastName],[City],[Country],[Phone])VALUES(1,'Maria','Anders','Berlin','Germany','030-0074321')
 INSERT INTO [Customer] ([Id],[FirstName],[LastName],[City],[Country],[Phone])VALUES(2,'Ana','Trujillo','México D.F.','Mexico','(5) 555-4729')
 INSERT INTO [Customer] ([Id],[FirstName],[LastName],[City],[Country],[Phone])VALUES(3,'Antonio','Moreno','México D.F.','Mexico','(5) 555-3932')
@@ -3191,3 +3500,284 @@ INSERT INTO [OrderItem] ([Id],[OrderId],[ProductId],[UnitPrice],[Quantity])VALUE
 INSERT INTO [OrderItem] ([Id],[OrderId],[ProductId],[UnitPrice],[Quantity])VALUES(2154,830,75,7.75,4)
 INSERT INTO [OrderItem] ([Id],[OrderId],[ProductId],[UnitPrice],[Quantity])VALUES(2155,830,77,13.00,2)
 SET IDENTITY_INSERT [OrderItem] OFF
+
+USE [SprocMapperTest]
+
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetProductAndSupplier'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[GetProductAndSupplier]
+  END
+
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetCustomerAndOrders'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[GetCustomerAndOrders]
+  END
+
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetProducts'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[GetProducts]
+  END
+
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetOrder'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[GetOrder]
+  END
+
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetCustomer'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[GetCustomer]
+  END
+
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'SaveCustomer'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[SaveCustomer]
+  END
+
+  
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'DeleteCustomer'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[DeleteCustomer]
+  END
+
+GO
+/****** Object:  StoredProcedure [dbo].[GetProductAndSupplier]    Script Date: 16/02/2017 8:26:05 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+
+CREATE PROCEDURE [dbo].[GetProductAndSupplier]
+	-- Add the parameters for the stored procedure here
+	@Id int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT p.ProductName, p.UnitPrice, p.Package, p.IsDiscontinued,
+	s.Id, s.CompanyName, s.ContactName, s.ContactTitle, s.City, s.Country, s.Phone, s.Fax 
+	FROM dbo.Product p
+	INNER JOIN dbo.Supplier s
+	ON p.SupplierId = s.Id
+	WHERE p.Id = @Id
+
+	-- EXEC dbo.GetProductAndSupplier @Id = 62
+END
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetCustomerAndOrders]
+	-- Add the parameters for the stored procedure here
+	@FirstName nvarchar(40),
+	@LastName nvarchar(40)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT c.Id, c.FirstName, c.LastName, c.City, c.Country, c.Phone, 
+	o.Id as [OrderId], o.OrderDate, o.OrderNumber, o.TotalAmount
+	FROM dbo.Customer c
+	INNER JOIN dbo.[Order] o
+	ON o.CustomerId = c.Id
+	WHERE c.FirstName = @FirstName
+	AND c.LastName = @LastName
+
+	-- EXEC GetCustomerAndOrders @FirstName = 'Thomas', @LastName = 'Hardy'
+
+END
+
+/****** Object:  StoredProcedure [dbo].[GetProducts]    Script Date: 16/02/2017 8:33:05 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetProducts]
+	-- Add the parameters for the stored procedure here
+AS
+BEGIN
+SELECT p.Id as [Product Id], p.ProductName FROM dbo.Product p
+END
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].GetOrder
+	@OrderId int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	SELECT o.Id, o.OrderDate, o.OrderNumber, o.TotalAmount,
+	oi.UnitPrice, oi.Quantity,
+	p.ProductName, p.SupplierId, 
+	p.UnitPrice as [Price],
+	p.Package,
+	p.IsDiscontinued
+	FROM [Order] o
+	INNER JOIN OrderItem oi
+	ON o.Id = oi.OrderId
+	INNER JOIN Product p
+	ON oi.ProductId = p.Id
+    WHERE o.Id = @OrderId
+
+END
+GO
+
+-- ================================================
+-- Template generated from Template Explorer using:
+-- Create Procedure (New Menu).SQL
+--
+-- Use the Specify Values for Template Parameters 
+-- command (Ctrl-Shift-M) to fill in the parameter 
+-- values below.
+--
+-- This block of comments will not be included in
+-- the definition of the procedure.
+-- ================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetCustomer]
+	@CustomerId int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT c.FirstName, c.LastName, c.City, c.Country, c.Phone 
+	FROM Customer c 
+	WHERE Id = @CustomerId
+END
+
+-- ================================================
+-- Template generated from Template Explorer using:
+-- Create Procedure (New Menu).SQL
+--
+-- Use the Specify Values for Template Parameters 
+-- command (Ctrl-Shift-M) to fill in the parameter 
+-- values below.
+--
+-- This block of comments will not be included in
+-- the definition of the procedure.
+-- ================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE DeleteCustomer
+	-- Add the parameters for the stored procedure here
+	@CustomerId int
+AS
+BEGIN
+	DELETE FROM dbo.Customer
+	WHERE Id = @CustomerId
+END
+GO
+
+USE [SprocMapperTest]
+GO
+/****** Object:  StoredProcedure [dbo].[SaveCustomer]    Script Date: 16/02/2017 12:09:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[SaveCustomer]
+	-- Add the parameters for the stored procedure here
+	@Id int output,
+	@City nvarchar(40),
+	@Country nvarchar(40),
+	@Phone nvarchar(20),
+	@FirstName nvarchar(40),
+	@LastName nvarchar(40)
+AS
+BEGIN
+
+	INSERT INTO dbo.Customer
+		(
+		FirstName,
+		LastName,
+		City,
+		Country,
+		Phone
+		)
+
+		VALUES
+		(
+		@FirstName,
+		@LastName,
+		@City,
+		@Country,
+		@Phone
+		)
+
+		SET @Id = SCOPE_IDENTITY();
+END

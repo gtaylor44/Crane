@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using FastMember;
-using SprocMapperLibrary.CustomException;
 
-[assembly: InternalsVisibleTo("IntegrationTest")]
 [assembly: InternalsVisibleTo("UnitTest")]
 namespace SprocMapperLibrary
 {    

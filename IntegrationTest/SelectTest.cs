@@ -160,6 +160,20 @@ namespace IntegrationTest
         }
 
         [TestMethod]
+        public void GetSupplierByName()
+        {
+            using (SqlConnection conn = GetSqlConnection())
+            {
+                var supplier = conn.Select()
+                    .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
+                    .ExecuteReader<Supplier>(conn, "dbo.GetSupplierByName")
+                    .FirstOrDefault();
+
+                Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);
+            }
+        }
+
+        [TestMethod]
         public void InsertCustomerThenDelete()
         {
             Customer customer = new Customer()

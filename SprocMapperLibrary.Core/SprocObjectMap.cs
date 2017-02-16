@@ -21,14 +21,4 @@ namespace SprocMapperLibrary.Core
         public TypeAccessor TypeAccessor { get; set; }
         public Dictionary<string, int> ColumnOrdinalDic { get; set; }
     }
-
-    public interface ISprocObjectMap
-    {
-        Type Type { get; set; }
-        HashSet<string> Columns { get; set; }
-        Dictionary<string, string> CustomColumnMappings { get; set; }
-        Dictionary<string, Member> MemberInfoCache { get; set; }
-        TypeAccessor TypeAccessor { get; set; }
-        Dictionary<string, int> ColumnOrdinalDic { get; set; }
-    }
 }

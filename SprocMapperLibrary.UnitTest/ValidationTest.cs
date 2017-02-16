@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SprocMapperLibrary;
 using SprocMapperLibrary.Core;
 using SprocMapperLibrary.TestCommon;
 

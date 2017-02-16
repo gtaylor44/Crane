@@ -25,13 +25,11 @@ namespace UnitTest
         [TestMethod]
         public void ValidateDuplicateSelectAliases_IsValid()
         {
-            Select select = new Select();
             DataTable table = GetValidSchema();
 
             var result = SprocMapper.ValidateDuplicateSelectAliases(table, false, null);
 
             Assert.IsTrue(result);
-
         }
 
 

@@ -9,7 +9,7 @@ using Moq;
 namespace UnitTest
 {
     [TestClass]
-    public class SqlReaderTest
+    public class OrdinalTest
     {
 
         [TestMethod]
@@ -29,9 +29,9 @@ namespace UnitTest
 
             var dataTable = GetTestSchemaTwoTables();
 
-            Select.SetOrdinal(dataTable, new List<ISprocObjectMap>() {objectMap});
+            SprocMapper.SetOrdinal(dataTable, new List<ISprocObjectMap>() {objectMap});
 
-            var result = Select.GetObject<President>(objectMap, moq.Object);
+            var result = SprocMapper.GetObject<President>(objectMap, moq.Object);
 
             Assert.AreEqual(5, result.Fans);
             Assert.AreEqual("Donald", result.FirstName);
@@ -59,7 +59,7 @@ namespace UnitTest
             list.Add(presidentObjectMap);
             list.Add(assPresidentObjectMap);
 
-            Select.SetOrdinal(schemaTable, list);
+            SprocMapper.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(6, list.ElementAt(1).ColumnOrdinalDic["PresidentId"]);
         }
@@ -77,7 +77,7 @@ namespace UnitTest
 
             list.Add(presidentObjectMap);
 
-            Select.SetOrdinal(schemaTable, list);
+            SprocMapper.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(0, list.ElementAt(0).ColumnOrdinalDic["Id"]);
         }
@@ -103,7 +103,7 @@ namespace UnitTest
             list.Add(presidentObjectMap);
             list.Add(assPresidentObjectMap);
 
-            Select.SetOrdinal(schemaTable, list);
+            SprocMapper.SetOrdinal(schemaTable, list);
 
             Assert.AreEqual(8, list.ElementAt(1).ColumnOrdinalDic["Assistant Last Name"]);
         }

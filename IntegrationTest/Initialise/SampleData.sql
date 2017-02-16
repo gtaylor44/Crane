@@ -3560,6 +3560,14 @@ IF EXISTS(SELECT *
       DROP PROCEDURE [dbo].[DeleteCustomer]
   END
 
+IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetSuppliers'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].[GetSuppliers]
+  END
+
 GO
 /****** Object:  StoredProcedure [dbo].[GetProductAndSupplier]    Script Date: 16/02/2017 8:26:05 AM ******/
 SET ANSI_NULLS ON
@@ -3781,3 +3789,36 @@ BEGIN
 
 		SET @Id = SCOPE_IDENTITY();
 END
+
+-- ================================================
+-- Template generated from Template Explorer using:
+-- Create Procedure (New Menu).SQL
+--
+-- Use the Specify Values for Template Parameters 
+-- command (Ctrl-Shift-M) to fill in the parameter 
+-- values below.
+--
+-- This block of comments will not be included in
+-- the definition of the procedure.
+-- ================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].GetSuppliers	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT *
+	FROM Supplier
+END
+GO

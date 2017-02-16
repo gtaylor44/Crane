@@ -132,6 +132,17 @@ namespace IntegrationTest
         }
 
         [TestMethod]
+        public void GetSuppliers()
+        {
+            using (SqlConnection conn = GetSqlConnection())
+            {
+                var suppliers = conn.Select().ExecuteReader<Supplier>(conn, "dbo.GetSuppliers");
+
+                Assert.IsTrue(suppliers.Any());
+            }
+        }
+
+        [TestMethod]
         public void GetCustomer()
         {
             using (SqlConnection conn = GetSqlConnection())

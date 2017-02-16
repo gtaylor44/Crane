@@ -5,6 +5,7 @@ using System.Data.SqlTypes;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FastMember;
 using SprocMapperLibrary.CustomException;
@@ -13,7 +14,7 @@ namespace SprocMapperLibrary
 {
     public static class SprocMapper
     {
-        internal static bool ValidateDuplicateSelectAliases(DataTable schema, bool pedanticValidation, List<ISprocObjectMap> sprocObjectMapList)
+        internal static bool ValidateDuplicateSelectAliases(DataTable schema, bool pedanticValidation, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
         {
             HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
 
@@ -39,13 +40,13 @@ namespace SprocMapperLibrary
 
             if (pedanticValidation)
             {
-                ClearUnusedMaps(columns, sprocObjectMapList);
+                ClearUnusedMaps(columns, sprocObjectMapList, storedProcedure);
             }
 
             return true;
         }
 
-        internal static void ClearUnusedMaps(HashSet<string> columns, List<ISprocObjectMap> sprocObjectMapList)
+        internal static void ClearUnusedMaps(HashSet<string> columns, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
         {
             HashSet<string> allColumns = new HashSet<string>();
             foreach (var map in sprocObjectMapList)
@@ -75,10 +76,10 @@ namespace SprocMapperLibrary
                 });
             }
 
-            ValidateSelectParams(columns, allColumns);
+            ValidateSelectParams(columns, allColumns, storedProcedure);
         }
 
-        internal static void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns)
+        internal static void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns, string storedProcedureName)
         {
             HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
             foreach (var selectParam in schemaColumnSet)
@@ -90,11 +91,13 @@ namespace SprocMapperLibrary
             if (unmatchedParams.Count > 0)
             {
                 string message = string.Join(", ", unmatchedParams.ToList());
-                throw new SprocMapperException($"The following select params are not mapped: {message}");
+                throw new SprocMapperException($"The following select columns in stored procedure '{storedProcedureName}' could not be mapped to a model: {message}. " +
+                                               $"Introduce property for the unmapped columns, setup a custom column mapping for an existing property or directly " +
+                                               $"remove the column from your select statement.");
             }
         }
 
-        internal static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList)
+        internal static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string partitionOn)
         {
 
             var rowDic = schema?.Rows.Cast<DataRow>().ToDictionary(x => x["ColumnName"].ToString().ToLower());
@@ -102,9 +105,16 @@ namespace SprocMapperLibrary
             if (rowDic == null)
                 return;
 
+            int[] partitionOnOrdinal = null;
+
+            if (partitionOn != null)
+                partitionOnOrdinal = GetOrdinalPartition(schema, partitionOn, sprocObjectMapList.Count);
+
+            int currMap = 0;
 
             foreach (var map in sprocObjectMapList)
             {
+                
                 foreach (var column in map.Columns)
                 {
                     string actualColumn = column;
@@ -118,7 +128,14 @@ namespace SprocMapperLibrary
                     {
                         int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
 
-                        if (ValidateOrdinal(sprocObjectMapList, actualColumn))
+                        if (partitionOnOrdinal != null)
+                        {
+                            if (currMap == sprocObjectMapList.Count - 1 || ordinalAsInt < partitionOnOrdinal[currMap + 1])
+                            {
+                                map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
+                            }
+                        }
+                        else
                         {
                             map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
                         }
@@ -126,23 +143,64 @@ namespace SprocMapperLibrary
                     }
                 }
 
+                currMap++;
             }
         }
 
-        internal static bool ValidateOrdinal(List<ISprocObjectMap> sprocObjectMapList, string key)
+        internal static int[] GetOrdinalPartition(DataTable schema, string partitionOn, int mapCount)
         {
-            foreach (var map in sprocObjectMapList)
+
+            List<int> result = new List<int>();
+            string[] partitionOnArr = partitionOn.Split('|');
+
+            if (partitionOnArr.Length != mapCount)
             {
-                if (map.ColumnOrdinalDic.ContainsKey(key))
-                {
-                    throw new SprocMapperException($"\n\nThe column '{key}' can't be mapped twice. " +
-                                                   $"Ignore or set up a custom mapping for each model included in multi-map that has a property named '{key}'. The model that currently has this property mapped is " +
-                                                   $"'{map.Type.Name}' You can ignore columns and setup custom mappings using the AddMapping method. See documentation for more info.\n");
-                }
+                throw new SprocMapperException($"Invalid number of arguments entered for partitionOn. Expected {mapCount} arguments but instead saw {partitionOnArr.Length} arguments");
             }
 
-            return true;
+            int currPartition = 0;
+
+            var rows = schema?.Rows.Cast<DataRow>().ToList();
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                string selectParam = rows[i]["ColumnName"].ToString();
+
+                if (i == 0 && !string.Equals(selectParam, partitionOnArr[currPartition]))
+                {
+                    throw new SprocMapperException($"First partitionOn argument is incorrect. Expected {selectParam} but instead saw {partitionOnArr[currPartition]}");
+                }
+
+                if (string.Equals(selectParam, partitionOnArr[currPartition]))
+                {
+                    result.Add(int.Parse(rows[i]["ColumnOrdinal"].ToString()));
+                    currPartition++;
+                }
+
+                if (currPartition == partitionOnArr.Length)
+                    break;
+            }
+
+            if (currPartition != partitionOnArr.Length)
+            {
+                throw new SprocMapperException($"Please check that partitionOn arguments are all valid column names. Was only able to match {currPartition} arguments");
+            }
+
+            return result.ToArray();
+
         }
+
+        internal static void ValidatePartitionOn(string partitionOn)
+        {
+            if (partitionOn == null)
+                return;
+
+            var validPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]+(?:\|[a-zA-Z_][a-zA-Z0-9_]*)*$");
+
+            if (!validPattern.IsMatch(partitionOn))
+                throw new SprocMapperException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'Id|Id'");
+        }
+            
 
         // Validate that no custom column mapping is mapped to 
         internal static bool ValidateCustomColumnMappings(List<ISprocObjectMap> sprocObjectMapList)
@@ -318,7 +376,7 @@ namespace SprocMapperLibrary
         {
             LambdaExpression lambda = method as LambdaExpression;
             if (lambda == null)
-                throw new ArgumentNullException("method");
+                throw new ArgumentNullException(nameof(method));
 
             MemberExpression memberExpr = null;
 
@@ -333,7 +391,7 @@ namespace SprocMapperLibrary
             }
 
             if (memberExpr == null)
-                throw new ArgumentException("method");
+                throw new ArgumentException(nameof(method));
 
             return memberExpr.Member.Name;
         }

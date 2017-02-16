@@ -51,8 +51,11 @@ namespace SprocMapperLibrary
         }
 
         internal IEnumerable<T> ExecuteReaderImpl<T>(Action<SqlDataReader, List<T>> getObjectDel, SqlConnection conn, string storedProcedure,
-            int commandTimeout, bool pedanticValidation)
+            int commandTimeout, bool validateSelectColumns, string partitionOn, bool validatePartitionOn)
         {
+            if (validatePartitionOn)
+                SprocMapper.ValidatePartitionOn(partitionOn);
+
             // Try open connection if not already open.
             OpenConn(conn);
 
@@ -66,8 +69,8 @@ namespace SprocMapperLibrary
                 {
                     DataTable schema = reader.GetSchemaTable();
 
-                    SprocMapper.ValidateDuplicateSelectAliases(schema, pedanticValidation, _sprocObjectMapList);
-                    SprocMapper.SetOrdinal(schema, _sprocObjectMapList);
+                    SprocMapper.ValidateDuplicateSelectAliases(schema, validateSelectColumns, _sprocObjectMapList, storedProcedure);
+                    SprocMapper.SetOrdinal(schema, _sprocObjectMapList, partitionOn);
 
                     SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
 
@@ -85,8 +88,11 @@ namespace SprocMapperLibrary
         }
 
         internal async Task<IEnumerable<T>> ExecuteReaderAsyncImpl<T>(Action<SqlDataReader, List<T>> getObjectDel, SqlConnection conn, string storedProcedure,
-            int commandTimeout, bool pedanticValidation)
+            int commandTimeout, bool validateSelectColumns, string partitionOn, bool validatePartitionOn)
         {
+            if (validatePartitionOn)
+                SprocMapper.ValidatePartitionOn(partitionOn);
+
             // Try open connection if not already open.
             await OpenConnAsync(conn);
 
@@ -101,8 +107,8 @@ namespace SprocMapperLibrary
                 {
                     DataTable schema = reader.GetSchemaTable();
 
-                    SprocMapper.ValidateDuplicateSelectAliases(schema, pedanticValidation, _sprocObjectMapList);
-                    SprocMapper.SetOrdinal(schema, _sprocObjectMapList);
+                    SprocMapper.ValidateDuplicateSelectAliases(schema, validateSelectColumns, _sprocObjectMapList, storedProcedure);
+                    SprocMapper.SetOrdinal(schema, _sprocObjectMapList, partitionOn);
                     SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
 
                     if (!reader.HasRows)
@@ -118,7 +124,7 @@ namespace SprocMapperLibrary
             return result;
         }
 
-        public IEnumerable<T> ExecuteReader<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600, bool pedanticValidation = false)
+        public IEnumerable<T> ExecuteReader<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -127,11 +133,11 @@ namespace SprocMapperLibrary
                 T obj1 = SprocMapper.GetObject<T>(_sprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, null, false);
         }
 
         public IEnumerable<T> ExecuteReader<T, T1>(SqlConnection conn, string storedProcedure, Action<T, T1> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+            string partitionOn, int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -144,11 +150,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2>(SqlConnection conn, string storedProcedure, Action<T, T1, T2> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public IEnumerable<T> ExecuteReader<T, T1, T2>(SqlConnection conn, string storedProcedure, Action<T, T1, T2> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -162,11 +168,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -181,11 +187,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, T4, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -201,11 +207,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, T4, T5, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -222,11 +228,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -244,11 +250,11 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6, T7>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6, T7> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6, T7>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6, T7> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, T7>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -267,10 +273,10 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -279,11 +285,11 @@ namespace SprocMapperLibrary
                 T obj1 = SprocMapper.GetObject<T>(_sprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, null, false);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1>(SqlConnection conn, string storedProcedure, Action<T, T1> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1>(SqlConnection conn, string storedProcedure, Action<T, T1> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
 
             SprocMapper.MapObject<T, T1, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
@@ -297,11 +303,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2>(SqlConnection conn, string storedProcedure, Action<T, T1, T2> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2>(SqlConnection conn, string storedProcedure, Action<T, T1, T2> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -315,11 +321,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -334,11 +340,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, T4, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -354,11 +360,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, T4, T5, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -375,11 +381,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
             SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
 
@@ -397,11 +403,11 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5, T6, T7>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6, T7> callBack,
-            int commandTimeout = 600, bool pedanticValidation = false)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5, T6, T7>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6, T7> callBack, string partitionOn,
+            int commandTimeout = 600, bool validateSelectColumns = false)
         {
 
             SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, T7>(_sprocObjectMapDic, _sprocObjectMapList);
@@ -421,7 +427,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, pedanticValidation);
+            }, conn, storedProcedure, commandTimeout, validateSelectColumns, partitionOn, true);
         }
 
         public Select AddMapping<T>(MapObject<T> propertyMap)

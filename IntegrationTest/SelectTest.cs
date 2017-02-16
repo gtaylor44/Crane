@@ -57,7 +57,7 @@ namespace IntegrationTest
                         if (o.Id != default(int))
                             cust.CustomerOrders.Add(o);
 
-                    });
+                    }, "Id|OrderId");
             }
 
             Assert.AreEqual(13, cust.CustomerOrders.Count);
@@ -74,15 +74,12 @@ namespace IntegrationTest
             using (SqlConnection conn = GetSqlConnection())
             {
                 product = conn.Select()
-                    .AddMapping(PropertyMapper.MapObject<Product>()
-                    .IgnoreColumn(x => x.Id))
-
                     .AddSqlParameter("@Id", productId)
                     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
                         p.Supplier = s;
 
-                    }).FirstOrDefault();
+                    }, "ProductName|Id").FirstOrDefault();
             }
 
             Assert.AreEqual("Tarte au sucre", product?.ProductName);
@@ -103,17 +100,11 @@ namespace IntegrationTest
                 Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
                 MapObject<Product> productMapping =
-                    PropertyMapper.MapObject<Product>()
-                        //.IgnoreColumn(x => x.Id)
+                    PropertyMapper.MapObject<Product>()               
                         .CustomColumnMapping(x => x.UnitPrice, "Price");
-
-                MapObject<OrderItem> orderItemMapping =
-                    PropertyMapper.MapObject<OrderItem>();
-                        //.IgnoreColumn(x => x.Id);
 
                 conn.Select()
                 .AddSqlParameter("@OrderId", orderId)
-                .AddMapping(orderItemMapping)
                 .AddMapping(productMapping)
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
                     {
@@ -127,7 +118,7 @@ namespace IntegrationTest
                         order = orderDic[o.Id];
                         oi.Product = p;
                         order.OrderItemList.Add(oi);
-                    });
+                    }, "Id|UnitPrice|ProductName", validateSelectColumns: true);
             }
         }
 

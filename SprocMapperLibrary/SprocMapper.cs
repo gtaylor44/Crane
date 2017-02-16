@@ -147,6 +147,13 @@ namespace SprocMapperLibrary
             }
         }
 
+        /// <summary>
+        /// Gets the ordinal as a start index for each column in partitionOn string. 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="partitionOn"></param>
+        /// <param name="mapCount"></param>
+        /// <returns></returns>
         internal static int[] GetOrdinalPartition(DataTable schema, string partitionOn, int mapCount)
         {
 
@@ -166,12 +173,12 @@ namespace SprocMapperLibrary
             {
                 string selectParam = rows[i]["ColumnName"].ToString();
 
-                if (i == 0 && !string.Equals(selectParam, partitionOnArr[currPartition]))
+                if (i == 0 && !string.Equals(selectParam, partitionOnArr[currPartition], StringComparison.OrdinalIgnoreCase))
                 {
                     throw new SprocMapperException($"First partitionOn argument is incorrect. Expected {selectParam} but instead saw {partitionOnArr[currPartition]}");
                 }
 
-                if (string.Equals(selectParam, partitionOnArr[currPartition]))
+                if (string.Equals(selectParam, partitionOnArr[currPartition], StringComparison.OrdinalIgnoreCase))
                 {
                     result.Add(int.Parse(rows[i]["ColumnOrdinal"].ToString()));
                     currPartition++;

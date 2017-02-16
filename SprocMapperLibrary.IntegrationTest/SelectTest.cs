@@ -121,6 +121,8 @@ namespace IntegrationTest
                         order.OrderItemList.Add(oi);
                     }, "Id|UnitPrice|ProductName", validateSelectColumns: true);
             }
+
+            Assert.IsNotNull(order);
         }
 
         [TestMethod]

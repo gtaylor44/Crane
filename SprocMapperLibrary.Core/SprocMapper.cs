@@ -130,7 +130,14 @@ namespace SprocMapperLibrary.Core
                             if (currMap == sprocObjectMapList.Count - 1 || 
                                 (ordinalAsInt < partitionOnOrdinal[currMap + 1] && ordinalAsInt >= partitionOnOrdinal[currMap]))
                             {
-                                map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
+                                // Handle the case if an existing property has the same name as a custom column mapping destination. Overwrite the existing. 
+                                int existingOrdinal;
+                                if (map.ColumnOrdinalDic.TryGetValue(actualColumn, out existingOrdinal))
+                                {
+                                    map.ColumnOrdinalDic[actualColumn] = ordinalAsInt;
+                                }
+                                else
+                                    map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
                             }
                         }
                         else

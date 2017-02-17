@@ -26,7 +26,6 @@ namespace UnitTest
             var assPresidentObjectMap = PropertyMapper.MapObject<PresidentAssistant>()
                 .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
                 .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
-                .IgnoreColumn(x => x.Id)
                 .AddAllColumns()
                 .GetMap();
 
@@ -70,7 +69,6 @@ namespace UnitTest
             var assPresidentObjectMap = PropertyMapper.MapObject<PresidentAssistant>()
                 .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
                 .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
-                .IgnoreColumn(x => x.Id)
                 .AddAllColumns()
                 .GetMap();
 
@@ -86,7 +84,7 @@ namespace UnitTest
         public void GetOrdinalPartition_ReturnsCorrectArr()
         {
             const string partitionOn = "Id|Id";
-            DataTable schema = DataTableFactory.GetTestDataTableV2();
+            var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
             var result = SprocMapper.GetOrdinalPartition(schema, partitionOn, 2);
 
@@ -99,7 +97,7 @@ namespace UnitTest
         public void GetOrdinalPartition_ThrowsException_WhenInvalidNumberOfPartitionOnArgumentsEntered()
         {
             const string partitionOn = "Id|Id|Id";
-            DataTable schema = DataTableFactory.GetTestDataTableV2();
+            var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
             SprocMapper.GetOrdinalPartition(schema, partitionOn, 2);
         }
@@ -109,7 +107,7 @@ namespace UnitTest
         public void GetOrdinalPartition_ThrowsException_WhenFirstColumnNotAMatch()
         {
             const string partitionOn = "FirstName";
-            DataTable schema = DataTableFactory.GetTestDataTableV2();
+            var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
             SprocMapper.GetOrdinalPartition(schema, partitionOn, 1);
         }
@@ -119,11 +117,50 @@ namespace UnitTest
         public void GetOrdinalPartition_ThrowsException_WhenCantFindAllPartitionArguments()
         {
             const string partitionOn = "Id|MiddleName";
-            DataTable schema = DataTableFactory.GetTestDataTableV2();
+            var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
             SprocMapper.GetOrdinalPartition(schema, partitionOn, 2);
         }
 
+        [TestMethod]
+        public void GetOrdinalPosition_WithDuplicateId_ReturnsCorrectOrdinal()
+        {
+            var dataTable = DataTableFactory.GetInvalidSchema().Rows.Cast<DataRow>().ToList();
+
+            var result = SprocMapper.GetOrdinalPosition(dataTable, "Id", 3, 5);
+
+            Assert.AreEqual(3, result);
+        }
+
+        [TestMethod]
+        public void GetOrdinalPosition_WhenMaxRangeIsNull()
+        {
+            var dataTable = DataTableFactory.GetInvalidSchema().Rows.Cast<DataRow>().ToList();
+
+            var result = SprocMapper.GetOrdinalPosition(dataTable, "MiddleName", 5, null);
+
+            Assert.AreEqual(6, result);
+        }
+
+        [TestMethod]
+        public void GetOrdinalPosition_ReturnsNullWhenColumnDoesNotExist()
+        {
+            var dataTable = DataTableFactory.GetInvalidSchema().Rows.Cast<DataRow>().ToList();
+
+            var result = SprocMapper.GetOrdinalPosition(dataTable, "Absent", 0, null);
+
+            Assert.AreEqual(null, result);
+        }
+
+        [TestMethod]
+        public void GetOrdinalPosition_ReturnsNullWhenDoesNotExistInRange()
+        {
+            var dataTable = DataTableFactory.GetInvalidSchema().Rows.Cast<DataRow>().ToList();
+
+            var result = SprocMapper.GetOrdinalPosition(dataTable, "Last Name", 3, 5);
+
+            Assert.AreEqual(null, result);
+        }
 
     }
 }

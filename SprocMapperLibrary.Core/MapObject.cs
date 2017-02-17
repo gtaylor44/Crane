@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using FastMember;
 
-[assembly: InternalsVisibleTo("UnitTest")]
 namespace SprocMapperLibrary.Core
 {    
     public class MapObject<T>
     {
         internal HashSet<string> Columns { get; set; }
-        internal HashSet<string> IgnoreColumns { get; set; }
         internal Dictionary<string, string> CustomColumnMappings { get; set; }
         internal Dictionary<string, Member> MemberInfoCache { get; set; }
         internal TypeAccessor TypeAccessor { get; set; }
@@ -19,7 +16,6 @@ namespace SprocMapperLibrary.Core
         {
             CustomColumnMappings = new Dictionary<string, string>();
             Columns = new HashSet<string>();
-            IgnoreColumns = new HashSet<string>();
             MemberInfoCache = new Dictionary<string, Member>();
         }
 
@@ -30,13 +26,6 @@ namespace SprocMapperLibrary.Core
         public MapObject<T> AddAllColumns()
         {
             Columns = GetAllValueTypeAndStringColumns(this);
-            return this;
-        }
-
-        public MapObject<T> IgnoreColumn(Expression<Func<T, object>> source)
-        {
-            var propertyName = SprocMapper.GetPropertyName(source);
-            IgnoreColumns.Add(propertyName);
             return this;
         }
 
@@ -86,7 +75,7 @@ namespace SprocMapperLibrary.Core
 
             foreach (var member in members)
             {
-                if (SprocMapper.CheckForValidDataType(member.Type) && !mapObject.IgnoreColumns.Contains(member.Name))
+                if (SprocMapper.CheckForValidDataType(member.Type))
                 {
                     columns.Add(member.Name);
                     mapObject.MemberInfoCache.Add(member.Name, member);

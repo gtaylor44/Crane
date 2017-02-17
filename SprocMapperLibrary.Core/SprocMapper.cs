@@ -11,50 +11,23 @@ namespace SprocMapperLibrary.Core
 {
     public static class SprocMapper
     {
-        public static bool ValidateDuplicateSelectAliases(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
-        {
-            HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
-
-            var rowList = schema?.Rows.Cast<DataRow>();
-
-            if (rowList != null)
-            {
-                foreach (var occurence in rowList)
-                {
-                    string schemaColumn = (string)occurence["ColumnName"];
-
-                    if (columns.Contains(schemaColumn))
-                    {
-                        throw new SprocMapperException(
-                            $"Duplicate column in select not allowed. Ensure that all columns in stored procedure are unique. " +
-                            "Try setting an alias for your column in your stored procedure " +
-                            $"and set up a custom column mapping. The offending column is '{schemaColumn}'");
-                    }
-
-                    columns.Add(schemaColumn);
-                }
-            }
-
-            return true;
-        }
-
         public static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string partitionOn)
         {
-            var rowDic = schema?.Rows.Cast<DataRow>().ToDictionary(x => x["ColumnName"].ToString().ToLower());
+            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
-            if (rowDic == null)
-                return;
+            if (rowList == null)
+                throw new SprocMapperException("Could not get schema for stored procedure");
 
             int[] partitionOnOrdinal = null;
 
             if (partitionOn != null)
-                partitionOnOrdinal = GetOrdinalPartition(schema, partitionOn, sprocObjectMapList.Count);
+                partitionOnOrdinal = GetOrdinalPartition(rowList, partitionOn, sprocObjectMapList.Count);
 
             int currMap = 0;
 
             foreach (var map in sprocObjectMapList)
             {
-                
+
                 foreach (var column in map.Columns)
                 {
                     string actualColumn = column;
@@ -62,27 +35,24 @@ namespace SprocMapperLibrary.Core
                     if (map.CustomColumnMappings.ContainsKey(actualColumn))
                         actualColumn = map.CustomColumnMappings[actualColumn];
 
-                    DataRow dataRow;
+                    if (map.ColumnOrdinalDic.ContainsKey(actualColumn))
+                        throw new SprocMapperException($"Could not assign ordinal for column {actualColumn}");
 
-                    if (rowDic.TryGetValue(actualColumn.ToLower(), out dataRow))
+                    int? pos;
+                    if (partitionOnOrdinal != null)
                     {
-                        int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
+                        pos = currMap == sprocObjectMapList.Count - 1 ? GetOrdinalPosition(rowList, actualColumn, partitionOnOrdinal[currMap],
+                                null) : GetOrdinalPosition(rowList, actualColumn, partitionOnOrdinal[currMap],
+                                partitionOnOrdinal[currMap + 1]);
+                    }
+                    else
+                    {
+                        pos = GetOrdinalPosition(rowList, actualColumn, 0, null);
+                    }
 
-                        if (partitionOnOrdinal != null)
-                        {
-                            if (currMap == sprocObjectMapList.Count - 1 || 
-                                (ordinalAsInt < partitionOnOrdinal[currMap + 1] && ordinalAsInt >= partitionOnOrdinal[currMap]))
-                            {
-                                if (map.ColumnOrdinalDic.ContainsKey(actualColumn))
-                                    throw new SprocMapperException($"Could not assign ordinal for column {actualColumn}");
-
-                                map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
-                            }
-                        }
-                        else
-                        {
-                            map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
-                        }
+                    if (pos.HasValue)
+                    {
+                        map.ColumnOrdinalDic.Add(actualColumn, pos.Value);
                     }
                 }
 
@@ -90,14 +60,39 @@ namespace SprocMapperLibrary.Core
             }
         }
 
+        public static int? GetOrdinalPosition(List<DataRow> dataRowList, string columnName, int minRange, int? maxRange)
+        {
+            foreach (var dataRow in dataRowList)
+            {
+                int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
+
+                if (maxRange.HasValue)
+                {
+                    if (dataRow["ColumnName"].ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase)
+                        && ordinalAsInt >= minRange
+                        && ordinalAsInt < maxRange)
+                    {
+                        return ordinalAsInt;
+                    }
+                }
+                else if (dataRow["ColumnName"].ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase)
+                         && ordinalAsInt >= minRange)
+                {
+                    return ordinalAsInt;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Gets the ordinal as a start index for each column in partitionOn string. 
         /// </summary>
-        /// <param name="schema"></param>
+        /// <param name="rows"></param>
         /// <param name="partitionOn"></param>
         /// <param name="mapCount"></param>
         /// <returns></returns>
-        public static int[] GetOrdinalPartition(DataTable schema, string partitionOn, int mapCount)
+        public static int[] GetOrdinalPartition(List<DataRow> rows, string partitionOn, int mapCount)
         {
 
             List<int> result = new List<int>();
@@ -109,8 +104,6 @@ namespace SprocMapperLibrary.Core
             }
 
             int currPartition = 0;
-
-            var rows = schema?.Rows.Cast<DataRow>().ToList();
 
             for (int i = 0; i < rows.Count; i++)
             {
@@ -216,7 +209,7 @@ namespace SprocMapperLibrary.Core
             var schemaProperty = (Type)occurence["DataType"];
 
             Type nullableType;
-            if (((nullableType = Nullable.GetUnderlyingType(member.Type)) != null && schemaProperty != nullableType) 
+            if (((nullableType = Nullable.GetUnderlyingType(member.Type)) != null && schemaProperty != nullableType)
                 || schemaProperty != member.Type && nullableType == null)
             {
                 throw new SprocMapperException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{member.Type}'");

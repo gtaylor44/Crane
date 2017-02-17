@@ -45,8 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ISprocObjectMap.cs" />
-    <Compile Include="SprocMapperException.cs" />
     <Compile Include="MapObject.cs" />
+    <Compile Include="SprocMapperException.cs" />
     <Compile Include="NoMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyMapper.cs" />

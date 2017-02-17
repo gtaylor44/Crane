@@ -68,10 +68,7 @@ namespace SprocMapperLibrary
                 using (var reader = command.ExecuteReader())
                 {
                     DataTable schema = reader.GetSchemaTable();
-
-                    SprocMapper.ValidateDuplicateSelectAliases(schema, _sprocObjectMapList, storedProcedure);
                     SprocMapper.SetOrdinal(schema, _sprocObjectMapList, partitionOn);
-
                     SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
 
                     if (!reader.HasRows)
@@ -106,8 +103,6 @@ namespace SprocMapperLibrary
                 using (var reader = await command.ExecuteReaderAsync())
                 {
                     DataTable schema = reader.GetSchemaTable();
-
-                    SprocMapper.ValidateDuplicateSelectAliases(schema, _sprocObjectMapList, storedProcedure);
                     SprocMapper.SetOrdinal(schema, _sprocObjectMapList, partitionOn);
                     SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
 

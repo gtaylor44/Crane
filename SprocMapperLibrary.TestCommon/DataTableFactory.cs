@@ -47,6 +47,9 @@ namespace SprocMapperLibrary.TestCommon
             tab.Rows.Add("FirstName", 1);
             tab.Rows.Add("Last Name", 2);
             tab.Rows.Add("Id", 3);
+            tab.Rows.Add("FirstName", 4);
+            tab.Rows.Add("Id", 5);
+            tab.Rows.Add("MiddleName", 6);
 
             return tab;
         }

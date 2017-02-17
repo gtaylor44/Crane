@@ -120,7 +120,7 @@ namespace IntegrationTest
                         order = orderDic[o.Id];
                         oi.Product = p;
                         order.OrderItemList.Add(oi);
-                    }, "Id|UnitPrice|ProductName");
+                    }, "Id|Id|Id");
             }
 
             Assert.IsNotNull(order);

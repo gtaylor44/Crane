@@ -54,7 +54,7 @@ namespace SprocMapperLibrary.Core
 
             foreach (var member in members)
             {
-                if (member.Name == destination)
+                if (member.Name.Equals(destination, StringComparison.OrdinalIgnoreCase))
                     throw new SprocMapperException($"Custom column mapping must map to a unique " +
                                                    $"property. A property with the name '{destination}' already exists.");
             }

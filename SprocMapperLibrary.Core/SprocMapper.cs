@@ -11,7 +11,7 @@ namespace SprocMapperLibrary.Core
 {
     public static class SprocMapper
     {
-        public static bool ValidateDuplicateSelectAliases(DataTable schema, bool pedanticValidation, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
+        public static bool ValidateDuplicateSelectAliases(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
         {
             HashSet<string> columns = new HashSet<string>(StringComparer.Ordinal);
 
@@ -35,68 +35,11 @@ namespace SprocMapperLibrary.Core
                 }
             }
 
-            if (pedanticValidation)
-            {
-                ClearUnusedMaps(columns, sprocObjectMapList, storedProcedure);
-            }
-
             return true;
-        }
-
-        public static void ClearUnusedMaps(HashSet<string> columns, List<ISprocObjectMap> sprocObjectMapList, string storedProcedure)
-        {
-            HashSet<string> allColumns = new HashSet<string>();
-            foreach (var map in sprocObjectMapList)
-            {
-                map.Columns.ToList().ForEach(x =>
-                {
-                    if (map.CustomColumnMappings.ContainsKey(x))
-                    {
-                        if (!columns.Contains(map.CustomColumnMappings[x]))
-                        {
-                            map.CustomColumnMappings.Remove(map.CustomColumnMappings[x]);
-                        }
-                        else
-                        {
-                            allColumns.Add(map.CustomColumnMappings[x]);
-                        }
-                    }
-                    else if (!columns.Contains(x))
-                    {
-
-                        map.Columns.Remove(x);
-                    }
-                    else
-                    {
-                        allColumns.Add(x);
-                    }
-                });
-            }
-
-            ValidateSelectParams(columns, allColumns, storedProcedure);
-        }
-
-        public static void ValidateSelectParams(HashSet<string> schemaColumnSet, HashSet<string> allColumns, string storedProcedureName)
-        {
-            HashSet<string> unmatchedParams = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var selectParam in schemaColumnSet)
-            {
-                if (!allColumns.Contains(selectParam))
-                    unmatchedParams.Add(selectParam);
-            }
-
-            if (unmatchedParams.Count > 0)
-            {
-                string message = string.Join(", ", unmatchedParams.ToList());
-                throw new SprocMapperException($"The following select columns in stored procedure '{storedProcedureName}' could not be mapped to a model: {message}. " +
-                                               $"Introduce property for the unmapped columns, setup a custom column mapping for an existing property or directly " +
-                                               $"remove the column from your select statement.");
-            }
         }
 
         public static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string partitionOn)
         {
-
             var rowDic = schema?.Rows.Cast<DataRow>().ToDictionary(x => x["ColumnName"].ToString().ToLower());
 
             if (rowDic == null)
@@ -130,21 +73,16 @@ namespace SprocMapperLibrary.Core
                             if (currMap == sprocObjectMapList.Count - 1 || 
                                 (ordinalAsInt < partitionOnOrdinal[currMap + 1] && ordinalAsInt >= partitionOnOrdinal[currMap]))
                             {
-                                // Handle the case if an existing property has the same name as a custom column mapping destination. Overwrite the existing. 
-                                int existingOrdinal;
-                                if (map.ColumnOrdinalDic.TryGetValue(actualColumn, out existingOrdinal))
-                                {
-                                    map.ColumnOrdinalDic[actualColumn] = ordinalAsInt;
-                                }
-                                else
-                                    map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
+                                if (map.ColumnOrdinalDic.ContainsKey(actualColumn))
+                                    throw new SprocMapperException($"Could not assign ordinal for column {actualColumn}");
+
+                                map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
                             }
                         }
                         else
                         {
                             map.ColumnOrdinalDic.Add(actualColumn, ordinalAsInt);
                         }
-
                     }
                 }
 

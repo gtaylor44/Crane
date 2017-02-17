@@ -16,7 +16,7 @@ namespace UnitTest
         {
             DataTable table = DataTableFactory.GetInvalidSchema();
 
-            SprocMapper.ValidateDuplicateSelectAliases(table, false, null, null);
+            SprocMapper.ValidateDuplicateSelectAliases(table, null, null);
 
         }
 
@@ -25,7 +25,7 @@ namespace UnitTest
         {
             DataTable table = DataTableFactory.GetValidSchema();
 
-            var result = SprocMapper.ValidateDuplicateSelectAliases(table, false, null, null);
+            var result = SprocMapper.ValidateDuplicateSelectAliases(table, null, null);
 
             Assert.IsTrue(result);
         }

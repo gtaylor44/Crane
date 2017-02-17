@@ -43,6 +43,22 @@ namespace SprocMapperLibrary.Core
         public MapObject<T> CustomColumnMapping(Expression<Func<T, object>> source, string destination)
         {
             var propertyName = SprocMapper.GetPropertyName(source);
+
+            if (destination == null)
+                throw new ArgumentNullException(nameof(destination));
+
+            var typeAccessor = TypeAccessor.Create(typeof(T));
+
+            //Get all properties
+            MemberSet members = typeAccessor.GetMembers();
+
+            foreach (var member in members)
+            {
+                if (member.Name == destination)
+                    throw new SprocMapperException($"Custom column mapping must map to a unique " +
+                                                   $"property. A property with the name '{destination}' already exists.");
+            }
+
             CustomColumnMappings.Add(propertyName, destination);
             return this;
         }

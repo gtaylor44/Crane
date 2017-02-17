@@ -107,6 +107,7 @@ namespace IntegrationTest
                 conn.Select()
                 .AddSqlParameter("@OrderId", orderId)
                 .AddMapping(productMapping)
+                .AddMapping(PropertyMapper.MapObject<OrderItem>().CustomColumnMapping(x => x.Id, "OrderId1"))
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
                     {
                         Order ord;
@@ -119,7 +120,7 @@ namespace IntegrationTest
                         order = orderDic[o.Id];
                         oi.Product = p;
                         order.OrderItemList.Add(oi);
-                    }, "Id|UnitPrice|ProductName", validateSelectColumns: true);
+                    }, "Id|UnitPrice|ProductName");
             }
 
             Assert.IsNotNull(order);

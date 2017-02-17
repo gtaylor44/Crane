@@ -148,7 +148,7 @@ namespace SprocMapperLibrary.Core
             var validPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]+(?:\|[a-zA-Z_][a-zA-Z0-9_]*)*$");
 
             if (!validPattern.IsMatch(partitionOn))
-                throw new SprocMapperException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'Id|Id'");
+                throw new SprocMapperException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'OrderId|ProductId'");
         }
 
         public static bool ValidateCustomColumnMappings(List<ISprocObjectMap> sprocObjectMapList)

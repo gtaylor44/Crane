@@ -216,12 +216,8 @@ namespace SprocMapperLibrary.Core
             var schemaProperty = (Type)occurence["DataType"];
 
             Type nullableType;
-            if ((nullableType = Nullable.GetUnderlyingType(member.Type)) != null && schemaProperty != nullableType)
-            {
-                throw new SprocMapperException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{member.Type}'");
-            }
-
-            if (schemaProperty != member.Type && nullableType == null)
+            if (((nullableType = Nullable.GetUnderlyingType(member.Type)) != null && schemaProperty != nullableType) 
+                || schemaProperty != member.Type && nullableType == null)
             {
                 throw new SprocMapperException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{member.Type}'");
             }

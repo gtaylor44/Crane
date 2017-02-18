@@ -82,9 +82,9 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 -----------------------------
 Join up to seven other related entities. When mapping a join you must supply the **partitionOn** and **callback** parameters.
 Please observe the below procedure carefully and pay special attention to the columns 'ProductName' and 'Id'.
-These are the two arguments for the partitionOn parameter. The callback parameter is a delegate and is invoked
-for every row that is processed. This is your chance to do any mappings for your TResult reference type. Because SprocMapper
-reads row by row, some relationships may require an intermediate dictionary. 
+These are the two arguments for the partitionOn parameter. partitionOn arguments are separated by a pipe '|'. The callback parameter 
+is a delegate and is invoked for every row that is processed. This is your chance to do any mappings for your TResult reference type. 
+Because SprocMapper reads row by row, some relationships may require an intermediate dictionary. 
 
 The below example retrieves a single product with an Id of 62 and its associated supplier. It's a 1:1 relationship. 
 

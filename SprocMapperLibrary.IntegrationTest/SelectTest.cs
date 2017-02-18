@@ -7,7 +7,6 @@ using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Model;
 using SprocMapperLibrary;
-using SprocMapperLibrary.Core;
 
 namespace IntegrationTest
 {
@@ -26,7 +25,8 @@ namespace IntegrationTest
                     new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
             {
                 var products = conn.Select()
-                    .AddMapping(PropertyMapper.MapObject<Product>().CustomColumnMapping(x => x.Id, "Product Id"))
+                    .CustomColumnMapping<Product>(x => x.Id, "Product Id")
+                    //.AddMapping(PropertyMapper.MapObject<Product>().CustomColumnMapping(x => x.Id, "Product Id"))
                     .ExecuteReader<Product>(conn, "dbo.GetProducts");
 
                 Assert.IsNotNull(products);
@@ -46,7 +46,7 @@ namespace IntegrationTest
                 conn.Select()
                     .AddSqlParameter("@FirstName", "Thomas")
                     .AddSqlParameter("@LastName", "Hardy")
-                    .AddMapping(PropertyMapper.MapObject<Order>().CustomColumnMapping(x => x.Id, "OrderId"))
+                    .CustomColumnMapping<Order>(x => x.Id, "OrderId")
                     .ExecuteReader<Customer, Order>(conn, "dbo.GetCustomerAndOrders", (c, o) =>
                     {
                         if (cust == null)
@@ -73,7 +73,7 @@ namespace IntegrationTest
             Product product = null;
 
             using (SqlConnection conn = GetSqlConnection())
-            {
+            {              
                 product = conn.Select()
                     .AddSqlParameter("@Id", productId)
                     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
@@ -100,14 +100,10 @@ namespace IntegrationTest
             {
                 Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-                MapObject<Product> productMapping =
-                    PropertyMapper.MapObject<Product>()               
-                        .CustomColumnMapping(x => x.UnitPrice, "Price");
-
                 conn.Select()
                 .AddSqlParameter("@OrderId", orderId)
-                .AddMapping(productMapping)
-                .AddMapping(PropertyMapper.MapObject<OrderItem>().CustomColumnMapping(x => x.Id, "OrderId1"))
+                .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")
+                .CustomColumnMapping<OrderItem>(x => x.Id, "OrderId1")              
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
                     {
                         Order ord;

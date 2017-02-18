@@ -71,10 +71,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj">
-      <Project>{6DD0AA4B-9A8E-4313-8B40-BAD1F4E43DB0}</Project>
-      <Name>SprocMapperLibrary.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SprocMapperLibrary.Model\SprocMapperLibrary.TestModel.csproj">
       <Project>{967c306f-3ffd-42de-87c6-0643a47636ac}</Project>
       <Name>SprocMapperLibrary.TestModel</Name>
@@ -83,9 +79,9 @@
       <Project>{77ad5839-9475-4d85-b432-13caa263db7c}</Project>
       <Name>SprocMapperLibrary.TestCommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SprocMapperLibrary\SprocMapperLibrary.csproj">
+    <ProjectReference Include="..\SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj">
       <Project>{ccaf87a0-a266-4be7-bc3c-389f35914e8f}</Project>
-      <Name>SprocMapperLibrary</Name>
+      <Name>SprocMapperLibrary.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

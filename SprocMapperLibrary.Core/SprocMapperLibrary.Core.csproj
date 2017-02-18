@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6DD0AA4B-9A8E-4313-8B40-BAD1F4E43DB0}</ProjectGuid>
+    <ProjectGuid>{CCAF87A0-A266-4BE7-BC3C-389F35914E8F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SprocMapperLibrary.Core</RootNamespace>
@@ -30,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FastMember, Version=1.0.0.9, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FastMember.1.1.0\lib\net40\FastMember.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,16 +41,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ISprocObjectMap.cs" />
-    <Compile Include="MapObject.cs" />
-    <Compile Include="SprocMapperException.cs" />
     <Compile Include="NoMap.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyMapper.cs" />
     <Compile Include="SprocMapper.cs" />
+    <Compile Include="SprocMapperException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SprocObjectMap.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\fast-member\FastMember_Net40\FastMember_Net40.csproj">
+      <Project>{4c19bcad-c12c-4574-bac0-9dd5c6d12d0b}</Project>
+      <Name>FastMember_Net40</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

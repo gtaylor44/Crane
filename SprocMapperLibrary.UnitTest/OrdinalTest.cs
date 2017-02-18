@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using Model;
+using SprocMapperLibrary;
 using SprocMapperLibrary.Core;
 using SprocMapperLibrary.TestCommon;
 
@@ -13,70 +15,36 @@ namespace UnitTest
     {
 
         [TestMethod]
-        public void TestOrdinal()
-        {
-            DataTable schemaTable = DataTableFactory.GetTestDataTable();
-
-            List<ISprocObjectMap> list = new List<ISprocObjectMap>();
-
-            var presidentObjectMap = PropertyMapper.MapObject<President>()
-                .AddAllColumns()
-                .GetMap();
-
-            var assPresidentObjectMap = PropertyMapper.MapObject<PresidentAssistant>()
-                .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
-                .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
-                .AddAllColumns()
-                .GetMap();
-
-            list.Add(presidentObjectMap);
-            list.Add(assPresidentObjectMap);
-
-            SprocMapper.SetOrdinal(schemaTable, list, "id|presidentid");
-
-            Assert.AreEqual(6, list.ElementAt(1).ColumnOrdinalDic["PresidentId"]);
-        }
-
-        [TestMethod]
         public void TestOrdinalForId()
         {
+            // Arrange
             DataTable schemaTable = DataTableFactory.GetTestDataTable();
-
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
+            SprocMapper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
 
-            var presidentObjectMap = PropertyMapper.MapObject<President>()
-                .AddAllColumns()
-                .GetMap();
-
-            list.Add(presidentObjectMap);
-
+            // Act
             SprocMapper.SetOrdinal(schemaTable, list, null);
 
+            // Assert
             Assert.AreEqual(0, list.ElementAt(0).ColumnOrdinalDic["Id"]);
         }
 
         [TestMethod]
         public void TestOrdinalForCustomMapping()
         {
+            // Arrange
             DataTable schemaTable = DataTableFactory.GetTestDataTable();
-
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
+            Dictionary<Type, Dictionary<string, string>> customColumnMappingDic = new Dictionary<Type, Dictionary<string, string>>();
+            Dictionary<string, string> customColumnMapping = new Dictionary<string, string>() { { "LastName", "Assistant Last Name" }, {"FirstName", "Assistant First Name"} };
+            customColumnMappingDic.Add(typeof(PresidentAssistant), customColumnMapping);
+            SprocMapper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            SprocMapper.MapObject<PresidentAssistant>(list, customColumnMappingDic);
 
-            var presidentObjectMap = PropertyMapper.MapObject<President>()
-                .AddAllColumns()
-                .GetMap();
-
-            var assPresidentObjectMap = PropertyMapper.MapObject<PresidentAssistant>()
-                .CustomColumnMapping(x => x.LastName, "Assistant Last Name")
-                .CustomColumnMapping(x => x.FirstName, "Assistant First Name")
-                .AddAllColumns()
-                .GetMap();
-
-            list.Add(presidentObjectMap);
-            list.Add(assPresidentObjectMap);
-
+            // Act
             SprocMapper.SetOrdinal(schemaTable, list, "id|presidentId");
 
+            // Assert
             Assert.AreEqual(8, list.ElementAt(1).ColumnOrdinalDic["Assistant Last Name"]);
         }
 

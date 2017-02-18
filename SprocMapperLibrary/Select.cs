@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using FastMember;
 using SprocMapperLibrary.Core;
 
 namespace SprocMapperLibrary
 {
     public class Select : AbstractQuery
     {
-        private readonly Dictionary<Type, ISprocObjectMap> _sprocObjectMapDic;
         private readonly List<ISprocObjectMap> _sprocObjectMapList;
+        private readonly Dictionary<Type, Dictionary<string, string>> _customColumnMappings;
         public Select() : base()
         {
-            _sprocObjectMapDic = new Dictionary<Type, ISprocObjectMap>();
             _sprocObjectMapList = new List<ISprocObjectMap>();
+            _customColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
         }
 
         public Select AddSqlParameter(SqlParameter item)
@@ -47,6 +49,42 @@ namespace SprocMapperLibrary
                 throw new NullReferenceException(nameof(sqlParameterCollection));
 
             ParamList.AddRange(sqlParameterCollection);
+            return this;
+        }
+
+        public Select CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination)
+        {
+            var propertyName = SprocMapper.GetPropertyName(source);
+
+            if (destination == null)
+                throw new ArgumentNullException(nameof(destination));
+
+            if (typeof(T).IsValueType)
+                throw new SprocMapperException("An error occurred in CustomColumnMapping<T>. Can't be value type");
+
+            Dictionary<string, string> customColumnDic;
+            if (!_customColumnMappings.TryGetValue(typeof(T), out customColumnDic))
+            {
+                Dictionary<string, string> newDic = new Dictionary<string, string>();
+                _customColumnMappings.Add(typeof(T), newDic);
+
+                customColumnDic = newDic;
+            }        
+
+            var typeAccessor = TypeAccessor.Create(typeof(T));
+
+            //Get all properties
+            MemberSet members = typeAccessor.GetMembers();
+
+            foreach (var member in members)
+            {
+                if (member.Name.Equals(destination, StringComparison.OrdinalIgnoreCase))
+                    throw new SprocMapperException($"Custom column mapping must map to a unique " +
+                                                   $"property. A property with the name '{destination}' already exists.");
+            }
+
+            customColumnDic.Add(propertyName, destination);
+
             return this;
         }
 
@@ -121,7 +159,7 @@ namespace SprocMapperLibrary
 
         public IEnumerable<T> ExecuteReader<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, res) =>
             {
@@ -134,7 +172,7 @@ namespace SprocMapperLibrary
         public IEnumerable<T> ExecuteReader<T, T1>(SqlConnection conn, string storedProcedure, Action<T, T1> callBack,
             string partitionOn, int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, res) =>
             {
@@ -151,7 +189,7 @@ namespace SprocMapperLibrary
         public IEnumerable<T> ExecuteReader<T, T1, T2>(SqlConnection conn, string storedProcedure, Action<T, T1, T2> callBack, string partitionOn,
             int commandTimeout = 600)
         {
-            SprocMapper.MapObject<T, T1, T2, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, res) =>
             {
@@ -169,7 +207,7 @@ namespace SprocMapperLibrary
         public IEnumerable<T> ExecuteReader<T, T1, T2, T3>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, res) =>
             {
@@ -188,7 +226,7 @@ namespace SprocMapperLibrary
         public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, T4, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, res) =>
             {
@@ -208,7 +246,7 @@ namespace SprocMapperLibrary
         public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, res) =>
             {
@@ -229,7 +267,7 @@ namespace SprocMapperLibrary
         public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, result) =>
             {
@@ -251,7 +289,7 @@ namespace SprocMapperLibrary
         public IEnumerable<T> ExecuteReader<T, T1, T2, T3, T4, T5, T6, T7>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6, T7> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, T7>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, T7>(_sprocObjectMapList, _customColumnMappings);
 
             return ExecuteReaderImpl<T>((reader, result) =>
             {
@@ -273,7 +311,7 @@ namespace SprocMapperLibrary
 
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -287,7 +325,7 @@ namespace SprocMapperLibrary
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
 
-            SprocMapper.MapObject<T, T1, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, NoMap, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -304,7 +342,7 @@ namespace SprocMapperLibrary
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2>(SqlConnection conn, string storedProcedure, Action<T, T1, T2> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, NoMap, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -322,7 +360,7 @@ namespace SprocMapperLibrary
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, NoMap, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -341,7 +379,7 @@ namespace SprocMapperLibrary
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, T4, NoMap, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, NoMap, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -361,7 +399,7 @@ namespace SprocMapperLibrary
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, NoMap, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, NoMap, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -382,7 +420,7 @@ namespace SprocMapperLibrary
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T1, T2, T3, T4, T5, T6>(SqlConnection conn, string storedProcedure, Action<T, T1, T2, T3, T4, T5, T6> callBack, string partitionOn,
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
-            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, NoMap>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, NoMap>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -405,7 +443,7 @@ namespace SprocMapperLibrary
             int commandTimeout = 600, bool validateSelectColumns = false)
         {
 
-            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, T7>(_sprocObjectMapDic, _sprocObjectMapList);
+            SprocMapper.MapObject<T, T1, T2, T3, T4, T5, T6, T7>(_sprocObjectMapList, _customColumnMappings);
 
             return await ExecuteReaderAsyncImpl<T>((reader, res) =>
             {
@@ -423,29 +461,6 @@ namespace SprocMapperLibrary
                 res.Add(obj1);
 
             }, conn, storedProcedure, commandTimeout, partitionOn, true);
-        }
-
-        public Select AddMapping<T>(MapObject<T> propertyMap)
-        {
-            if (propertyMap == null)
-                throw new NullReferenceException(nameof(propertyMap));
-
-            if (typeof(T).IsValueType)
-                throw new SprocMapperException("An error occurred in AddMapping<T>. Map can't be value type, must be custom.");
-
-            if (!_sprocObjectMapDic.ContainsKey(typeof(T)))
-            {
-                propertyMap.AddAllColumns();
-                _sprocObjectMapDic.Add(typeof(T), propertyMap.GetMap());
-            }
-            else
-            {
-                throw new SprocMapperException($"An error occurred in AddMapping<T>. Map already exists for type {typeof(T).Name}");
-            }
-
-            return this;
-        }
-
-        
+        }    
     }
 }

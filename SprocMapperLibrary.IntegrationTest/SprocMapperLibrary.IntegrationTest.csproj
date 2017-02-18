@@ -66,20 +66,24 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\fast-member\FastMember_Net40\FastMember_Net40.csproj">
+      <Project>{4c19bcad-c12c-4574-bac0-9dd5c6d12d0b}</Project>
+      <Name>FastMember_Net40</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SprocMapperLibrary.Model\SprocMapperLibrary.TestModel.csproj">
       <Project>{967c306f-3ffd-42de-87c6-0643a47636ac}</Project>
-      <Name>SprocMapperLibrary.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj">
-      <Project>{6DD0AA4B-9A8E-4313-8B40-BAD1F4E43DB0}</Project>
-      <Name>SprocMapperLibrary.Core</Name>
+      <Name>SprocMapperLibrary.TestModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\SprocMapperLibrary.TestCommon\SprocMapperLibrary.TestCommon.csproj">
       <Project>{77ad5839-9475-4d85-b432-13caa263db7c}</Project>
       <Name>SprocMapperLibrary.TestCommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SprocMapperLibrary\SprocMapperLibrary.csproj">
+    <ProjectReference Include="..\SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj">
       <Project>{ccaf87a0-a266-4be7-bc3c-389f35914e8f}</Project>
+      <Name>SprocMapperLibrary.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SprocMapperLibrary\SprocMapperLibrary.csproj">
+      <Project>{ac717bc4-c2f1-40ba-afb2-0ade649a33a5}</Project>
       <Name>SprocMapperLibrary</Name>
     </ProjectReference>
   </ItemGroup>

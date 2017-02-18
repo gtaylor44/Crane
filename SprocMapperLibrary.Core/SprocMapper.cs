@@ -216,45 +216,69 @@ namespace SprocMapperLibrary.Core
             }
         }
 
-        public static void MapObject<T, T1, T2, T3, T4, T5, T6, T7>(Dictionary<Type, ISprocObjectMap> sprocObjectMapDic, List<ISprocObjectMap> sprocObjectMapList)
+        public static void MapObject<T, T1, T2, T3, T4, T5, T6, T7>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
         {
             if (typeof(T) != typeof(NoMap))
-                MapObject<T>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T>(sprocObjectMapList, customColumnMappings);
 
             if (typeof(T1) != typeof(NoMap))
-                MapObject<T1>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T1>(sprocObjectMapList, customColumnMappings);
 
             if (typeof(T2) != typeof(NoMap))
-                MapObject<T2>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T2>(sprocObjectMapList, customColumnMappings);
 
             if (typeof(T3) != typeof(NoMap))
-                MapObject<T3>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T3>(sprocObjectMapList, customColumnMappings);
 
             if (typeof(T4) != typeof(NoMap))
-                MapObject<T4>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T4>(sprocObjectMapList, customColumnMappings);
 
             if (typeof(T5) != typeof(NoMap))
-                MapObject<T5>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T5>(sprocObjectMapList, customColumnMappings);
 
             if (typeof(T6) != typeof(NoMap))
-                MapObject<T6>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T6>(sprocObjectMapList, customColumnMappings);
 
             if (typeof(T7) != typeof(NoMap))
-                MapObject<T7>(sprocObjectMapDic, sprocObjectMapList);
+                MapObject<T7>(sprocObjectMapList, customColumnMappings);
         }
 
-        public static void MapObject<T>(Dictionary<Type, ISprocObjectMap> sprocObjectMapDic, List<ISprocObjectMap> sprocObjectMapList)
+        public static void MapObject<T>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
         {
-            ISprocObjectMap objMap;
-            if (!sprocObjectMapDic.TryGetValue(typeof(T), out objMap))
-            {
-                var map = PropertyMapper.MapObject<T>();
-                map.AddAllColumns();
+            SprocObjectMap<T> objectMap = new SprocObjectMap<T>();
 
-                objMap = map.GetMap();
+            objectMap.Columns = GetAllValueTypeAndStringColumns(objectMap);
+
+            Dictionary<string, string> customColumnDic;
+
+            if (customColumnMappings.TryGetValue(typeof(T), out customColumnDic))
+            {
+                objectMap.CustomColumnMappings = customColumnDic;
             }
 
-            sprocObjectMapList.Add(objMap);
+            sprocObjectMapList.Add(objectMap);
+        }
+
+        public static HashSet<string> GetAllValueTypeAndStringColumns<TObj>(SprocObjectMap<TObj> mapObject)
+        {
+            HashSet<string> columns = new HashSet<string>();
+
+            mapObject.TypeAccessor = TypeAccessor.Create(typeof(TObj));
+
+            //Get all properties
+            MemberSet members = mapObject.TypeAccessor.GetMembers();
+
+            foreach (var member in members)
+            {
+                if (CheckForValidDataType(member.Type))
+                {
+                    columns.Add(member.Name);
+                    mapObject.MemberInfoCache.Add(member.Name, member);
+                }
+            }
+
+            return columns;
+
         }
 
         public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)

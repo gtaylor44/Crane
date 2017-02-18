@@ -7,7 +7,7 @@ SprocMapper is a productivity tool for mapping SQL result sets from stored proce
  * Minimises the risk of making common mistakes when attempting to manually map each column (yes, you are human).
  * Validate data type is correct between model property and its matched column in the stored procedure for you. int32 != int64 for example.
  * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues. 
- * Validate that all columns in select statement are mapped to a model property (this is an optional feature). 
+ * Validate that all columns in select statement are mapped to corresponding model property (this is an optional feature). 
  
 
 ##Examples
@@ -172,9 +172,9 @@ Assert.IsNotNull(cust);
 Assert.AreEqual(13, cust.CustomerOrders.Count);
 ```
 -----------------------------
-Set validateSelectColumns to true to validate all select columns have a home. This is set to false by default. 
+Set validateSelectColumns to true to validate all select columns are mapped to corresponding model property. This is set to false by default. 
 The below example sets an alias in stored procedure but because no custom column mapping has been setup, it's not mapped 
-and throws an exception with a useful message. The same exception message is shown if the property does not exist or a custom 
+and throws a SprocMapperException. The same exception message is shown if the property does not exist or a custom 
 column mapping is incorrect. Note that when mapping joins, it's important to have accurate 'partitionOn' arguments to avoid mixed results. 
 
 ```sql
@@ -194,11 +194,11 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
     Customer customer = conn.Select() 
     .AddSqlParameter("@CustomerId", 6)
-    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", **validateSelectColumns: true**)
+    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", validateSelectColumns: true)
     .FirstOrDefault();
 }
 ```
-###Result:
+####Result:
 ```
 'validateSelectColumns' flag is set to TRUE
 

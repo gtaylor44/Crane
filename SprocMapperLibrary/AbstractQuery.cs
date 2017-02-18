@@ -31,10 +31,12 @@ namespace SprocMapperLibrary
             }
         }
 
-        protected void SetCommandProps(SqlCommand command, int commandTimeout)
+        protected void SetCommandProps(SqlCommand command, int? commandTimeout)
         {
             command.CommandType = CommandType.StoredProcedure;
-            command.CommandTimeout = commandTimeout;
+
+            if (commandTimeout.HasValue)
+                command.CommandTimeout = commandTimeout.Value;
 
             if (ParamList != null && ParamList.Any())
                 command.Parameters.AddRange(ParamList.ToArray());

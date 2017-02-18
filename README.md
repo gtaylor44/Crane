@@ -238,7 +238,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
     int outputId = idParam.GetValueOrDefault<int>();
 }
 
-Assert.IsTrue(insertedRecords > 0);
+Assert.IsTrue(insertedRecords == 1);
 ```
 -----------------------------
 

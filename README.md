@@ -28,7 +28,9 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 }
 ```
 -----------------------------
-Easily add parameters.
+Easily add parameters. The below example gets all products with a supplier id of 2.
+You can chain the AddSqlParamater method more than once if you have more than one parameter
+to include. 
 
 ```sql
 ALTER PROCEDURE [dbo].[GetProducts]
@@ -44,11 +46,7 @@ END
 
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{
-    /* Gets all products with a supplier id of 2. AddSqlParamater can 
-    be chained more than once if you have more than one parameter to 
-    include. */    
-    
+{   
     var products = conn.Select()
     .AddSqlParameter("@SupplierId", 2)
     .ExecuteReader<Product>(conn, "dbo.GetProducts");
@@ -159,7 +157,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             cust.CustomerOrders = new List<Order>();
         }
         
-        // There is a left join to orders
+        // There is a left join to order table
         if (o.Id != default(int))
             cust.CustomerOrders.Add(o);
 

@@ -782,6 +782,6 @@ namespace SprocMapperLibrary
                 res.Add(obj1);
 
             }, conn, storedProcedure, commandTimeout, partitionOn, true);
-        }    
+        }
     }
 }

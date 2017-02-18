@@ -24,7 +24,7 @@ namespace SprocMapperLibrary
             return this;
         }
 
-        public int ExecuteNonQuery(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
+        public int ExecuteNonQuery(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             int affectedRecords;
 
@@ -39,7 +39,7 @@ namespace SprocMapperLibrary
             return affectedRecords;
         }
 
-        public async Task<int> ExecuteNonQueryAsync(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
+        public async Task<int> ExecuteNonQueryAsync(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             int affectedRecords;
 
@@ -53,7 +53,7 @@ namespace SprocMapperLibrary
             return affectedRecords;
         }
 
-        public T ExecuteScalar<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
+        public T ExecuteScalar<T>(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             T obj;
 
@@ -67,7 +67,7 @@ namespace SprocMapperLibrary
             return obj;
         }
 
-        public async Task<T> ExecuteScalarAsync<T>(SqlConnection conn, string storedProcedure, int commandTimeout = 600)
+        public async Task<T> ExecuteScalarAsync<T>(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             T obj;
 

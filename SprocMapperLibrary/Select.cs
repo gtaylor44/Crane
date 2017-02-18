@@ -126,7 +126,7 @@ namespace SprocMapperLibrary
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOn"></param>
         /// <param name="validatePartitionOn"></param>
@@ -242,7 +242,7 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -266,9 +266,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TResult"></typeparam>
         /// <typeparam name="TJoin1"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -298,9 +298,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin1"></typeparam>
         /// <typeparam name="TJoin2"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -334,9 +334,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin2"></typeparam>
         /// <typeparam name="TJoin3"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -373,9 +373,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin3"></typeparam>
         /// <typeparam name="TJoin4"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -415,9 +415,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin4"></typeparam>
         /// <typeparam name="TJoin5"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -460,9 +460,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin5"></typeparam>
         /// <typeparam name="TJoin6"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -508,9 +508,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin6"></typeparam>
         /// <typeparam name="TJoin7"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -575,9 +575,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TResult"></typeparam>
         /// <typeparam name="TJoin1"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -609,9 +609,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin1"></typeparam>
         /// <typeparam name="TJoin2"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -645,9 +645,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin2"></typeparam>
         /// <typeparam name="TJoin3"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -684,9 +684,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin3"></typeparam>
         /// <typeparam name="TJoin4"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -727,9 +727,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin4"></typeparam>
         /// <typeparam name="TJoin5"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -772,9 +772,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin5"></typeparam>
         /// <typeparam name="TJoin6"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -820,9 +820,9 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin6"></typeparam>
         /// <typeparam name="TJoin7"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="callBack"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>

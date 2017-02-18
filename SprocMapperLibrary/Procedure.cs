@@ -24,6 +24,13 @@ namespace SprocMapperLibrary
             return this;
         }
 
+        /// <summary>
+        /// Execute a stored procedure synchronously.
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>Number of affected records.</returns>
         public int ExecuteNonQuery(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             int affectedRecords;
@@ -39,6 +46,13 @@ namespace SprocMapperLibrary
             return affectedRecords;
         }
 
+        /// <summary>
+        /// Execute a stored procedure asynchronously.
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>Number of affected records.</returns>
         public async Task<int> ExecuteNonQueryAsync(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             int affectedRecords;
@@ -53,6 +67,14 @@ namespace SprocMapperLibrary
             return affectedRecords;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="conn"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>First column of the first row in the result set.</returns>
         public T ExecuteScalar<T>(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             T obj;
@@ -67,6 +89,14 @@ namespace SprocMapperLibrary
             return obj;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="conn"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>First column of the first row in the result set.</returns>
         public async Task<T> ExecuteScalarAsync<T>(SqlConnection conn, string storedProcedure, int? commandTimeout = null)
         {
             T obj;

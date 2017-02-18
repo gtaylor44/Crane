@@ -71,10 +71,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SprocMapperLibrary.Model\SprocMapperLibrary.TestModel.csproj">
-      <Project>{967c306f-3ffd-42de-87c6-0643a47636ac}</Project>
-      <Name>SprocMapperLibrary.TestModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SprocMapperLibrary.TestCommon\SprocMapperLibrary.TestCommon.csproj">
       <Project>{77ad5839-9475-4d85-b432-13caa263db7c}</Project>
       <Name>SprocMapperLibrary.TestCommon</Name>

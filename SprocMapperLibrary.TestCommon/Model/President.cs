@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Model
+namespace SprocMapperLibrary.TestCommon.Model
 {
     public class President
     {
@@ -10,7 +10,5 @@ namespace Model
         public int? Fans { get; set; }
         public bool IsHonest { get; set; }
         public List<PresidentAssistant> PresidentAssistantList { get; set; }
-
-
     }
 }

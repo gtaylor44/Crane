@@ -6,10 +6,10 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Model;
 using SprocMapperLibrary;
 using SprocMapperLibrary.Core;
 using SprocMapperLibrary.TestCommon;
+using SprocMapperLibrary.TestCommon.Model;
 
 namespace IntegrationTest
 {

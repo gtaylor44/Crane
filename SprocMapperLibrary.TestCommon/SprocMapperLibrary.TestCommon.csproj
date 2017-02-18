@@ -42,6 +42,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataTableFactory.cs" />
+    <Compile Include="Model\Customer.cs" />
+    <Compile Include="Model\Order.cs" />
+    <Compile Include="Model\OrderItem.cs" />
+    <Compile Include="Model\President.cs" />
+    <Compile Include="Model\PresidentAssistant.cs" />
+    <Compile Include="Model\Product.cs" />
+    <Compile Include="Model\Supplier.cs" />
     <Compile Include="MyExpectedException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -8,7 +8,7 @@ Minimises the risk of making common mistakes by manually mapping each column (ye
 
 ##Examples
 
-Select all products defined by a stored procedure named 'dbo.GetProducts'
+Select all products defined by a stored procedure named 'dbo.GetProducts'.
 
 ```sql
 ALTER PROCEDURE [dbo].[GetProducts]
@@ -29,15 +29,28 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 ```
 
 Easily add parameters.
+
+```sql
+ALTER PROCEDURE [dbo].[GetProducts]
+	@SupplierId int
+AS
+BEGIN
+SELECT p.Id, p.ProductName, p.UnitPrice,
+p.Package, p.IsDiscontinued 
+FROM dbo.Product p
+WHERE p.SupplierId = @SupplierId
+END
+```
+
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    /* Get all products with a supplier id of 10. AddSqlParamater can 
+    /* Get all products with a supplier id of 2. AddSqlParamater can 
     be chained more than once if you have more than one parameter to 
     include. */
     
     var products = conn.Select()
-    .AddSqlParameter("@SupplierId", 10)
+    .AddSqlParameter("@SupplierId", 2)
     .ExecuteReader<Product>(conn, "dbo.GetProducts");
 }
 ```
@@ -65,10 +78,11 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 }
 ```
 
-Join up to seven other related entities.When mapping a join you must supply the partitionOn and callback parameters.
+Join up to seven other related entities. When mapping a join you must supply the partitionOn and callback parameters.
 Please observe the below procedure carefully and pay special attention to the columns 'ProductName' and 'Id'.
 These are the two arguments for the partitionOn parameter. The callback parameter is a delegate and is called
-for every row that is processed. This is your chance to do any mappings for your TResult reference type.
+for every row that is processed. This is your chance to do any mappings for your TResult reference type. Because SprocMapper
+reads row by row, some relationships may require an intermediate dictionary. 
 
 ```sql
 ALTER PROCEDURE [dbo].[GetProductAndSupplier]
@@ -92,7 +106,7 @@ Product product = null;
 
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {    
-    // Retrieves a product with an Id of 62 and it's associated supplier. 
+    // Retrieves a single product with an Id of 62 and it's associated supplier. 
     
     product = conn.Select()
     .AddSqlParameter("@Id", 62)
@@ -108,7 +122,7 @@ Assert.AreEqual("Chantal Goulet", product?.Supplier.ContactName);
 
 ```
 
-One to many example
+One to many example.
 
 ```sql
 ALTER PROCEDURE [dbo].[GetCustomerAndOrders]
@@ -145,6 +159,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             cust.CustomerOrders = new List<Order>();
         }
         
+        // SprocMapper handles DbNull.Value gracefully.
         if (o.Id != default(int))
             cust.CustomerOrders.Add(o);
 
@@ -155,7 +170,7 @@ Assert.IsNotNull(cust);
 Assert.AreEqual(13, cust.CustomerOrders.Count);
 ```
 
-Execute a stored procedure without a result set
+Execute a stored procedure without a result set.
 ```c#
 
 Customer customer = new Customer()
@@ -167,7 +182,7 @@ Customer customer = new Customer()
     Phone = "111"
 };
 
-int inserted = 0;
+int insertedRecords = 0;
             
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
@@ -178,7 +193,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
         Direction = ParameterDirection.Output 
     };
 
-    inserted = conn.Procedure()
+    insertedRecords = conn.Procedure()
         .AddSqlParameter(idParam)
         .AddSqlParameter("@City", customer.City)
         .AddSqlParameter("@Country", customer.Country)
@@ -189,12 +204,14 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 
     int outputId = idParam.GetValueOrDefault<int>();
 }
+
+Assert.IsTrue(insertedRecords > 0);
 ```
 
 
 ###Performance
-Internally, SprocMapper will cache property members for quick lookups. 
-Performance is more dependant on how well your SQL is written. 
+Internally, SprocMapper will cache property members for quick lookups and uses FastMember 
+for assigning values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
 Please feel free to blog, compare and review.
 
 

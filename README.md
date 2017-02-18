@@ -28,7 +28,8 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    var products = conn.Select().ExecuteReader<Product>(conn, "dbo.GetProducts");
+    var products = conn.Select()
+    .ExecuteReader<Product>(conn, "dbo.GetProducts");
 }
 ```
 -----------------------------

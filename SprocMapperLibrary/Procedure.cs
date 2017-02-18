@@ -4,20 +4,41 @@ using System.Threading.Tasks;
 
 namespace SprocMapperLibrary
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Procedure : AbstractQuery
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public Procedure AddSqlParameter(SqlParameter item)
         {
             ParamList.Add(item);
             return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public Procedure AddSqlParameter(string parameterName, object value)
         {
             ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName });
             return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <param name="value"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
         public Procedure AddSqlParameter(string parameterName, object value, SqlDbType dbType)
         {
             ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName, SqlDbType = dbType});

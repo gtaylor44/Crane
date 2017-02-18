@@ -11,11 +11,17 @@ using SprocMapperLibrary.Core.Interface;
 
 namespace SprocMapperLibrary
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Select : AbstractQuery
     {
         private readonly List<ISprocObjectMap> _sprocObjectMapList;
         private readonly Dictionary<Type, Dictionary<string, string>> _customColumnMappings;
         private const bool ValidateColumnsDefault = false;
+        /// <summary>
+        /// 
+        /// </summary>
         public Select() : base()
         {
             _sprocObjectMapList = new List<ISprocObjectMap>();

@@ -4,6 +4,9 @@ using System.Data.SqlClient;
 
 namespace SprocMapperLibrary
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class SprocMapperExtensions
     {
         /// <summary>

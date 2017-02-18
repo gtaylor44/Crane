@@ -4,11 +4,11 @@ SprocMapper is a productivity tool for mapping SQL result sets from stored proce
 
 * Advantages of using SprocMapper:
  * Speeds up the time it takes to map a stored procedure in the application layer.
- * Minimises the risk of making common mistakes by manually mapping each column (yes, you are human).
+ * Minimises the risk of making common mistakes when manually mapping each column (yes, you are human).
 
 ##Examples
 
-Select all products defined by a stored procedure named 'dbo.GetProducts'.
+Selects all products defined by 'dbo.GetProducts'.
 
 ```sql
 ALTER PROCEDURE [dbo].[GetProducts]
@@ -27,7 +27,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
     var products = conn.Select().ExecuteReader<Product>(conn, "dbo.GetProducts");
 }
 ```
-
+-----------------------------
 Easily add parameters.
 
 ```sql
@@ -45,16 +45,16 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    /* Get all products with a supplier id of 2. AddSqlParamater can 
+    /* Gets all products with a supplier id of 2. AddSqlParamater can 
     be chained more than once if you have more than one parameter to 
-    include. */
+    include. */    
     
     var products = conn.Select()
     .AddSqlParameter("@SupplierId", 2)
     .ExecuteReader<Product>(conn, "dbo.GetProducts");
 }
 ```
-
+-----------------------------
 If you're using a column alias in your select statement, add one or
 many custom column mappings depending on your procedure.
 
@@ -77,12 +77,14 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
     .ExecuteReader<Product>(conn, "dbo.GetProducts");
 }
 ```
-
-Join up to seven other related entities. When mapping a join you must supply the partitionOn and callback parameters.
+-----------------------------
+Join up to seven other related entities. When mapping a join you must supply the **partitionOn** and **callback** parameters.
 Please observe the below procedure carefully and pay special attention to the columns 'ProductName' and 'Id'.
 These are the two arguments for the partitionOn parameter. The callback parameter is a delegate and is called
 for every row that is processed. This is your chance to do any mappings for your TResult reference type. Because SprocMapper
 reads row by row, some relationships may require an intermediate dictionary. 
+
+The below example retrieves a single product with an Id of 62 and its associated supplier. It's a 1:1 relationship. 
 
 ```sql
 ALTER PROCEDURE [dbo].[GetProductAndSupplier]
@@ -106,8 +108,6 @@ Product product = null;
 
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {    
-    // Retrieves a single product with an Id of 62 and it's associated supplier. 
-    
     product = conn.Select()
     .AddSqlParameter("@Id", 62)
     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
@@ -121,8 +121,8 @@ Assert.AreEqual("Tarte au sucre", product?.ProductName);
 Assert.AreEqual("Chantal Goulet", product?.Supplier.ContactName);
 
 ```
-
-One to many example.
+-----------------------------
+0:M example between customer their order(s).
 
 ```sql
 ALTER PROCEDURE [dbo].[GetCustomerAndOrders]
@@ -159,7 +159,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             cust.CustomerOrders = new List<Order>();
         }
         
-        // SprocMapper handles DbNull.Value gracefully.
+        // There is a left join to orders
         if (o.Id != default(int))
             cust.CustomerOrders.Add(o);
 
@@ -169,8 +169,43 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 Assert.IsNotNull(cust);
 Assert.AreEqual(13, cust.CustomerOrders.Count);
 ```
-
+-----------------------------
 Execute a stored procedure without a result set.
+
+```sql
+ALTER PROCEDURE [dbo].[SaveCustomer]
+	@Id int output,
+	@City nvarchar(40),
+	@Country nvarchar(40),
+	@Phone nvarchar(20),
+	@FirstName nvarchar(40),
+	@LastName nvarchar(40)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+	INSERT INTO dbo.Customer
+	(
+        FirstName,
+        LastName,
+        City,
+        Country,
+        Phone
+	)
+
+	VALUES
+	(
+        @FirstName,
+        @LastName,
+        @City,
+        @Country,
+        @Phone
+	)
+
+	SET @Id = SCOPE_IDENTITY();
+    
+END
+```
 ```c#
 
 Customer customer = new Customer()
@@ -207,7 +242,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 
 Assert.IsTrue(insertedRecords > 0);
 ```
-
+-----------------------------
 
 ###Performance
 Internally, SprocMapper will cache property members for quick lookups and uses FastMember 

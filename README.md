@@ -120,7 +120,7 @@ Assert.AreEqual("Chantal Goulet", product?.Supplier.ContactName);
 
 ```
 -----------------------------
-0..1:M example between customer their order(s).
+0..1:M example between customer (if exists) and their order(s).
 
 ```sql
 ALTER PROCEDURE [dbo].[GetCustomerAndOrders]

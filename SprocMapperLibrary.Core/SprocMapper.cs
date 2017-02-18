@@ -64,6 +64,11 @@ namespace SprocMapperLibrary.Core
         {
             foreach (var dataRow in dataRowList)
             {
+                if (columnName.Equals("Price"))
+                {
+                    
+                }
+
                 int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
 
                 if (maxRange.HasValue)
@@ -96,6 +101,7 @@ namespace SprocMapperLibrary.Core
         {
 
             List<int> result = new List<int>();
+            List<string> matched = new List<string>();
             string[] partitionOnArr = partitionOn.Split('|');
 
             if (partitionOnArr.Length != mapCount)
@@ -117,6 +123,7 @@ namespace SprocMapperLibrary.Core
                 if (string.Equals(selectParam, partitionOnArr[currPartition], StringComparison.OrdinalIgnoreCase))
                 {
                     result.Add(int.Parse(rows[i]["ColumnOrdinal"].ToString()));
+                    matched.Add(selectParam);
                     currPartition++;
                 }
 
@@ -126,7 +133,8 @@ namespace SprocMapperLibrary.Core
 
             if (currPartition != partitionOnArr.Length)
             {
-                throw new SprocMapperException($"Please check that partitionOn arguments are all valid column names. Was only able to match {currPartition} arguments");
+                string matchedStr = string.Join(", ", matched);
+                throw new SprocMapperException($"Please check that partitionOn arguments are all valid column names. I was only able to match the following arguments: {matchedStr}. Expecting a total of {mapCount} valid arguments.");
             }
 
             return result.ToArray();

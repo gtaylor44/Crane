@@ -3573,7 +3573,7 @@ IF EXISTS(SELECT *
           WHERE  ROUTINE_NAME = 'GetSupplierByName'
                  AND SPECIFIC_SCHEMA = 'dbo')
   BEGIN
-      DROP PROCEDURE [dbo].[GetSupplier]
+      DROP PROCEDURE [dbo].[GetSupplierByName]
   END
 
 GO

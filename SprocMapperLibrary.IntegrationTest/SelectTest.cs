@@ -7,6 +7,8 @@ using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Model;
 using SprocMapperLibrary;
+using SprocMapperLibrary.Core;
+using SprocMapperLibrary.TestCommon;
 
 namespace IntegrationTest
 {
@@ -14,19 +16,16 @@ namespace IntegrationTest
     public class SelectTest
     {
 
-        // Returns all products. 
+        // Returns all products with Id and Product Name only
         // Id has an alias of 'Product Id'
-
         [TestMethod]
         public void GetProducts()
         {
             using (
-                SqlConnection conn =
-                    new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString))
+                SqlConnection conn = GetSqlConnection())
             {
                 var products = conn.Select()
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    //.AddMapping(PropertyMapper.MapObject<Product>().CustomColumnMapping(x => x.Id, "Product Id"))
                     .ExecuteReader<Product>(conn, "dbo.GetProducts");
 
                 Assert.IsNotNull(products);
@@ -102,8 +101,7 @@ namespace IntegrationTest
 
                 conn.Select()
                 .AddSqlParameter("@OrderId", orderId)
-                .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")
-                .CustomColumnMapping<OrderItem>(x => x.Id, "OrderId1")              
+                .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")      
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
                     {
                         Order ord;
@@ -116,7 +114,7 @@ namespace IntegrationTest
                         order = orderDic[o.Id];
                         oi.Product = p;
                         order.OrderItemList.Add(oi);
-                    }, "Id|Id|Id");
+                    }, "Id|unitprice|productname");
             }
 
             Assert.IsNotNull(order);
@@ -207,6 +205,18 @@ namespace IntegrationTest
             }
 
             Assert.AreEqual(1, inserted);
+        }
+
+        [TestMethod]
+        [MyExpectedException(typeof(SprocMapperException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
+        public void CustomColumnName_MustBeUniqueToClass()
+        {
+            using (SqlConnection conn = GetSqlConnection())
+            {
+                conn.Select()
+                    .CustomColumnMapping<Product>(x => x.Package, "ProductName")
+                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+            }
         }
 
         private SqlConnection GetSqlConnection()

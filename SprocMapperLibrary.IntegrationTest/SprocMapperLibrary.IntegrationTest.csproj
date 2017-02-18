@@ -87,10 +87,6 @@
       <Name>SprocMapperLibrary</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Seed\SampleERD.png" />
-    <Content Include="Seed\SampleData.sql" />
-  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

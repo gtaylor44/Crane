@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -26,7 +27,7 @@ namespace IntegrationTest
             {
                 var products = conn.Select()
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+                    .ExecuteReader<Product, Supplier>(conn, "dbo.GetProducts", (p, s) => { }, "Product Id|Id");
 
                 Assert.IsNotNull(products);
             }
@@ -101,7 +102,7 @@ namespace IntegrationTest
 
                 conn.Select()
                 .AddSqlParameter("@OrderId", orderId)
-                .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")      
+                .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")   
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
                     {
                         Order ord;
@@ -182,10 +183,10 @@ namespace IntegrationTest
                 using (SqlConnection conn = GetSqlConnection())
                 {
                     conn.Open();
-                    SqlParameter param = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
+                    SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
 
                     inserted = conn.Procedure()
-                        .AddSqlParameter(param)
+                        .AddSqlParameter(idParam)
                         .AddSqlParameter("@City", customer.City)
                         .AddSqlParameter("@Country", customer.Country)
                         .AddSqlParameter("@FirstName", customer.FirstName)
@@ -193,7 +194,10 @@ namespace IntegrationTest
                         .AddSqlParameter("@Phone", customer.Phone)
                         .ExecuteNonQuery(conn, "dbo.SaveCustomer");
 
-                    int id = int.Parse(param.SqlValue.ToString());
+                    int id = idParam.GetValueOrDefault<int>();
+
+                    if (id == default(int))
+                        throw new InvalidOperationException("Id output not parsed");
 
                     conn.Procedure()
                         .AddSqlParameter("@CustomerId", id)

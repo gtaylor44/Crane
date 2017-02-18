@@ -4,8 +4,11 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using FastMember;
+using SprocMapperLibrary.Core.Interface;
 
 namespace SprocMapperLibrary.Core
 {
@@ -66,7 +69,7 @@ namespace SprocMapperLibrary.Core
             {
                 if (columnName.Equals("Price"))
                 {
-                    
+
                 }
 
                 int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
@@ -146,7 +149,7 @@ namespace SprocMapperLibrary.Core
             if (partitionOn == null)
                 throw new ArgumentNullException(nameof(partitionOn));
 
-            var validPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]+(?:\|[a-zA-Z_][a-zA-Z0-9_]*)*$");
+            var validPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_ ]+(?:\|[a-zA-Z_][a-zA-Z0-9_ ]*)*$");
 
             if (!validPattern.IsMatch(partitionOn))
                 throw new SprocMapperException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'OrderId|ProductId'");
@@ -226,28 +229,28 @@ namespace SprocMapperLibrary.Core
 
         public static void MapObject<T, T1, T2, T3, T4, T5, T6, T7>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
         {
-            if (typeof(T) != typeof(NoMap))
+            if (typeof(T) != typeof(INullType))
                 MapObject<T>(sprocObjectMapList, customColumnMappings);
 
-            if (typeof(T1) != typeof(NoMap))
+            if (typeof(T1) != typeof(INullType))
                 MapObject<T1>(sprocObjectMapList, customColumnMappings);
 
-            if (typeof(T2) != typeof(NoMap))
+            if (typeof(T2) != typeof(INullType))
                 MapObject<T2>(sprocObjectMapList, customColumnMappings);
 
-            if (typeof(T3) != typeof(NoMap))
+            if (typeof(T3) != typeof(INullType))
                 MapObject<T3>(sprocObjectMapList, customColumnMappings);
 
-            if (typeof(T4) != typeof(NoMap))
+            if (typeof(T4) != typeof(INullType))
                 MapObject<T4>(sprocObjectMapList, customColumnMappings);
 
-            if (typeof(T5) != typeof(NoMap))
+            if (typeof(T5) != typeof(INullType))
                 MapObject<T5>(sprocObjectMapList, customColumnMappings);
 
-            if (typeof(T6) != typeof(NoMap))
+            if (typeof(T6) != typeof(INullType))
                 MapObject<T6>(sprocObjectMapList, customColumnMappings);
 
-            if (typeof(T7) != typeof(NoMap))
+            if (typeof(T7) != typeof(INullType))
                 MapObject<T7>(sprocObjectMapList, customColumnMappings);
         }
 
@@ -289,9 +292,16 @@ namespace SprocMapperLibrary.Core
 
         }
 
-        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)
+        /// <summary>
+        /// Resolves an object of type T and handles DBNull.Value gracefully.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sprocObjectMap"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader) where T : new()
         {
-            T targetObject = NewInstance<T>.Instance();
+            T targetObject = (T)sprocObjectMap.TypeAccessor.CreateNew();
 
             foreach (var column in sprocObjectMap.Columns)
             {
@@ -308,12 +318,11 @@ namespace SprocMapperLibrary.Core
                     throw new KeyNotFoundException($"Could not get property for column {column}");
                 }
 
-
                 object readerObj = reader[ordinal];
 
                 if (readerObj == DBNull.Value)
                 {
-                    sprocObjectMap.TypeAccessor[targetObject, member.Name] = GetDefaultValue(member);
+                    sprocObjectMap.TypeAccessor[targetObject, member.Name] = GetDefaultValue(member, sprocObjectMap.DefaultValueDic);
                 }
 
                 else
@@ -326,18 +335,27 @@ namespace SprocMapperLibrary.Core
             return targetObject;
         }
 
-        public static object GetDefaultValue(Member member)
+        /// <summary>
+        /// Gets the default value of type. Caches the default value for performance.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="defaultValueDic"></param>
+        /// <returns></returns>
+        public static object GetDefaultValue(Member member, Dictionary<string, object> defaultValueDic)
         {
             if (member.Type.IsValueType)
-                return Activator.CreateInstance(member.Type);
+            {
+                object obj;
+                if (defaultValueDic.TryGetValue(member.Name, out obj))
+                {
+                    return obj;
+                }
+                obj = Activator.CreateInstance(member.Type);
+                defaultValueDic.Add(member.Name, obj);
+                return obj;
+            }            
+
             return null;
-        }
-
-
-        public static class NewInstance<T>
-        {
-            public static readonly Func<T> Instance =
-                Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
         }
 
         public static string GetPropertyName(Expression method)

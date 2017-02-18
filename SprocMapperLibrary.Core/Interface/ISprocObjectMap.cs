@@ -10,6 +10,7 @@ namespace SprocMapperLibrary.Core
         HashSet<string> Columns { get; set; }
         Dictionary<string, string> CustomColumnMappings { get; set; }
         Dictionary<string, Member> MemberInfoCache { get; set; }
+        Dictionary<string, object> DefaultValueDic { get; set; }
         TypeAccessor TypeAccessor { get; set; }
         Dictionary<string, int> ColumnOrdinalDic { get; set; }
     }

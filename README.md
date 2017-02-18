@@ -2,9 +2,9 @@
 -----------------------------
 SprocMapper is a productivity tool for mapping SQL result sets from stored procedures into strongly typed objects. 
 
-Advantages of using SprocMapper:
-Speeds up the time it takes to map a stored procedure in the application layer.
-Minimises the risk of making common mistakes by manually mapping each column (yes, you are human).
+* Advantages of using SprocMapper:
+ * Speeds up the time it takes to map a stored procedure in the application layer.
+ * Minimises the risk of making common mistakes by manually mapping each column (yes, you are human).
 
 ##Examples
 

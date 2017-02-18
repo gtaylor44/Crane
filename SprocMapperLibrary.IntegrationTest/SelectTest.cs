@@ -23,11 +23,11 @@ namespace IntegrationTest
         public void GetProducts()
         {
             using (
-                SqlConnection conn = GetSqlConnection())
+                SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
                 var products = conn.Select()
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    .ExecuteReader<Product, Supplier>(conn, "dbo.GetProducts", (p, s) => { }, "Product Id|Id");
+                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
 
                 Assert.IsNotNull(products);
             }
@@ -40,7 +40,7 @@ namespace IntegrationTest
         {
             Customer cust = null;
 
-            using (SqlConnection conn = GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
 
                 conn.Select()
@@ -72,7 +72,7 @@ namespace IntegrationTest
             int productId = 62;
             Product product = null;
 
-            using (SqlConnection conn = GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {              
                 product = conn.Select()
                     .AddSqlParameter("@Id", productId)
@@ -96,7 +96,7 @@ namespace IntegrationTest
 
             Order order = null;
 
-            using (SqlConnection conn = GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
                 Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
@@ -124,7 +124,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetSuppliers()
         {
-            using (SqlConnection conn = GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
                 var suppliers = conn.Select().ExecuteReader<Supplier>(conn, "dbo.GetSuppliers");
 
@@ -135,7 +135,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetCustomer()
         {
-            using (SqlConnection conn = GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
                 var customer = conn.Select()
                     .AddSqlParameter("@CustomerId", 6)
@@ -152,7 +152,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetSupplierByName()
         {
-            using (SqlConnection conn = GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
                 var supplier = conn.Select()
                     .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
@@ -180,7 +180,7 @@ namespace IntegrationTest
 
             using (TransactionScope scope = new TransactionScope())
             {
-                using (SqlConnection conn = GetSqlConnection())
+                using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
                 {
                     conn.Open();
                     SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
@@ -215,17 +215,12 @@ namespace IntegrationTest
         [MyExpectedException(typeof(SprocMapperException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
         public void CustomColumnName_MustBeUniqueToClass()
         {
-            using (SqlConnection conn = GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
                 conn.Select()
                     .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                     .ExecuteReader<Product>(conn, "dbo.GetProducts");
             }
-        }
-
-        private SqlConnection GetSqlConnection()
-        {
-            return new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString);
         }
     }
 }

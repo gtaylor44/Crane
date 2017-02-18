@@ -247,4 +247,6 @@ Internally, SprocMapper will cache property members for quick lookups and uses F
 for assigning values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
 Please feel free to blog, compare and review.
 
+Credit to Marc Gravell for FastMember library. 
+
 

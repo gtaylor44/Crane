@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -58,7 +57,7 @@ namespace IntegrationTest
                         if (o.Id != default(int))
                             cust.CustomerOrders.Add(o);
 
-                    }, "Id|OrderId");
+                    }, partitionOn: "Id|OrderId");
             }
 
             Assert.AreEqual(13, cust.CustomerOrders.Count);
@@ -80,7 +79,7 @@ namespace IntegrationTest
                     {
                         p.Supplier = s;
 
-                    }, "ProductName|Id").FirstOrDefault();
+                    }, partitionOn: "ProductName|Id").FirstOrDefault();
             }
 
             Assert.AreEqual("Tarte au sucre", product?.ProductName);
@@ -115,7 +114,7 @@ namespace IntegrationTest
                         order = orderDic[o.Id];
                         oi.Product = p;
                         order.OrderItemList.Add(oi);
-                    }, "Id|unitprice|productname");
+                    }, partitionOn: "Id|unitprice|productname");
             }
 
             Assert.IsNotNull(order);

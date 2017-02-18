@@ -178,29 +178,34 @@ namespace IntegrationTest
             int inserted = 0;
 
 
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                conn.Open();
-                SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
+                using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+                {
+                    conn.Open();
+                    SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
 
-                inserted = await conn.Procedure()
-                    .AddSqlParameter(idParam)
-                    .AddSqlParameter("@City", customer.City)
-                    .AddSqlParameter("@Country", customer.Country)
-                    .AddSqlParameter("@FirstName", customer.FirstName)
-                    .AddSqlParameter("@LastName", customer.LastName)
-                    .AddSqlParameter("@Phone", customer.Phone)
-                    .ExecuteNonQueryAsync(conn, "dbo.SaveCustomer");
+                    inserted = await conn.Procedure()
+                        .AddSqlParameter(idParam)
+                        .AddSqlParameter("@City", customer.City)
+                        .AddSqlParameter("@Country", customer.Country)
+                        .AddSqlParameter("@FirstName", customer.FirstName)
+                        .AddSqlParameter("@LastName", customer.LastName)
+                        .AddSqlParameter("@Phone", customer.Phone)
+                        .ExecuteNonQueryAsync(conn, "dbo.SaveCustomer");
 
-                int id = idParam.GetValueOrDefault<int>();
+                    int id = idParam.GetValueOrDefault<int>();
 
-                if (id == default(int))
-                    throw new InvalidOperationException("Id output not parsed");
+                    if (id == default(int))
+                        throw new InvalidOperationException("Id output not parsed");
 
-                await conn.Procedure()
-                    .AddSqlParameter("@CustomerId", id)
-                    .ExecuteNonQueryAsync(conn, "dbo.DeleteCustomer");
+                    await conn.Procedure()
+                        .AddSqlParameter("@CustomerId", id)
+                        .ExecuteNonQueryAsync(conn, "dbo.DeleteCustomer");
 
+                }
+
+                scope.Complete();
             }
 
             Assert.AreEqual(1, inserted);

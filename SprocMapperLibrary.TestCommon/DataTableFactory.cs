@@ -66,5 +66,42 @@ namespace SprocMapperLibrary.TestCommon
 
             return tab;
         }
+
+        public static DataTable GetPresidentSchema()
+        {
+            DataTable tab = new DataTable("Test") { };
+            tab.Columns.Add("ColumnName");
+            tab.Columns.Add("ColumnOrdinal");
+
+            tab.Rows.Add("Id", 0);
+            tab.Rows.Add("FirstName", 1);
+            tab.Rows.Add("LastName", 2);
+            tab.Rows.Add("Fans", 3);
+            tab.Rows.Add("IsHonest", 4);
+
+            return tab;
+        }
+
+        public static DataTable GetPresidentAndAssistantSchema()
+        {
+            DataTable tab = new DataTable("Test") { };
+            tab.Columns.Add("ColumnName");
+            tab.Columns.Add("ColumnOrdinal");
+
+            // President
+            tab.Rows.Add("Id", 0);
+            tab.Rows.Add("FirstName", 1);
+            tab.Rows.Add("LastName", 2);
+            tab.Rows.Add("Fans", 3);
+            tab.Rows.Add("IsHonest", 4);
+
+            // President Assistant
+            tab.Rows.Add("Id", 5);
+            tab.Rows.Add("PresidentId", 6);
+            tab.Rows.Add("FirstName", 7);
+            tab.Rows.Add("LastName", 8);
+
+            return tab;
+        }
     }
 }

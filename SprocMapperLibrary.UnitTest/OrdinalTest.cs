@@ -18,7 +18,7 @@ namespace UnitTest
         public void TestOrdinalForId()
         {
             // Arrange
-            DataTable schemaTable = DataTableFactory.GetTestDataTable();
+            var schemaTable = DataTableFactory.GetTestDataTable()?.Rows.Cast<DataRow>().ToList();
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
             SprocMapper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
 
@@ -33,16 +33,17 @@ namespace UnitTest
         public void TestOrdinalForCustomMapping()
         {
             // Arrange
-            DataTable schemaTable = DataTableFactory.GetTestDataTable();
+            var schemaTable = DataTableFactory.GetTestDataTable()?.Rows.Cast<DataRow>().ToList();
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
             Dictionary<Type, Dictionary<string, string>> customColumnMappingDic = new Dictionary<Type, Dictionary<string, string>>();
             Dictionary<string, string> customColumnMapping = new Dictionary<string, string>() { { "LastName", "Assistant Last Name" }, {"FirstName", "Assistant First Name"} };
             customColumnMappingDic.Add(typeof(PresidentAssistant), customColumnMapping);
             SprocMapper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
             SprocMapper.MapObject<PresidentAssistant>(list, customColumnMappingDic);
+            int[] partitionOnOrdinal = {0, 6};
 
             // Act
-            SprocMapper.SetOrdinal(schemaTable, list, "id|presidentId");
+            SprocMapper.SetOrdinal(schemaTable, list, partitionOnOrdinal);
 
             // Assert
             Assert.AreEqual(8, list.ElementAt(1).ColumnOrdinalDic["Assistant Last Name"]);

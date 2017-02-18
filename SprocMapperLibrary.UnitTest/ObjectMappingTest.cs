@@ -19,7 +19,7 @@ namespace UnitTest
             // Arrange
             List<ISprocObjectMap> list = new List<ISprocObjectMap>();
             SprocMapper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
-            var dataTable = DataTableFactory.GetTestDataTable();
+            var dataTable = DataTableFactory.GetTestDataTable()?.Rows.Cast<DataRow>().ToList();
 
             var moq = new Mock<IDataReader>();
 

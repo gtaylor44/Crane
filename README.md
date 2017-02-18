@@ -4,7 +4,11 @@ SprocMapper is a productivity tool for mapping SQL result sets from stored proce
 
 * Advantages of using SprocMapper:
  * Speeds up the time it takes to map a stored procedure in the application layer.
- * Minimises the risk of making common mistakes when manually mapping each column (yes, you are human).
+ * Minimises the risk of making common mistakes when attempting to manually map each column (yes, you are human).
+ * Validate data type is correct between model property and its matched column in the stored procedure for you. int32 != int64 for example.
+ * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues. 
+ * Validate that all columns in select statement are mapped to a model property (this is an optional feature). 
+ 
 
 ##Examples
 
@@ -166,6 +170,43 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 
 Assert.IsNotNull(cust);
 Assert.AreEqual(13, cust.CustomerOrders.Count);
+```
+-----------------------------
+Set validateSelectColumns to true to validate all select columns have a home. This is set to false by default. 
+The below example sets an alias in stored procedure but because no custom column mapping has been setup, it's not mapped 
+and throws an exception with a useful message. The same exception message is shown if the property does not exist or a custom 
+column mapping is incorrect. Note that when mapping joins, it's important to have accurate 'partitionOn' arguments to avoid mixed results. 
+
+```sql
+ALTER PROCEDURE [dbo].[GetCustomer]
+	@CustomerId int
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT c.FirstName as [First Name], c.LastName, c.City, c.Country, c.Phone 
+	FROM Customer c 
+	WHERE Id = @CustomerId
+END
+```
+```c#
+using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+{
+    Customer customer = conn.Select() 
+    .AddSqlParameter("@CustomerId", 6)
+    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", **validateSelectColumns: true**)
+    .FirstOrDefault();
+}
+```
+###Result:
+```
+'validateSelectColumns' flag is set to TRUE
+
+The following columns from the select statement in 'dbo.GetCustomer' have not been mapped to target model 'Customer'.
+
+Select column: 'First Name'
+Target model: 'Customer'
+
 ```
 -----------------------------
 Execute a stored procedure without a result set.

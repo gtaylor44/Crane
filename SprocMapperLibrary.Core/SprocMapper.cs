@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -14,17 +15,10 @@ namespace SprocMapperLibrary.Core
 {
     public static class SprocMapper
     {
-        public static void SetOrdinal(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, string partitionOn)
+        public static void SetOrdinal(List<DataRow> rowList, List<ISprocObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
-            var rowList = schema?.Rows.Cast<DataRow>().ToList();
-
             if (rowList == null)
                 throw new SprocMapperException("Could not get schema for stored procedure");
-
-            int[] partitionOnOrdinal = null;
-
-            if (partitionOn != null)
-                partitionOnOrdinal = GetOrdinalPartition(rowList, partitionOn, sprocObjectMapList.Count);
 
             int currMap = 0;
 
@@ -67,11 +61,6 @@ namespace SprocMapperLibrary.Core
         {
             foreach (var dataRow in dataRowList)
             {
-                if (columnName.Equals("Price"))
-                {
-
-                }
-
                 int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
 
                 if (maxRange.HasValue)
@@ -153,6 +142,65 @@ namespace SprocMapperLibrary.Core
 
             if (!validPattern.IsMatch(partitionOn))
                 throw new SprocMapperException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'OrderId|ProductId'");
+        }
+
+        public static bool ValidateSelectColumns(List<DataRow> rows, List<ISprocObjectMap> sprocObjectMapList,
+            int[] partitionOnOrdinal, string storedProcedure)
+        {
+            List<string> absentColumnMessageList = new List<string>();
+
+            if (sprocObjectMapList.Count == 1)
+            {
+                ISprocObjectMap objectMap = sprocObjectMapList.ElementAt(0);
+                foreach (var row in rows)
+                {
+                    string currColumn = row["ColumnName"].ToString();
+
+                    if (!objectMap.ColumnOrdinalDic.ContainsKey(currColumn))
+                        absentColumnMessageList.Add(
+                            $"Select column: '{currColumn}'\nTarget model: '{objectMap.Type.Name}'");
+                }
+            }
+
+            else
+            {
+                int currMap = 0;
+
+                foreach (var map in sprocObjectMapList)
+                {
+                    int minRange = partitionOnOrdinal[currMap];
+                    int maxRange = (sprocObjectMapList.Count - 1) == currMap ? rows.Count : partitionOnOrdinal[currMap + 1];
+
+                    for (int i = minRange; i < maxRange; i++)
+                    {
+                        string currColumn = rows[i]["ColumnName"].ToString();
+                        if (!map.ColumnOrdinalDic.ContainsKey(currColumn))
+                            absentColumnMessageList.Add($"Select column: '{currColumn}'\nTarget model: '{map.Type.Name}'");
+
+                    }
+
+                    currMap++;
+                }
+            }
+
+            string absentColumnsAsString = string.Join(",\n\n", absentColumnMessageList);
+
+            string message = sprocObjectMapList.Count == 1 ? $"The following columns from the select statement in '{storedProcedure}' have not been " +
+                                                             $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n\n{absentColumnsAsString}\n" : 
+                                                             $"The following columns from select statement have not been mapped to target model. "+
+                                                             $"The target model is determined by the 'partitionOn' parameter.\n\n{absentColumnsAsString}\n";
+
+            if (absentColumnMessageList.Count > 0)
+                throw new SprocMapperException($"'validateSelectColumns' flag is set to TRUE\n\n{message}");
+
+            return true;
+        }
+
+        public static string GetActualColumn(string columnName, ISprocObjectMap objectMap) 
+        {
+            return objectMap.CustomColumnMappings.ContainsKey(columnName)
+                ? objectMap.CustomColumnMappings[columnName]
+                : columnName;
         }
 
         public static bool ValidateCustomColumnMappings(List<ISprocObjectMap> sprocObjectMapList)

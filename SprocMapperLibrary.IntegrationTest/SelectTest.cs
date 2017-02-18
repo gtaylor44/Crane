@@ -138,7 +138,7 @@ namespace IntegrationTest
             {
                 var customer = conn.Select()
                     .AddSqlParameter("@CustomerId", 6)
-                    .ExecuteReader<Customer>(conn, "dbo.GetCustomer")
+                    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", validateSelectColumns: true)
                     .FirstOrDefault();
 
                 Assert.AreEqual("Hanna", customer?.FirstName);

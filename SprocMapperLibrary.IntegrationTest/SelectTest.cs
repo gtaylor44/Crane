@@ -9,6 +9,7 @@ using SprocMapperLibrary;
 using SprocMapperLibrary.Core;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
+using SqlBulkTools;
 
 namespace IntegrationTest
 {
@@ -220,6 +221,78 @@ namespace IntegrationTest
                     .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                     .ExecuteReader<Product>(conn, "dbo.GetProducts");
             }
+        }
+
+        [TestMethod]
+        public void SaveGetDataTypes()
+        {
+            BulkOperations bulk = new BulkOperations();
+
+            TestDataType dataTypeTest = new TestDataType()
+            {
+                IntTest = 1,
+                BigIntTest = 342324324324324324,
+                TinyIntTest = 126,
+                DateTimeTest = DateTime.UtcNow,
+                DateTime2Test = new DateTime(2008, 12, 12, 10, 20, 30),
+                DateTest = new DateTime(2007, 7, 5, 20, 30, 10),
+                TimeTest = new TimeSpan(23, 32, 23),
+                SmallDateTimeTest = new DateTime(2005, 7, 14),
+                BinaryTest = new byte[] { 0, 3, 3, 2, 4, 3 },
+                VarBinaryTest = new byte[] { 3, 23, 33, 243 },
+                DecimalTest = 178.43M,
+                MoneyTest = 24333.99M,
+                SmallMoneyTest = 103.32M,
+                RealTest = 32.53F,
+                NumericTest = 154343.3434342M,
+                FloatTest = 232.43F,
+                FloatTest2 = 43243.34,
+                TextTest = "This is some text.",
+                GuidTest = Guid.NewGuid(),
+                CharTest = "Some",
+                XmlTest = "<title>The best SQL Bulk tool</title>",
+                NCharTest = "SomeText",
+                ImageTest = new byte[] { 3, 3, 32, 4 }
+            };
+
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+            {
+                bulk.Setup<TestDataType>()
+                    .ForObject(dataTypeTest)
+                    .WithTable("TestDataTypes")
+                    .AddAllColumns()
+                    .Upsert()
+                    .MatchTargetOn(x => x.IntTest)
+                    .Commit(conn);
+
+                var result = conn.Select()
+                    .ExecuteReader<TestDataType>(conn, "dbo.GetTestDataTypes")
+                    .SingleOrDefault();
+
+                Assert.IsNotNull(result?.IntTest);
+                Assert.IsNotNull(result?.BigIntTest);
+                Assert.IsNotNull(result?.TinyIntTest);
+                Assert.IsNotNull(result?.DateTimeTest);
+                Assert.IsNotNull(result?.DateTime2Test);
+                Assert.IsNotNull(result?.DateTest);
+                Assert.IsNotNull(result?.TimeTest);
+                Assert.IsNotNull(result?.SmallDateTimeTest);
+                Assert.IsNotNull(result?.BinaryTest);
+                Assert.IsNotNull(result?.VarBinaryTest);
+                Assert.IsNotNull(result?.DecimalTest);
+                Assert.IsNotNull(result?.MoneyTest);
+                Assert.IsNotNull(result?.SmallMoneyTest);
+                Assert.IsNotNull(result?.RealTest);
+                Assert.IsNotNull(result?.NumericTest);
+                Assert.IsNotNull(result?.FloatTest);
+                Assert.IsNotNull(result?.FloatTest2);
+                Assert.IsNotNull(result?.TextTest);
+                Assert.IsNotNull(result?.GuidTest);
+                Assert.IsNotNull(result?.CharTest);
+                Assert.IsNotNull(result?.XmlTest);
+                Assert.IsNotNull(result?.NCharTest);
+                Assert.IsNotNull(result?.ImageTest);
+            }    
         }
     }
 }

@@ -51,6 +51,7 @@
     <Compile Include="Model\PresidentAssistant.cs" />
     <Compile Include="Model\Product.cs" />
     <Compile Include="Model\Supplier.cs" />
+    <Compile Include="Model\TestDataType.cs" />
     <Compile Include="MyExpectedException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlConnectionFactory.cs" />

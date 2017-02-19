@@ -144,6 +144,47 @@ if exists (select 1
    drop table Supplier
 go
 
+if exists(select 1 
+			from sysobjects
+			where id = object_id('TestDataType')
+			and type = 'U')
+			drop table TestDataType
+go
+
+/*==============================================================*/
+/* Table: TestDataType                                          */
+/*==============================================================*/
+
+CREATE TABLE [dbo].[TestDataTypes]
+(
+IntTest int PRIMARY KEY,
+FloatTest float(24), 
+FloatTest2 float,
+DecimalTest decimal(14,2), 
+MoneyTest money, 
+SmallMoneyTest smallmoney,
+NumericTest numeric(30,7),
+RealTest real,
+DateTimeTest datetime,
+DateTime2Test datetime2,
+SmallDateTimeTest smalldatetime,
+DateTest date,
+TimeTest time,
+GuidTest uniqueidentifier,
+TextTest text,
+VarBinaryTest varbinary(20),
+BinaryTest binary(6),
+TinyIntTest tinyint,
+BigIntTest bigint,
+CharTest char(17),
+ImageTest image,
+NTextTest ntext,
+NCharTest nchar(10),
+XmlTest xml
+);
+
+go
+
 /*==============================================================*/
 /* Table: Customer                                              */
 /*==============================================================*/
@@ -3576,6 +3617,14 @@ IF EXISTS(SELECT *
       DROP PROCEDURE [dbo].[GetSupplierByName]
   END
 
+  IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetTestDataTypes'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].GetTestDataTypes
+  END
+
 GO
 /****** Object:  StoredProcedure [dbo].[GetProductAndSupplier]    Script Date: 16/02/2017 8:26:05 AM ******/
 SET ANSI_NULLS ON
@@ -3865,5 +3914,35 @@ BEGIN
 	s.Phone, s.Fax
 	FROM Supplier s
 	WHERE s.CompanyName = @SupplierName
+END
+GO
+
+-- ================================================
+-- Template generated from Template Explorer using:
+-- Create Procedure (New Menu).SQL
+--
+-- Use the Specify Values for Template Parameters 
+-- command (Ctrl-Shift-M) to fill in the parameter 
+-- values below.
+--
+-- This block of comments will not be included in
+-- the definition of the procedure.
+-- ================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE GetTestDataTypes
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT TOP 1 * 
+	FROM dbo.TestDataTypes
 END
 GO

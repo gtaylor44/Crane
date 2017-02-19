@@ -146,9 +146,9 @@ go
 
 if exists(select 1 
 			from sysobjects
-			where id = object_id('TestDataType')
+			where id = object_id('TestDataTypes')
 			and type = 'U')
-			drop table TestDataType
+			drop table TestDataTypes
 go
 
 /*==============================================================*/
@@ -174,6 +174,7 @@ GuidTest uniqueidentifier,
 TextTest text,
 VarBinaryTest varbinary(20),
 BinaryTest binary(6),
+SmallIntTest smallint,
 TinyIntTest tinyint,
 BigIntTest bigint,
 CharTest char(17),

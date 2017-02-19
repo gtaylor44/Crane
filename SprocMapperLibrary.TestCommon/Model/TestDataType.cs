@@ -22,6 +22,7 @@ namespace SprocMapperLibrary.TestCommon.Model
         public byte[] VarBinaryTest { get; set; }
         public byte[] BinaryTest { get; set; }
         public byte TinyIntTest { get; set; }
+        public short SmallIntTest { get; set; }
         public long BigIntTest { get; set; }
         public string CharTest { get; set; }
         public byte[] ImageTest { get; set; }

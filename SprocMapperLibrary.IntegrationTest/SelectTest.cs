@@ -231,6 +231,7 @@ namespace IntegrationTest
             TestDataType dataTypeTest = new TestDataType()
             {
                 IntTest = 1,
+                //SmallIntTest = 3433,
                 BigIntTest = 342324324324324324,
                 TinyIntTest = 126,
                 DateTimeTest = DateTime.UtcNow,
@@ -269,29 +270,7 @@ namespace IntegrationTest
                     .ExecuteReader<TestDataType>(conn, "dbo.GetTestDataTypes")
                     .SingleOrDefault();
 
-                Assert.IsNotNull(result?.IntTest);
-                Assert.IsNotNull(result?.BigIntTest);
-                Assert.IsNotNull(result?.TinyIntTest);
-                Assert.IsNotNull(result?.DateTimeTest);
-                Assert.IsNotNull(result?.DateTime2Test);
-                Assert.IsNotNull(result?.DateTest);
-                Assert.IsNotNull(result?.TimeTest);
-                Assert.IsNotNull(result?.SmallDateTimeTest);
-                Assert.IsNotNull(result?.BinaryTest);
-                Assert.IsNotNull(result?.VarBinaryTest);
-                Assert.IsNotNull(result?.DecimalTest);
-                Assert.IsNotNull(result?.MoneyTest);
-                Assert.IsNotNull(result?.SmallMoneyTest);
-                Assert.IsNotNull(result?.RealTest);
-                Assert.IsNotNull(result?.NumericTest);
-                Assert.IsNotNull(result?.FloatTest);
-                Assert.IsNotNull(result?.FloatTest2);
-                Assert.IsNotNull(result?.TextTest);
-                Assert.IsNotNull(result?.GuidTest);
-                Assert.IsNotNull(result?.CharTest);
-                Assert.IsNotNull(result?.XmlTest);
-                Assert.IsNotNull(result?.NCharTest);
-                Assert.IsNotNull(result?.ImageTest);
+                Assert.AreEqual(1, result?.IntTest);
             }    
         }
     }

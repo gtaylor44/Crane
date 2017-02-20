@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -28,6 +30,9 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public Procedure AddSqlParameter(string parameterName, object value)
         {
+            if (parameterName == null)
+                throw new NullReferenceException(nameof(parameterName));
+
             ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName });
             return this;
         }
@@ -39,9 +44,25 @@ namespace SprocMapperLibrary
         /// <param name="value"></param>
         /// <param name="dbType"></param>
         /// <returns></returns>
-        public Procedure AddSqlParameter(string parameterName, object value, SqlDbType dbType)
+        public Procedure AddSqlParameter(string parameterName, SqlDbType dbType, object value)
         {
-            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName, SqlDbType = dbType});
+            if (parameterName == null)
+                throw new NullReferenceException(nameof(parameterName));
+
+            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName, SqlDbType = dbType });
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a list of SqlParameters to be passed into stored procedure.
+        /// </summary>
+        /// <returns></returns>
+        public Procedure AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
+        {
+            if (sqlParameterCollection == null)
+                throw new NullReferenceException(nameof(sqlParameterCollection));
+
+            ParamList.AddRange(sqlParameterCollection);
             return this;
         }
 

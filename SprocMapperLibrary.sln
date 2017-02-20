@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastMember_Net40", "fast-me
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary", "SprocMapperLibrary\SprocMapperLibrary.csproj", "{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlBulkTools", "..\SqlBulkTools\SqlBulkTools\SqlBulkTools.csproj", "{5CD2EE50-A2E1-4740-AEE4-87E9928F0230}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +45,6 @@ Global
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5CD2EE50-A2E1-4740-AEE4-87E9928F0230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5CD2EE50-A2E1-4740-AEE4-87E9928F0230}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5CD2EE50-A2E1-4740-AEE4-87E9928F0230}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5CD2EE50-A2E1-4740-AEE4-87E9928F0230}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

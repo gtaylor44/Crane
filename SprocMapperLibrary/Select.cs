@@ -56,7 +56,7 @@ namespace SprocMapperLibrary
         /// Add an SqlParameter to be passed into stored procedure.
         /// </summary>
         /// <returns></returns>
-        public Select AddSqlParameter(string parameterName, object value, SqlDbType dbType)
+        public Select AddSqlParameter(string parameterName, SqlDbType dbType, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));

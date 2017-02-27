@@ -34,6 +34,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FastMember, Version=1.0.0.9, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FastMember.1.1.0\lib\net40\FastMember.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -56,10 +60,7 @@
     <Compile Include="SprocObjectMap.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\fast-member\FastMember_Net40\FastMember_Net40.csproj">
-      <Project>{4c19bcad-c12c-4574-bac0-9dd5c6d12d0b}</Project>
-      <Name>FastMember_Net40</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

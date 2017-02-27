@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using FastMember;
-using SprocMapperLibrary.Core.Interface;
+using SprocMapperLibrary.Interface;
 
-namespace SprocMapperLibrary.Core
+[assembly: InternalsVisibleTo("UnitTest")]
+[assembly: InternalsVisibleTo("IntegrationTest")]
+namespace SprocMapperLibrary
 {
-    public static class SprocMapper
+    internal static class SprocMapper
     {
         public static void SetOrdinal(List<DataRow> rowList, List<ISprocObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {

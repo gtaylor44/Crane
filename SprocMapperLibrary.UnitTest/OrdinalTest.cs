@@ -4,7 +4,7 @@ using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using SprocMapperLibrary;
-using SprocMapperLibrary.Core;
+using SprocMapperLibrary.Interface;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
 

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
-using SprocMapperLibrary.Core;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
 

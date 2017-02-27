@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using FastMember;
 
-namespace SprocMapperLibrary.Core
+[assembly: InternalsVisibleTo("UnitTest")]
+[assembly: InternalsVisibleTo("IntegrationTest")]
+namespace SprocMapperLibrary.Interface
 {
-    public interface ISprocObjectMap
+    /// <summary>
+    /// 
+    /// </summary>
+    internal interface ISprocObjectMap
     {
         Type Type { get; set; }
         HashSet<string> Columns { get; set; }

@@ -6,8 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FastMember;
-using SprocMapperLibrary.Core;
-using SprocMapperLibrary.Core.Interface;
+using SprocMapperLibrary.Interface;
 
 namespace SprocMapperLibrary
 {

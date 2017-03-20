@@ -59,14 +59,14 @@ namespace SprocMapperLibrary.SqlServer
                     int[] partitionOnOrdinal = null;
 
                     if (partitionOn != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, _sprocObjectMapList.Count);
+                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, SprocObjectMapList.Count);
                   
-                    SprocMapper.SetOrdinal(rowList, _sprocObjectMapList, partitionOnOrdinal);
+                    SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
                     if (validateSelectColumns)
-                        SprocMapper.ValidateSelectColumns(rowList, _sprocObjectMapList, partitionOnOrdinal, storedProcedure);
+                        SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal, storedProcedure);
 
-                    SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
+                    SprocMapper.ValidateSchema(schema, SprocObjectMapList);
 
                     if (!reader.HasRows)
                         return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
@@ -117,14 +117,14 @@ namespace SprocMapperLibrary.SqlServer
                     int[] partitionOnOrdinal = null;
 
                     if (partitionOn != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, _sprocObjectMapList.Count);
+                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, SprocObjectMapList.Count);
 
-                    SprocMapper.SetOrdinal(rowList, _sprocObjectMapList, partitionOnOrdinal);
+                    SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
                     if (validateSelectColumns)
-                        SprocMapper.ValidateSelectColumns(rowList, _sprocObjectMapList, partitionOnOrdinal, storedProcedure);
+                        SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal, storedProcedure);
 
-                    SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
+                    SprocMapper.ValidateSchema(schema, SprocObjectMapList);
 
                     if (!reader.HasRows)
                         return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));

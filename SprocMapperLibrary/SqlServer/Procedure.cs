@@ -27,7 +27,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
         /// <returns>Number of affected records.</returns>
-        public int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null)
+        public override int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null)
         {
             int affectedRecords;
 
@@ -48,7 +48,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
         /// <returns>Number of affected records.</returns>
-        public async Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null)
+        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null)
         {
             int affectedRecords;
 

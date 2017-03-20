@@ -12,18 +12,18 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    public class BaseSelect : AbstractQuery
+    public abstract class BaseSelect : AbstractQuery
     {
-        protected readonly List<ISprocObjectMap> _sprocObjectMapList;
-        protected readonly Dictionary<Type, Dictionary<string, string>> _customColumnMappings;
-        protected const bool ValidateColumnsDefault = false;
+        protected readonly List<ISprocObjectMap> SprocObjectMapList;
+        protected readonly Dictionary<Type, Dictionary<string, string>> CustomColumnMappings;
+        protected const bool ValidateSelectColumnsDefault = true;
         /// <summary>
         /// 
         /// </summary>
         protected BaseSelect() : base()
         {
-            _sprocObjectMapList = new List<ISprocObjectMap>();
-            _customColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
+            SprocObjectMapList = new List<ISprocObjectMap>();
+            CustomColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
         }
 
         /// <summary>
@@ -93,10 +93,10 @@ namespace SprocMapperLibrary
                 throw new ArgumentNullException(nameof(destination));
 
             Dictionary<string, string> customColumnDic;
-            if (!_customColumnMappings.TryGetValue(typeof(T), out customColumnDic))
+            if (!CustomColumnMappings.TryGetValue(typeof(T), out customColumnDic))
             {
                 Dictionary<string, string> newDic = new Dictionary<string, string>();
-                _customColumnMappings.Add(typeof(T), newDic);
+                CustomColumnMappings.Add(typeof(T), newDic);
 
                 customColumnDic = newDic;
             }
@@ -129,14 +129,11 @@ namespace SprocMapperLibrary
         /// <param name="validatePartitionOn"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
-        protected virtual IEnumerable<TResult> ExecuteReaderImpl<TResult>(
+        protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<SqlDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string partitionOn,
             bool validatePartitionOn,
-            bool validateSelectColumns)
-        {
-            throw new NotImplementedException();
-        }
+            bool validateSelectColumns);
 
 
         /// <summary>
@@ -144,38 +141,34 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
-        /// <param name="conn"></param>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOn"></param>
         /// <param name="validatePartitionOn"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
-        protected virtual async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<SqlDataReader, List<TResult>> getObjectDel, 
-            string storedProcedure, int? commandTimeout, string partitionOn, 
-            bool validatePartitionOn, bool validateSelectColumns)
-        {
-            throw new NotImplementedException();
-        }
+        protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
+            Action<SqlDataReader, List<TResult>> getObjectDel,
+            string storedProcedure, int? commandTimeout, string partitionOn,
+            bool validatePartitionOn, bool validateSelectColumns);
 
         /// <summary>
         /// Perform a select statement returning a single entity.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="conn"></param>
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null) 
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null) 
             where TResult : class, new()
         {
-            SprocMapper.MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
             }, storedProcedure, commandTimeout, null, false, validateSelectColumns);
@@ -194,16 +187,16 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1>(SqlConnection conn, string storedProcedure, Action<TResult, TJoin1> callBack,
-            string partitionOn, bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null) 
+            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null) 
             where TResult : class, new() 
             where TJoin1 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
 
                 callBack.Invoke(obj1, obj2);
 
@@ -227,18 +220,18 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
 
                 callBack.Invoke(obj1, obj2, obj3);
 
@@ -263,20 +256,20 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
             where TJoin3 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
@@ -302,22 +295,22 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
             where TJoin3 : class, new()
             where TJoin4 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
@@ -344,7 +337,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -352,16 +345,16 @@ namespace SprocMapperLibrary
             where TJoin4 : class, new()
             where TJoin5 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
-                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(_sprocObjectMapList[5], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
@@ -389,7 +382,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -398,17 +391,17 @@ namespace SprocMapperLibrary
             where TJoin5 : class, new()
             where TJoin6 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, result) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
-                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(_sprocObjectMapList[5], reader);
-                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(_sprocObjectMapList[6], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
+                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
@@ -437,7 +430,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -447,18 +440,18 @@ namespace SprocMapperLibrary
             where TJoin6 : class, new()
             where TJoin7 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, result) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
-                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(_sprocObjectMapList[5], reader);
-                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(_sprocObjectMapList[6], reader);
-                TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(_sprocObjectMapList[7], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
+                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
+                TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(SprocObjectMapList[7], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
@@ -477,14 +470,14 @@ namespace SprocMapperLibrary
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(SqlConnection conn, string storedProcedure, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
              where TResult : class, new()
         {
-            SprocMapper.MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
             }, storedProcedure, commandTimeout, null, false, validateSelectColumns);
@@ -503,18 +496,18 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1>(SqlConnection conn, string storedProcedure, Action<TResult, TJoin1> callBack, 
-            string partitionOn, bool validateSelectColumns = ValidateColumnsDefault,
+            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
         {
 
-            SprocMapper.MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
 
                 callBack.Invoke(obj1, obj2);
 
@@ -537,19 +530,19 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2>(SqlConnection conn, string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, bool validateSelectColumns = ValidateColumnsDefault,
+            Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
 
                 callBack.Invoke(obj1, obj2, obj3);
 
@@ -574,20 +567,20 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
             where TJoin3 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
@@ -613,7 +606,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault,
+            bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -621,15 +614,15 @@ namespace SprocMapperLibrary
             where TJoin3 : class, new()
             where TJoin4 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
@@ -656,7 +649,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, 
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -664,16 +657,16 @@ namespace SprocMapperLibrary
             where TJoin4 : class, new()
             where TJoin5 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
-                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(_sprocObjectMapList[5], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
@@ -701,7 +694,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -710,17 +703,17 @@ namespace SprocMapperLibrary
             where TJoin5 : class, new()
             where TJoin6 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
-                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(_sprocObjectMapList[5], reader);
-                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(_sprocObjectMapList[6], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
+                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
@@ -749,7 +742,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(SqlConnection conn, 
             string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -759,18 +752,18 @@ namespace SprocMapperLibrary
             where TJoin6 : class, new()
             where TJoin7 : class, new()
         {
-            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(_sprocObjectMapList, _customColumnMappings);
+            SprocMapper.MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
-                TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
-                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(_sprocObjectMapList[1], reader);
-                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(_sprocObjectMapList[2], reader);
-                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(_sprocObjectMapList[3], reader);
-                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(_sprocObjectMapList[4], reader);
-                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(_sprocObjectMapList[5], reader);
-                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(_sprocObjectMapList[6], reader);
-                TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(_sprocObjectMapList[7], reader);
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
+                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
+                TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(SprocObjectMapList[7], reader);
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 

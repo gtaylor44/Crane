@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace SprocMapperLibrary
 {
     /// <summary>
     /// 
     /// </summary>
-    public class BaseProcedure : AbstractQuery
+    public abstract class BaseProcedure : AbstractQuery
     {
         public BaseProcedure() : base()
         {
         }
+
+        public abstract int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null);
+
+        public abstract Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null);
 
         /// <summary>
         /// 

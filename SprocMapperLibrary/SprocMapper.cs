@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using FastMember;
+using Microsoft.SqlServer.Types;
 using SprocMapperLibrary.Interface;
 
 [assembly: InternalsVisibleTo("UnitTest")]
@@ -436,7 +437,9 @@ namespace SprocMapperLibrary
                 type == typeof(string) ||
                 type == typeof(byte[]) ||
                 type == typeof(char[]) ||
-                type == typeof(SqlXml)
+                type == typeof(SqlXml) ||
+                type == typeof(SqlGeography) ||
+                type == typeof(SqlGeometry)
                 )
                 return true;
 

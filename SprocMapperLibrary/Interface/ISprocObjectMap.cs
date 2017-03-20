@@ -10,7 +10,7 @@ namespace SprocMapperLibrary.Interface
     /// <summary>
     /// 
     /// </summary>
-    internal interface ISprocObjectMap
+    public interface ISprocObjectMap
     {
         Type Type { get; set; }
         HashSet<string> Columns { get; set; }

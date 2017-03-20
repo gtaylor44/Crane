@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
+using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
 using SqlBulkTools;
@@ -21,9 +22,9 @@ namespace IntegrationTest
             using (
                 SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var products = conn.Select()
+                var products = conn.Select()                  
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+                    .ExecuteReader<Product>("dbo.GetProducts");
 
                 Assert.IsNotNull(products);
             }
@@ -95,7 +96,7 @@ namespace IntegrationTest
             {
                 Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-                conn.Select()
+                conn.Select()                
                 .AddSqlParameter("@OrderId", orderId)
                 .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")   
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
@@ -121,7 +122,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var suppliers = conn.Select().ExecuteReader<Supplier>(conn, "dbo.GetSuppliers");
+                var suppliers = conn.Select().ExecuteReader<Supplier>("dbo.GetSuppliers");
 
                 Assert.IsTrue(suppliers.Any());
             }
@@ -134,7 +135,7 @@ namespace IntegrationTest
             {
                 var customer = conn.Select()
                     .AddSqlParameter("@CustomerId", 6)
-                    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", validateSelectColumns: true)
+                    .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
                     .FirstOrDefault();
 
                 Assert.AreEqual("Hanna", customer?.FirstName);
@@ -151,7 +152,7 @@ namespace IntegrationTest
             {
                 var supplier = conn.Select()
                     .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                    .ExecuteReader<Supplier>(conn, "dbo.GetSupplierByName")
+                    .ExecuteReader<Supplier>("dbo.GetSupplierByName")
                     .FirstOrDefault();
 
                 Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);
@@ -168,7 +169,7 @@ namespace IntegrationTest
             {
                 conn.Select()
                     .CustomColumnMapping<Product>(x => x.Package, "ProductName")
-                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+                    .ExecuteReader<Product>("dbo.GetProducts");
             }
         }
 
@@ -216,7 +217,7 @@ namespace IntegrationTest
                     .Commit(conn);
 
                 var result = conn.Select()
-                    .ExecuteReader<TestDataType>(conn, "dbo.GetTestDataTypes")
+                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes")
                     .SingleOrDefault();
 
                 Assert.AreEqual(1, result?.IntTest);

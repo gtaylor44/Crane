@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
+using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
 
@@ -41,7 +42,7 @@ namespace IntegrationTest
                         .AddSqlParameter("@FirstName", customer.FirstName)
                         .AddSqlParameter("@LastName", customer.LastName)
                         .AddSqlParameter("@Phone", customer.Phone)
-                        .ExecuteNonQuery(conn, "dbo.SaveCustomer");
+                        .ExecuteNonQuery("dbo.SaveCustomer");
 
                     int id = idParam.GetValueOrDefault<int>();
 
@@ -50,7 +51,7 @@ namespace IntegrationTest
 
                     conn.Procedure()
                         .AddSqlParameter("@CustomerId", id)
-                        .ExecuteNonQuery(conn, "dbo.DeleteCustomer");
+                        .ExecuteNonQuery("dbo.DeleteCustomer");
 
                 }
 

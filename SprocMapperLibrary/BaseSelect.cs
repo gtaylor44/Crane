@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FastMember;
@@ -13,15 +12,15 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    public class Select : AbstractQuery
+    public class BaseSelect : AbstractQuery
     {
-        private readonly List<ISprocObjectMap> _sprocObjectMapList;
-        private readonly Dictionary<Type, Dictionary<string, string>> _customColumnMappings;
-        private const bool ValidateColumnsDefault = false;
+        protected readonly List<ISprocObjectMap> _sprocObjectMapList;
+        protected readonly Dictionary<Type, Dictionary<string, string>> _customColumnMappings;
+        protected const bool ValidateColumnsDefault = false;
         /// <summary>
         /// 
         /// </summary>
-        public Select() : base()
+        protected BaseSelect() : base()
         {
             _sprocObjectMapList = new List<ISprocObjectMap>();
             _customColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
@@ -32,7 +31,7 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public Select AddSqlParameter(SqlParameter item)
+        public BaseSelect AddSqlParameter(SqlParameter item)
         {
             ParamList.Add(item);
             return this;
@@ -42,7 +41,7 @@ namespace SprocMapperLibrary
         /// Add an SqlParameter to be passed into stored procedure.
         /// </summary>
         /// <returns></returns>
-        public Select AddSqlParameter(string parameterName, object value)
+        public BaseSelect AddSqlParameter(string parameterName, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
@@ -55,7 +54,7 @@ namespace SprocMapperLibrary
         /// Add an SqlParameter to be passed into stored procedure.
         /// </summary>
         /// <returns></returns>
-        public Select AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        public BaseSelect AddSqlParameter(string parameterName, SqlDbType dbType, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
@@ -68,7 +67,7 @@ namespace SprocMapperLibrary
         /// Adds a list of SqlParameters to be passed into stored procedure.
         /// </summary>
         /// <returns></returns>
-        public Select AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
+        public BaseSelect AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
         {
             if (sqlParameterCollection == null)
                 throw new NullReferenceException(nameof(sqlParameterCollection));
@@ -86,7 +85,7 @@ namespace SprocMapperLibrary
         /// <param name="source"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        public Select CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination) where T : class
+        public BaseSelect CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination) where T : class
         {
             var propertyName = SprocMapper.GetPropertyName(source);
 
@@ -100,7 +99,7 @@ namespace SprocMapperLibrary
                 _customColumnMappings.Add(typeof(T), newDic);
 
                 customColumnDic = newDic;
-            }        
+            }
 
             var typeAccessor = TypeAccessor.Create(typeof(T));
 
@@ -124,58 +123,21 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
-        /// <param name="conn"></param>
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOn"></param>
         /// <param name="validatePartitionOn"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
-        private IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<SqlDataReader, List<TResult>> getObjectDel, 
-            SqlConnection conn, string storedProcedure, int? commandTimeout, string partitionOn, bool validatePartitionOn, 
+        protected virtual IEnumerable<TResult> ExecuteReaderImpl<TResult>(
+            Action<SqlDataReader, List<TResult>> getObjectDel,
+            string storedProcedure, int? commandTimeout, string partitionOn,
+            bool validatePartitionOn,
             bool validateSelectColumns)
         {
-            if (validatePartitionOn)
-                SprocMapper.ValidatePartitionOn(partitionOn);
-
-            // Try open connection if not already open.
-            OpenConn(conn);
-
-            List<TResult> result = new List<TResult>();
-            using (SqlCommand command = new SqlCommand(storedProcedure, conn))
-            {
-                // Set common SqlCommand properties
-                SetCommandProps(command, commandTimeout);
-
-                using (var reader = command.ExecuteReader())
-                {
-                    DataTable schema = reader.GetSchemaTable();
-                    var rowList = schema?.Rows.Cast<DataRow>().ToList();
-
-                    int[] partitionOnOrdinal = null;
-
-                    if (partitionOn != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, _sprocObjectMapList.Count);
-                  
-                    SprocMapper.SetOrdinal(rowList, _sprocObjectMapList, partitionOnOrdinal);
-
-                    if (validateSelectColumns)
-                        SprocMapper.ValidateSelectColumns(rowList, _sprocObjectMapList, partitionOnOrdinal, storedProcedure);
-
-                    SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
-
-                    if (!reader.HasRows)
-                        return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
-
-                    while (reader.Read())
-                    {
-                        getObjectDel(reader, result);
-                    }
-                }
-
-            }
-            return result;
+            throw new NotImplementedException();
         }
+
 
         /// <summary>
         /// Performs asynchronous version of stored procedure.
@@ -189,51 +151,11 @@ namespace SprocMapperLibrary
         /// <param name="validatePartitionOn"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<SqlDataReader, List<TResult>> getObjectDel, 
-            SqlConnection conn, string storedProcedure, int? commandTimeout, string partitionOn, 
+        protected virtual async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<SqlDataReader, List<TResult>> getObjectDel, 
+            string storedProcedure, int? commandTimeout, string partitionOn, 
             bool validatePartitionOn, bool validateSelectColumns)
         {
-            if (validatePartitionOn)
-                SprocMapper.ValidatePartitionOn(partitionOn);
-
-            // Try open connection if not already open.
-            await OpenConnAsync(conn);
-
-            List<TResult> result = new List<TResult>();
-
-            using (SqlCommand command = new SqlCommand(storedProcedure, conn))
-            {
-                // Set common SqlCommand properties
-                SetCommandProps(command, commandTimeout);
-
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    DataTable schema = reader.GetSchemaTable();
-                    var rowList = schema?.Rows.Cast<DataRow>().ToList();
-
-                    int[] partitionOnOrdinal = null;
-
-                    if (partitionOn != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, _sprocObjectMapList.Count);
-
-                    SprocMapper.SetOrdinal(rowList, _sprocObjectMapList, partitionOnOrdinal);
-
-                    if (validateSelectColumns)
-                        SprocMapper.ValidateSelectColumns(rowList, _sprocObjectMapList, partitionOnOrdinal, storedProcedure);
-
-                    SprocMapper.ValidateSchema(schema, _sprocObjectMapList);
-
-                    if (!reader.HasRows)
-                        return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
-
-                    while (reader.Read())
-                    {
-                        getObjectDel(reader, result);
-                    }
-                }
-
-            }
-            return result;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -245,7 +167,7 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public IEnumerable<TResult> ExecuteReader<TResult>(SqlConnection conn, string storedProcedure, 
+        public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, 
             bool validateSelectColumns = ValidateColumnsDefault, int? commandTimeout = null) 
             where TResult : class, new()
         {
@@ -256,7 +178,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, null, false, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, false, validateSelectColumns);
         }
 
         /// <summary>
@@ -287,7 +209,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -322,7 +244,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -360,7 +282,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -401,7 +323,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -445,7 +367,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -492,7 +414,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -542,7 +464,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -565,7 +487,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(_sprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, null, false, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, false, validateSelectColumns);
         }
 
         /// <summary>
@@ -598,7 +520,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -633,7 +555,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -671,7 +593,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -713,7 +635,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -757,7 +679,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -804,7 +726,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
 
         /// <summary>
@@ -854,7 +776,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, conn, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
         }
     }
 }

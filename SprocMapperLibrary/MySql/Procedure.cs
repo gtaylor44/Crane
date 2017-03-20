@@ -10,7 +10,7 @@ namespace SprocMapperLibrary.MySql
     /// <summary>
     /// 
     /// </summary>
-    public class Procedure : AbstractQuery
+    public class Procedure : BaseProcedure
     {
         private readonly MySqlConnection _mySqlConn;
 
@@ -18,63 +18,9 @@ namespace SprocMapperLibrary.MySql
         /// 
         /// </summary>
         /// <param name="mySqlConn"></param>
-        public Procedure(MySqlConnection mySqlConn)
+        public Procedure(MySqlConnection mySqlConn) : base()
         {
             _mySqlConn = mySqlConn;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public Procedure AddSqlParameter(SqlParameter item)
-        {
-            ParamList.Add(item);
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parameterName"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public Procedure AddSqlParameter(string parameterName, object value)
-        {
-            if (parameterName == null)
-                throw new NullReferenceException(nameof(parameterName));
-
-            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName });
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parameterName"></param>
-        /// <param name="value"></param>
-        /// <param name="dbType"></param>
-        /// <returns></returns>
-        public Procedure AddSqlParameter(string parameterName, SqlDbType dbType, object value)
-        {
-            if (parameterName == null)
-                throw new NullReferenceException(nameof(parameterName));
-
-            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName, SqlDbType = dbType });
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a list of SqlParameters to be passed into stored procedure.
-        /// </summary>
-        /// <returns></returns>
-        public Procedure AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
-        {
-            if (sqlParameterCollection == null)
-                throw new NullReferenceException(nameof(sqlParameterCollection));
-
-            ParamList.AddRange(sqlParameterCollection);
-            return this;
         }
 
         /// <summary>

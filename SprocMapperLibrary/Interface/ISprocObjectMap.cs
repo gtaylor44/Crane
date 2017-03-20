@@ -12,12 +12,33 @@ namespace SprocMapperLibrary.Interface
     /// </summary>
     public interface ISprocObjectMap
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Type Type { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         HashSet<string> Columns { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         Dictionary<string, string> CustomColumnMappings { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         Dictionary<string, Member> MemberInfoCache { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         Dictionary<string, object> DefaultValueDic { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         TypeAccessor TypeAccessor { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         Dictionary<string, int> ColumnOrdinalDic { get; set; }
     }
 }

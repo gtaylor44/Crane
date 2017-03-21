@@ -1,8 +1,5 @@
 <img src="http://gregnz.com/images/SprocMapper/logo.png" alt="SprocMapper logo"> 
-
-# SprocMapper
------------------------------
-
+---
 SprocMapper is an easy to use Object-relational mapper specifically designed for stored procedures. Write less lines of code and be more productive.
 
 Key Features:

@@ -24,7 +24,7 @@ namespace IntegrationTest
             using (
                 SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var products = await conn.Procedure()
+                var products = await conn.Sproc()
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                     .ExecuteReaderAsync<Product>(conn, "dbo.GetProducts");
 
@@ -42,7 +42,7 @@ namespace IntegrationTest
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
 
-                await conn.Procedure()
+                await conn.Sproc()
                     .AddSqlParameter("@FirstName", "Thomas")
                     .AddSqlParameter("@LastName", "Hardy")
                     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
@@ -73,7 +73,7 @@ namespace IntegrationTest
 
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                product = (await conn.Procedure()
+                product = (await conn.Sproc()
                     .AddSqlParameter("@Id", productId)
                     .ExecuteReaderAsync<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
@@ -99,7 +99,7 @@ namespace IntegrationTest
             {
                 Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-                await conn.Procedure()
+                await conn.Sproc()
                 .AddSqlParameter("@OrderId", orderId)
                 .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")
                 .ExecuteReaderAsync<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
@@ -125,7 +125,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var suppliers = await conn.Procedure().ExecuteReaderAsync<Supplier>(conn, "dbo.GetSuppliers");
+                var suppliers = await conn.Sproc().ExecuteReaderAsync<Supplier>(conn, "dbo.GetSuppliers");
 
                 Assert.IsTrue(suppliers.Any());
             }
@@ -136,7 +136,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var customer = (await conn.Procedure()
+                var customer = (await conn.Sproc()
                     .AddSqlParameter("@CustomerId", 6)
                     .ExecuteReaderAsync<Customer>(conn, "dbo.GetCustomer"))
                     .FirstOrDefault();
@@ -153,7 +153,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var supplier = (await conn.Procedure()
+                var supplier = (await conn.Sproc()
                     .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
                     .ExecuteReaderAsync<Supplier>(conn, "dbo.GetSupplierByName"))
                     .FirstOrDefault();
@@ -184,7 +184,7 @@ namespace IntegrationTest
                     conn.Open();
                     SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
 
-                    inserted = await conn.Procedure()
+                    inserted = await conn.Sproc()
                         .AddSqlParameter(idParam)
                         .AddSqlParameter("@City", customer.City)
                         .AddSqlParameter("@Country", customer.Country)
@@ -198,7 +198,7 @@ namespace IntegrationTest
                     if (id == default(int))
                         throw new InvalidOperationException("Id output not parsed");
 
-                    await conn.Procedure()
+                    await conn.Sproc()
                         .AddSqlParameter("@CustomerId", id)
                         .ExecuteNonQueryAsync("dbo.DeleteCustomer");
                 }
@@ -215,7 +215,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                await conn.Procedure()
+                await conn.Sproc()
                     .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                     .ExecuteReaderAsync<Product>(conn, "dbo.GetProducts");
             }

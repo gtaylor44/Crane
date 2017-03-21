@@ -22,7 +22,7 @@ namespace IntegrationTest
             using (
                 SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var products = conn.Procedure()                  
+                var products = conn.Sproc()                  
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                     .ExecuteReader<Product>("dbo.GetProducts");
 
@@ -39,7 +39,7 @@ namespace IntegrationTest
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
 
-                conn.Procedure()
+                conn.Sproc()
                     .AddSqlParameter("@FirstName", "Thomas")
                     .AddSqlParameter("@LastName", "Hardy")
                     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
@@ -70,7 +70,7 @@ namespace IntegrationTest
 
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {              
-                product = conn.Procedure()
+                product = conn.Sproc()
                     .AddSqlParameter("@Id", productId)
                     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
@@ -96,7 +96,7 @@ namespace IntegrationTest
             {
                 Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-                conn.Procedure()                
+                conn.Sproc()                
                 .AddSqlParameter("@OrderId", orderId)
                 .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")   
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
@@ -122,7 +122,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var suppliers = conn.Procedure().ExecuteReader<Supplier>("dbo.GetSuppliers");
+                var suppliers = conn.Sproc().ExecuteReader<Supplier>("dbo.GetSuppliers");
 
                 Assert.IsTrue(suppliers.Any());
             }
@@ -133,7 +133,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var customer = conn.Procedure()
+                var customer = conn.Sproc()
                     .AddSqlParameter("@CustomerId", 6)
                     .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
                     .FirstOrDefault();
@@ -150,7 +150,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var supplier = conn.Procedure()
+                var supplier = conn.Sproc()
                     .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
                     .ExecuteReader<Supplier>("dbo.GetSupplierByName")
                     .FirstOrDefault();
@@ -167,7 +167,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                conn.Procedure()
+                conn.Sproc()
                     .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                     .ExecuteReader<Product>("dbo.GetProducts");
             }
@@ -216,7 +216,7 @@ namespace IntegrationTest
                     .MatchTargetOn(x => x.IntTest)
                     .Commit(conn);
 
-                var result = conn.Procedure()
+                var result = conn.Sproc()
                     .ExecuteReader<TestDataType>("dbo.GetTestDataTypes")
                     .SingleOrDefault();
 

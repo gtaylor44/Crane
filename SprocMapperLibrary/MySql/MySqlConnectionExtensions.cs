@@ -1,6 +1,4 @@
-﻿using System.Data;
-using MySql.Data.MySqlClient;
-using SprocMapperLibrary.SqlServer;
+﻿using MySql.Data.MySqlClient;
 
 namespace SprocMapperLibrary.MySql
 {
@@ -14,7 +12,7 @@ namespace SprocMapperLibrary.MySql
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public static MySqlSproc Procedure(this MySqlConnection conn)
+        public static MySqlSproc Sproc(this MySqlConnection conn)
         {
             return new MySqlSproc(conn);
         }

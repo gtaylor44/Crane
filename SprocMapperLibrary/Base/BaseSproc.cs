@@ -15,9 +15,19 @@ namespace SprocMapperLibrary.Base
     /// </summary>
     public abstract class BaseSproc : BaseInitialiser
     {
+        /// <summary>
+        /// 
+        /// </summary>
         protected readonly List<ISprocObjectMap> SprocObjectMapList;
+        /// <summary>
+        /// 
+        /// </summary>
         protected readonly Dictionary<Type, Dictionary<string, string>> CustomColumnMappings;
+        /// <summary>
+        /// 
+        /// </summary>
         protected const bool ValidateSelectColumnsDefault = true;
+
         /// <summary>
         /// 
         /// </summary>

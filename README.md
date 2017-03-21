@@ -80,7 +80,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 }
 ```
 -----------------------------
-Join up to seven other related entities. When mapping a join you must supply the **partitionOn** and **callback** parameters.
+Join up to eight other related entities. When mapping a join you must supply the **partitionOn** and **callback** parameters.
 Please observe the below procedure carefully and pay special attention to the columns 'ProductName' and 'Id'.
 These are the two arguments for the partitionOn parameter. partitionOn arguments are separated by a pipe '|'. The callback parameter 
 is a delegate and is invoked for every row that is processed. This is your chance to do any mappings for your TResult reference type. 
@@ -172,7 +172,7 @@ Assert.IsNotNull(cust);
 Assert.AreEqual(13, cust.CustomerOrders.Count);
 ```
 -----------------------------
-Set validateSelectColumns to true to validate all select columns are mapped to corresponding model property. This is set to false by default. 
+SprocMapper validates that all select columns are mapped to a corresponding model property by default. This can be disabled by setting validateSelectColumns to false. 
 The below example sets an alias in stored procedure but because no custom column mapping has been setup, it's not mapped 
 and throws a SprocMapperException. The same exception message is shown if the property does not exist or a custom 
 column mapping is incorrect. Note that when mapping joins, it's important to have accurate 'partitionOn' arguments to avoid mixed results. 

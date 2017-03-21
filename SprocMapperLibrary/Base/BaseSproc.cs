@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 using FastMember;
 using SprocMapperLibrary.Interface;
 
-namespace SprocMapperLibrary
+namespace SprocMapperLibrary.Base
 {
     /// <summary>
     /// 
     /// </summary>
-    public abstract class BaseProcedure : BaseInitialiser
+    public abstract class BaseSproc : BaseInitialiser
     {
         protected readonly List<ISprocObjectMap> SprocObjectMapList;
         protected readonly Dictionary<Type, Dictionary<string, string>> CustomColumnMappings;
@@ -21,7 +21,7 @@ namespace SprocMapperLibrary
         /// <summary>
         /// 
         /// </summary>
-        protected BaseProcedure() : base()
+        protected BaseSproc() : base()
         {
             SprocObjectMapList = new List<ISprocObjectMap>();
             CustomColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
@@ -70,7 +70,7 @@ namespace SprocMapperLibrary
         /// <param name="source"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        public BaseProcedure CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination) where T : class
+        public BaseSproc CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination) where T : class
         {
             var propertyName = SprocMapper.GetPropertyName(source);
 
@@ -142,7 +142,7 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public BaseProcedure AddSqlParameter(SqlParameter item)
+        public BaseSproc AddSqlParameter(SqlParameter item)
         {
             ParamList.Add(item);
             return this;
@@ -154,7 +154,7 @@ namespace SprocMapperLibrary
         /// <param name="parameterName"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public BaseProcedure AddSqlParameter(string parameterName, object value)
+        public BaseSproc AddSqlParameter(string parameterName, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
@@ -170,7 +170,7 @@ namespace SprocMapperLibrary
         /// <param name="value"></param>
         /// <param name="dbType"></param>
         /// <returns></returns>
-        public BaseProcedure AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        public BaseSproc AddSqlParameter(string parameterName, SqlDbType dbType, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
@@ -183,7 +183,7 @@ namespace SprocMapperLibrary
         /// Adds a list of SqlParameters to be passed into stored procedure.
         /// </summary>
         /// <returns></returns>
-        public BaseProcedure AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
+        public BaseSproc AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
         {
             if (sqlParameterCollection == null)
                 throw new NullReferenceException(nameof(sqlParameterCollection));

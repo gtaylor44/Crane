@@ -5,7 +5,7 @@ namespace SprocMapperLibrary.MySql
     /// <summary>
     /// 
     /// </summary>
-    public static class SprocmapperExtensions
+    public static class DbConnectionExtensions
     {
         /// <summary>
         /// Entry point for performing a MySql procedure.

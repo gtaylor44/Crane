@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using FastMember;
 
-[assembly: InternalsVisibleTo("UnitTest")]
-[assembly: InternalsVisibleTo("IntegrationTest")]
-namespace SprocMapperLibrary.Interface
+// ReSharper disable once CheckNamespace
+namespace SprocMapperLibrary
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface ISprocObjectMap
+    internal interface ISprocObjectMap
     {
         /// <summary>
         /// 

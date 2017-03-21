@@ -58,13 +58,13 @@
     <Compile Include="GenericExtensions.cs" />
     <Compile Include="Interface\INullType.cs" />
     <Compile Include="Interface\ISprocObjectMap.cs" />
-    <Compile Include="MySql\MySqlConnectionExtensions.cs" />
+    <Compile Include="MySql\DbConnectionExtensions.cs" />
     <Compile Include="SqlServer\SqlServerSproc.cs" />
     <Compile Include="MySql\MySqlSproc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SprocMapper.cs" />
     <Compile Include="SprocMapperException.cs" />
-    <Compile Include="SqlServer\SqlConnectionExtensions.cs" />
+    <Compile Include="SqlServer\DbConnectionExtensions.cs" />
     <Compile Include="SprocObjectMap.cs" />
   </ItemGroup>
   <ItemGroup>

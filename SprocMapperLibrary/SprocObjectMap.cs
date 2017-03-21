@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using FastMember;
-using SprocMapperLibrary.Interface;
 
-[assembly: InternalsVisibleTo("UnitTest")]
-[assembly: InternalsVisibleTo("IntegrationTest")]
 namespace SprocMapperLibrary
 {
     internal class SprocObjectMap<T> : ISprocObjectMap
     {
-        public SprocObjectMap()
+        internal SprocObjectMap()
         {
             MemberInfoCache = new Dictionary<string, Member>();
             CustomColumnMappings = new Dictionary<string, string>();

@@ -1,16 +1,16 @@
-#SprocMapper
------------------------------
-SprocMapper is a productivity tool for mapping SQL result sets from stored procedures into strongly typed objects. 
+<img src="http://gregnz.com/images/SprocMapper/logo.png" alt="SprocMapper logo"> 
 
-* Advantages of using SprocMapper:
- * Speeds up the time it takes to map a stored procedure in the application layer.
- * Minimises the risk of making common mistakes when attempting to manually map each column (yes, you are human).
- * Validate data type is correct between model property and its matched column in the stored procedure for you. int32 != int64 for example.
+SprocMapper is an easy to use object-relational mapper specifically designed for stored procedures. Write less lines of code and be more productive.
+
+Key Features:
+ * Support: SQL Server and MySql
+ * Specificially designed for working with stored procedures.
+ * Drastically Speed up the time it takes to map a stored procedure in the application layer. Minimise the risk of common mistakes that occur when mapping manually. 
  * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues. 
- * Validate that all columns in select statement are mapped to corresponding model property (this is an optional feature). 
+ * Validate that all columns in select statement are mapped to a corresponding model property (this can optionally be disabled). 
  
 
-##Examples
+## Examples
 
 Selects all products defined by 'dbo.GetProducts'.
 
@@ -28,7 +28,7 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    var products = conn.Select().ExecuteReader<Product>(conn, "dbo.GetProducts");
+    var products = conn.Sproc().ExecuteReader<Product>("dbo.GetProducts");
 }
 ```
 -----------------------------
@@ -51,9 +51,9 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {   
-    var products = conn.Select()
+    var products = conn.Sproc()
     .AddSqlParameter("@SupplierId", 2)
-    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+    .ExecuteReader<Product>("dbo.GetProducts");
 }
 ```
 -----------------------------
@@ -73,10 +73,10 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    var products = conn.Select()
+    var products = conn.Sproc()
     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
     .CustomColumnMapping<Product>(x => x.ProductName, "Product Name")
-    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+    .ExecuteReader<Product>("dbo.GetProducts");
 }
 ```
 -----------------------------
@@ -110,9 +110,9 @@ Product product = null;
 
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {    
-    product = conn.Select()
+    product = conn.Sproc()
     .AddSqlParameter("@Id", 62)
-    .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
+    .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
     {
         p.Supplier = s;
     }, partitionOn: "ProductName|Id")
@@ -149,11 +149,11 @@ Customer cust = null;
 
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    conn.Select()
+    conn.Sproc()
     .AddSqlParameter("@FirstName", "Thomas")
     .AddSqlParameter("@LastName", "Hardy")
     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
-    .ExecuteReader<Customer, Order>(conn, "dbo.GetCustomerAndOrders", (c, o) =>
+    .ExecuteReader<Customer, Order>("dbo.GetCustomerAndOrders", (c, o) =>
     {
         if (cust == null)
         {
@@ -192,13 +192,13 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    Customer customer = conn.Select() 
+    Customer customer = conn.Sproc() 
     .AddSqlParameter("@CustomerId", 6)
-    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", validateSelectColumns: true)
+    .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
     .FirstOrDefault();
 }
 ```
-####Result:
+#### Result:
 ```
 'validateSelectColumns' flag is set to TRUE
 
@@ -267,14 +267,14 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
         Direction = ParameterDirection.Output 
     };
 
-    insertedRecords = conn.Procedure()
+    insertedRecords = conn.Sproc()
         .AddSqlParameter(idParam)
         .AddSqlParameter("@City", customer.City)
         .AddSqlParameter("@Country", customer.Country)
         .AddSqlParameter("@FirstName", customer.FirstName)
         .AddSqlParameter("@LastName", customer.LastName)
         .AddSqlParameter("@Phone", customer.Phone)
-        .ExecuteNonQuery(conn, "dbo.SaveCustomer");
+        .ExecuteNonQuery("dbo.SaveCustomer");
 
     int outputId = idParam.GetValueOrDefault<int>();
 }
@@ -283,11 +283,7 @@ Assert.IsTrue(insertedRecords == 1);
 ```
 -----------------------------
 
-###Performance
-Internally, SprocMapper will cache property members for quick lookups and uses FastMember 
-for assigning values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
+### Performance
+Internally, SprocMapper uses FastMember for caching property members and mutating values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
 Please feel free to blog, compare and review.
-
-Credit to Marc Gravell for FastMember. 
-
 

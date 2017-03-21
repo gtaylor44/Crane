@@ -1,13 +1,11 @@
-﻿using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 
 namespace SprocMapperLibrary.SqlServer
 {
     /// <summary>
     /// 
     /// </summary>
-    public static class SqlConnectionExtensions
+    public static class DbConnectionExtensions
     {
         /// <summary>
         /// Entry point for performing a Sql Server procedure.

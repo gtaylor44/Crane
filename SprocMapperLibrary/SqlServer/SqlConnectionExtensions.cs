@@ -23,9 +23,9 @@ namespace SprocMapperLibrary.SqlServer
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public static Procedure Procedure(this SqlConnection conn)
+        public static SqlServerProcedure Procedure(this SqlConnection conn)
         {
-            return new Procedure(conn);
+            return new SqlServerProcedure(conn);
         }
     }
 }

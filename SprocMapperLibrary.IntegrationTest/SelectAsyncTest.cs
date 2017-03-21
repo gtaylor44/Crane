@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -202,7 +201,6 @@ namespace IntegrationTest
                     await conn.Procedure()
                         .AddSqlParameter("@CustomerId", id)
                         .ExecuteNonQueryAsync("dbo.DeleteCustomer");
-
                 }
 
                 scope.Complete();

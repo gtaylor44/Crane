@@ -24,9 +24,9 @@ namespace SprocMapperLibrary.MySql
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public static Procedure Procedure(this MySqlConnection conn)
+        public static MySqlProcedure Procedure(this MySqlConnection conn)
         {
-            return new Procedure(conn);
+            return new MySqlProcedure(conn);
         }
     }
 }

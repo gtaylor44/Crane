@@ -9,15 +9,31 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    public abstract class BaseProcedure : AbstractQuery
+    public abstract class BaseProcedure : BaseQuery
     {
         public BaseProcedure() : base()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
         public abstract int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
         public abstract Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null);
+
+        public abstract T ExecuteScalar<T>(string storedProcedure, int? commandTimeout = null);
+
+        public abstract Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null);
 
         /// <summary>
         /// 

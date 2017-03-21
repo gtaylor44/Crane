@@ -1,28 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
-namespace SprocMapperLibrary.SqlServer
+namespace SprocMapperLibrary.MySql
 {
     /// <summary>
     /// 
     /// </summary>
-    public class Procedure : BaseProcedure
+    public class MySqlProcedure : BaseProcedure
     {
-        private readonly SqlConnection _conn;
+        private readonly MySqlConnection _mySqlConn;
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="conn"></param>
-        public Procedure(SqlConnection conn) : base()
+        /// <param name="mySqlConn"></param>
+        public MySqlProcedure(MySqlConnection mySqlConn) : base()
         {
-            _conn = conn;
+            _mySqlConn = mySqlConn;
         }
 
         /// <summary>
-        /// Execute a MSSql stored procedure synchronously.
+        /// Execute a MySQL stored procedure synchronously.
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
@@ -31,12 +29,12 @@ namespace SprocMapperLibrary.SqlServer
         {
             int affectedRecords;
 
-            OpenConn(_conn);
+            OpenConn(_mySqlConn);
 
-            using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
             {
                 SetCommandProps(command, commandTimeout);
-                affectedRecords = command.ExecuteNonQuery();                
+                affectedRecords = command.ExecuteNonQuery();
             }
 
             return affectedRecords;
@@ -52,8 +50,8 @@ namespace SprocMapperLibrary.SqlServer
         {
             int affectedRecords;
 
-            await OpenConnAsync(_conn);
-            using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+            await OpenConnAsync(_mySqlConn);
+            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
             {
                 SetCommandProps(command, commandTimeout);
                 affectedRecords = await command.ExecuteNonQueryAsync();
@@ -69,12 +67,12 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public T ExecuteScalar<T>(string storedProcedure, int? commandTimeout = null)
+        public override T ExecuteScalar<T>(string storedProcedure, int? commandTimeout = null)
         {
             T obj;
 
-            OpenConn(_conn);
-            using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+            OpenConn(_mySqlConn);
+            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
             {
                 SetCommandProps(command, commandTimeout);
                 obj = (T)command.ExecuteScalar();
@@ -90,12 +88,12 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public async Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null)
+        public override async Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null)
         {
             T obj;
 
-            await OpenConnAsync(_conn);
-            using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+            await OpenConnAsync(_mySqlConn);
+            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
             {
                 SetCommandProps(command, commandTimeout);
                 obj = (T)await command.ExecuteScalarAsync();

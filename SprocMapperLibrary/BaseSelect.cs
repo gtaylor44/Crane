@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    public abstract class BaseSelect : AbstractQuery
+    public abstract class BaseSelect : BaseQuery
     {
         protected readonly List<ISprocObjectMap> SprocObjectMapList;
         protected readonly Dictionary<Type, Dictionary<string, string>> CustomColumnMappings;
@@ -130,7 +131,7 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
-            Action<SqlDataReader, List<TResult>> getObjectDel,
+            Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string partitionOn,
             bool validatePartitionOn,
             bool validateSelectColumns);
@@ -148,7 +149,7 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
-            Action<SqlDataReader, List<TResult>> getObjectDel,
+            Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string partitionOn,
             bool validatePartitionOn, bool validateSelectColumns);
 

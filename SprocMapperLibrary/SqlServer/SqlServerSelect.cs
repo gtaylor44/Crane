@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
-using FastMember;
-using SprocMapperLibrary.Interface;
 
 namespace SprocMapperLibrary.SqlServer
 {
@@ -35,7 +33,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="validatePartitionOn"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
-        protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<SqlDataReader, List<TResult>> getObjectDel, 
+        protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel, 
             string storedProcedure, int? commandTimeout, string partitionOn, bool validatePartitionOn, 
             bool validateSelectColumns)
         {
@@ -92,7 +90,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="validatePartitionOn"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
-        protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<SqlDataReader, List<TResult>> getObjectDel, 
+        protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel, 
             string storedProcedure, int? commandTimeout, string partitionOn, 
             bool validatePartitionOn, bool validateSelectColumns)
         {

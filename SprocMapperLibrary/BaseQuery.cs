@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,17 +11,17 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    public abstract class AbstractQuery
+    public abstract class BaseQuery
     {
         /// <summary>
         /// 
         /// </summary>
-        protected List<SqlParameter> ParamList;       
+        protected List<SqlParameter> ParamList;
 
         /// <summary>
         /// 
         /// </summary>
-        protected AbstractQuery()
+        protected BaseQuery()
         {
             ParamList = new List<SqlParameter>();
         }

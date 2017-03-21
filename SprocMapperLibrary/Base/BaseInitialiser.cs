@@ -10,7 +10,7 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    public abstract class BaseQuery
+    public abstract class BaseInitialiser
     {
         /// <summary>
         /// 
@@ -20,7 +20,7 @@ namespace SprocMapperLibrary
         /// <summary>
         /// 
         /// </summary>
-        protected BaseQuery()
+        protected BaseInitialiser()
         {
             ParamList = new List<SqlParameter>();
         }

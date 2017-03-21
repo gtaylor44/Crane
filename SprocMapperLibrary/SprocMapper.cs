@@ -276,33 +276,6 @@ namespace SprocMapperLibrary
             }
         }
 
-        public static void MapObject<T, T1, T2, T3, T4, T5, T6, T7>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
-        {
-            if (typeof(T) != typeof(INullType))
-                MapObject<T>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T1) != typeof(INullType))
-                MapObject<T1>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T2) != typeof(INullType))
-                MapObject<T2>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T3) != typeof(INullType))
-                MapObject<T3>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T4) != typeof(INullType))
-                MapObject<T4>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T5) != typeof(INullType))
-                MapObject<T5>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T6) != typeof(INullType))
-                MapObject<T6>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T7) != typeof(INullType))
-                MapObject<T7>(sprocObjectMapList, customColumnMappings);
-        }
-
         public static void MapObject<T>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
         {
             SprocObjectMap<T> objectMap = new SprocObjectMap<T>();

@@ -53,8 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseQuery.cs" />
-    <Compile Include="BaseProcedure.cs" />
+    <Compile Include="Base\BaseInitialiser.cs" />
+    <Compile Include="Base\BaseProcedure.cs" />
     <Compile Include="GenericExtensions.cs" />
     <Compile Include="Interface\INullType.cs" />
     <Compile Include="Interface\ISprocObjectMap.cs" />

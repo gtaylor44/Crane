@@ -4,7 +4,7 @@ using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using SprocMapperLibrary;
-using SprocMapperLibrary.Core;
+using SprocMapperLibrary.Interface;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
 
@@ -82,7 +82,7 @@ namespace UnitTest
         }
 
         [TestMethod]
-        [MyExpectedException(typeof(SprocMapperException), "Please check that partitionOn arguments are all valid column names. I was only able to match the following arguments: Id. Expecting a total of 2 valid arguments.")]
+        [MyExpectedException(typeof(SprocMapperException), "Please check that partitionOn arguments are all valid column names. SprocMapper was only able to match the following arguments: Id. Expecting a total of 2 valid arguments.")]
         public void GetOrdinalPartition_ThrowsException_WhenCantFindAllPartitionArguments()
         {
             const string partitionOn = "Id|MiddleName";

@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using FastMember;
+using SprocMapperLibrary.Interface;
 
-namespace SprocMapperLibrary.Core
+[assembly: InternalsVisibleTo("UnitTest")]
+[assembly: InternalsVisibleTo("IntegrationTest")]
+namespace SprocMapperLibrary
 {
-    public class SprocObjectMap<T> : ISprocObjectMap
+    internal class SprocObjectMap<T> : ISprocObjectMap
     {
         public SprocObjectMap()
         {

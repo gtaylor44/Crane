@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using FastMember;
-using SprocMapperLibrary.Core.Interface;
+using Microsoft.SqlServer.Types;
+using SprocMapperLibrary.Interface;
 
-namespace SprocMapperLibrary.Core
+[assembly: InternalsVisibleTo("UnitTest")]
+[assembly: InternalsVisibleTo("IntegrationTest")]
+namespace SprocMapperLibrary
 {
-    public static class SprocMapper
+    internal static class SprocMapper
     {
         public static void SetOrdinal(List<DataRow> rowList, List<ISprocObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
@@ -126,7 +127,7 @@ namespace SprocMapperLibrary.Core
             if (currPartition != partitionOnArr.Length)
             {
                 string matchedStr = string.Join(", ", matched);
-                throw new SprocMapperException($"Please check that partitionOn arguments are all valid column names. I was only able to match the following arguments: {matchedStr}. Expecting a total of {mapCount} valid arguments.");
+                throw new SprocMapperException($"Please check that partitionOn arguments are all valid column names. SprocMapper was only able to match the following arguments: {matchedStr}. Expecting a total of {mapCount} valid arguments.");
             }
 
             return result.ToArray();
@@ -188,7 +189,7 @@ namespace SprocMapperLibrary.Core
             string message = sprocObjectMapList.Count == 1 ? $"The following columns from the select statement in '{storedProcedure}' have not been " +
                                                              $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n\n{absentColumnsAsString}\n" : 
                                                              $"The following columns from select statement have not been mapped to target model. "+
-                                                             $"The target model is determined by the 'partitionOn' parameter.\n\n{absentColumnsAsString}\n";
+                                                             $"The target model is determined by the 'partitionOn' parameter. This validation message is dependant on a sound partitionOn argument. \n\n{absentColumnsAsString}\n";
 
             if (absentColumnMessageList.Count > 0)
                 throw new SprocMapperException($"'validateSelectColumns' flag is set to TRUE\n\n{message}");
@@ -273,33 +274,6 @@ namespace SprocMapperLibrary.Core
             {
                 throw new SprocMapperException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{member.Type}'");
             }
-        }
-
-        public static void MapObject<T, T1, T2, T3, T4, T5, T6, T7>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
-        {
-            if (typeof(T) != typeof(INullType))
-                MapObject<T>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T1) != typeof(INullType))
-                MapObject<T1>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T2) != typeof(INullType))
-                MapObject<T2>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T3) != typeof(INullType))
-                MapObject<T3>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T4) != typeof(INullType))
-                MapObject<T4>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T5) != typeof(INullType))
-                MapObject<T5>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T6) != typeof(INullType))
-                MapObject<T6>(sprocObjectMapList, customColumnMappings);
-
-            if (typeof(T7) != typeof(INullType))
-                MapObject<T7>(sprocObjectMapList, customColumnMappings);
         }
 
         public static void MapObject<T>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
@@ -436,7 +410,9 @@ namespace SprocMapperLibrary.Core
                 type == typeof(string) ||
                 type == typeof(byte[]) ||
                 type == typeof(char[]) ||
-                type == typeof(SqlXml)
+                type == typeof(SqlXml) ||
+                type == typeof(SqlGeography) ||
+                type == typeof(SqlGeometry)
                 )
                 return true;
 

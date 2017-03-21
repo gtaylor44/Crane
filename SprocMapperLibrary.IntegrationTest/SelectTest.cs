@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
-using SprocMapperLibrary.Core;
+using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
 using SqlBulkTools;
@@ -22,9 +22,9 @@ namespace IntegrationTest
             using (
                 SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var products = conn.Select()
+                var products = conn.Sproc()                  
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+                    .ExecuteReader<Product>("dbo.GetProducts");
 
                 Assert.IsNotNull(products);
             }
@@ -39,7 +39,7 @@ namespace IntegrationTest
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
 
-                conn.Select()
+                conn.Sproc()
                     .AddSqlParameter("@FirstName", "Thomas")
                     .AddSqlParameter("@LastName", "Hardy")
                     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
@@ -70,7 +70,7 @@ namespace IntegrationTest
 
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {              
-                product = conn.Select()
+                product = conn.Sproc()
                     .AddSqlParameter("@Id", productId)
                     .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
@@ -96,7 +96,7 @@ namespace IntegrationTest
             {
                 Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-                conn.Select()
+                conn.Sproc()                
                 .AddSqlParameter("@OrderId", orderId)
                 .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")   
                 .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
@@ -122,7 +122,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var suppliers = conn.Select().ExecuteReader<Supplier>(conn, "dbo.GetSuppliers");
+                var suppliers = conn.Sproc().ExecuteReader<Supplier>("dbo.GetSuppliers");
 
                 Assert.IsTrue(suppliers.Any());
             }
@@ -133,9 +133,9 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var customer = conn.Select()
+                var customer = conn.Sproc()
                     .AddSqlParameter("@CustomerId", 6)
-                    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", validateSelectColumns: true)
+                    .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
                     .FirstOrDefault();
 
                 Assert.AreEqual("Hanna", customer?.FirstName);
@@ -150,9 +150,9 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var supplier = conn.Select()
+                var supplier = conn.Sproc()
                     .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                    .ExecuteReader<Supplier>(conn, "dbo.GetSupplierByName")
+                    .ExecuteReader<Supplier>("dbo.GetSupplierByName")
                     .FirstOrDefault();
 
                 Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);
@@ -167,9 +167,9 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                conn.Select()
+                conn.Sproc()
                     .CustomColumnMapping<Product>(x => x.Package, "ProductName")
-                    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+                    .ExecuteReader<Product>("dbo.GetProducts");
             }
         }
 
@@ -216,8 +216,8 @@ namespace IntegrationTest
                     .MatchTargetOn(x => x.IntTest)
                     .Commit(conn);
 
-                var result = conn.Select()
-                    .ExecuteReader<TestDataType>(conn, "dbo.GetTestDataTypes")
+                var result = conn.Sproc()
+                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes")
                     .SingleOrDefault();
 
                 Assert.AreEqual(1, result?.IntTest);

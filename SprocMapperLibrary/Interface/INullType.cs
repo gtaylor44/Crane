@@ -1,9 +1,9 @@
-﻿namespace SprocMapperLibrary.Core.Interface
+﻿namespace SprocMapperLibrary.Interface
 {
     /// <summary>
     /// Marker interface for overloaded ExecuteReader methods to encourage code reuse
     /// </summary>
-    public interface INullType
+    internal interface INullType
     {
     }
 }

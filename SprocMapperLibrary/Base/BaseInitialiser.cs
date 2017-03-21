@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,17 +10,17 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    public abstract class AbstractQuery
+    public abstract class BaseInitialiser
     {
         /// <summary>
         /// 
         /// </summary>
-        protected List<SqlParameter> ParamList;       
+        protected List<SqlParameter> ParamList;
 
         /// <summary>
         /// 
         /// </summary>
-        protected AbstractQuery()
+        protected BaseInitialiser()
         {
             ParamList = new List<SqlParameter>();
         }
@@ -28,7 +29,7 @@ namespace SprocMapperLibrary
         /// 
         /// </summary>
         /// <param name="conn"></param>
-        protected void OpenConn(SqlConnection conn)
+        protected void OpenConn(DbConnection conn)
         {
             if (conn.State != ConnectionState.Open)
             {
@@ -41,7 +42,7 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        protected async Task OpenConnAsync(SqlConnection conn)
+        protected async Task OpenConnAsync(DbConnection conn)
         {
             if (conn.State != ConnectionState.Open)
             {
@@ -54,7 +55,7 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="command"></param>
         /// <param name="commandTimeout"></param>
-        protected void SetCommandProps(SqlCommand command, int? commandTimeout)
+        protected void SetCommandProps(DbCommand command, int? commandTimeout)
         {
             command.CommandType = CommandType.StoredProcedure;
 

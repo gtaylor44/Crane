@@ -77,9 +77,9 @@
       <Project>{77ad5839-9475-4d85-b432-13caa263db7c}</Project>
       <Name>SprocMapperLibrary.TestCommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj">
-      <Project>{ccaf87a0-a266-4be7-bc3c-389f35914e8f}</Project>
-      <Name>SprocMapperLibrary.Core</Name>
+    <ProjectReference Include="..\SprocMapperLibrary\SprocMapperLibrary.csproj">
+      <Project>{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}</Project>
+      <Name>SprocMapperLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

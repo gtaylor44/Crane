@@ -6,9 +6,9 @@ using System.Data.SqlClient;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FastMember;
-using SprocMapperLibrary.Interface;
 
-namespace SprocMapperLibrary.Base
+// ReSharper disable once CheckNamespace
+namespace SprocMapperLibrary
 {
     /// <summary>
     /// 
@@ -18,7 +18,7 @@ namespace SprocMapperLibrary.Base
         /// <summary>
         /// 
         /// </summary>
-        protected readonly List<ISprocObjectMap> SprocObjectMapList;
+        internal readonly List<ISprocObjectMap> SprocObjectMapList;
         /// <summary>
         /// 
         /// </summary>

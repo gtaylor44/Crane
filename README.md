@@ -28,7 +28,7 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    var products = conn.Sproc().ExecuteReader<Product>(conn, "dbo.GetProducts");
+    var products = conn.Sproc().ExecuteReader<Product>("dbo.GetProducts");
 }
 ```
 -----------------------------
@@ -53,7 +53,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {   
     var products = conn.Sproc()
     .AddSqlParameter("@SupplierId", 2)
-    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+    .ExecuteReader<Product>("dbo.GetProducts");
 }
 ```
 -----------------------------
@@ -76,7 +76,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
     var products = conn.Sproc()
     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
     .CustomColumnMapping<Product>(x => x.ProductName, "Product Name")
-    .ExecuteReader<Product>(conn, "dbo.GetProducts");
+    .ExecuteReader<Product>("dbo.GetProducts");
 }
 ```
 -----------------------------
@@ -112,7 +112,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {    
     product = conn.Sproc()
     .AddSqlParameter("@Id", 62)
-    .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
+    .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
     {
         p.Supplier = s;
     }, partitionOn: "ProductName|Id")
@@ -153,7 +153,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
     .AddSqlParameter("@FirstName", "Thomas")
     .AddSqlParameter("@LastName", "Hardy")
     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
-    .ExecuteReader<Customer, Order>(conn, "dbo.GetCustomerAndOrders", (c, o) =>
+    .ExecuteReader<Customer, Order>("dbo.GetCustomerAndOrders", (c, o) =>
     {
         if (cust == null)
         {
@@ -194,7 +194,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
     Customer customer = conn.Sproc() 
     .AddSqlParameter("@CustomerId", 6)
-    .ExecuteReader<Customer>(conn, "dbo.GetCustomer", validateSelectColumns: true)
+    .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
     .FirstOrDefault();
 }
 ```
@@ -267,14 +267,14 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
         Direction = ParameterDirection.Output 
     };
 
-    insertedRecords = conn.Procedure()
+    insertedRecords = conn.Sproc()
         .AddSqlParameter(idParam)
         .AddSqlParameter("@City", customer.City)
         .AddSqlParameter("@Country", customer.Country)
         .AddSqlParameter("@FirstName", customer.FirstName)
         .AddSqlParameter("@LastName", customer.LastName)
         .AddSqlParameter("@Phone", customer.Phone)
-        .ExecuteNonQuery(conn, "dbo.SaveCustomer");
+        .ExecuteNonQuery("dbo.SaveCustomer");
 
     int outputId = idParam.GetValueOrDefault<int>();
 }

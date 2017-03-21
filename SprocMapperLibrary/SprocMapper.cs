@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using FastMember;
 using Microsoft.SqlServer.Types;
-using SprocMapperLibrary.Interface;
 
 [assembly: InternalsVisibleTo("UnitTest")]
 [assembly: InternalsVisibleTo("IntegrationTest")]

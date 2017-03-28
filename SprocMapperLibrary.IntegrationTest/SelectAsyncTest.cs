@@ -26,7 +26,7 @@ namespace IntegrationTest
             {
                 var products = await conn.Sproc()
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    .ExecuteReaderAsync<Product>(conn, "dbo.GetProducts");
+                    .ExecuteReaderAsync<Product>("dbo.GetProducts");
 
                 Assert.IsNotNull(products);
             }
@@ -46,7 +46,7 @@ namespace IntegrationTest
                     .AddSqlParameter("@FirstName", "Thomas")
                     .AddSqlParameter("@LastName", "Hardy")
                     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
-                    .ExecuteReaderAsync<Customer, Order>(conn, "dbo.GetCustomerAndOrders", (c, o) =>
+                    .ExecuteReaderAsync<Customer, Order>("dbo.GetCustomerAndOrders", (c, o) =>
                     {
                         if (cust == null)
                         {
@@ -75,7 +75,7 @@ namespace IntegrationTest
             {
                 product = (await conn.Sproc()
                     .AddSqlParameter("@Id", productId)
-                    .ExecuteReaderAsync<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
+                    .ExecuteReaderAsync<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
                         p.Supplier = s;
 
@@ -102,7 +102,7 @@ namespace IntegrationTest
                 await conn.Sproc()
                 .AddSqlParameter("@OrderId", orderId)
                 .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")
-                .ExecuteReaderAsync<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
+                .ExecuteReaderAsync<Order, OrderItem, Product>("dbo.GetOrder", (o, oi, p) =>
                 {
                     Order ord;
                     if (!orderDic.TryGetValue(o.Id, out ord))
@@ -125,7 +125,7 @@ namespace IntegrationTest
         {
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
-                var suppliers = await conn.Sproc().ExecuteReaderAsync<Supplier>(conn, "dbo.GetSuppliers");
+                var suppliers = await conn.Sproc().ExecuteReaderAsync<Supplier>("dbo.GetSuppliers");
 
                 Assert.IsTrue(suppliers.Any());
             }
@@ -138,7 +138,7 @@ namespace IntegrationTest
             {
                 var customer = (await conn.Sproc()
                     .AddSqlParameter("@CustomerId", 6)
-                    .ExecuteReaderAsync<Customer>(conn, "dbo.GetCustomer"))
+                    .ExecuteReaderAsync<Customer>("dbo.GetCustomer"))
                     .FirstOrDefault();
 
                 Assert.AreEqual("Hanna", customer?.FirstName);
@@ -155,7 +155,7 @@ namespace IntegrationTest
             {
                 var supplier = (await conn.Sproc()
                     .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                    .ExecuteReaderAsync<Supplier>(conn, "dbo.GetSupplierByName"))
+                    .ExecuteReaderAsync<Supplier>("dbo.GetSupplierByName"))
                     .FirstOrDefault();
 
                 Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);
@@ -217,7 +217,7 @@ namespace IntegrationTest
             {
                 await conn.Sproc()
                     .CustomColumnMapping<Product>(x => x.Package, "ProductName")
-                    .ExecuteReaderAsync<Product>(conn, "dbo.GetProducts");
+                    .ExecuteReaderAsync<Product>("dbo.GetProducts");
             }
         }
 

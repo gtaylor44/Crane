@@ -43,7 +43,7 @@ namespace IntegrationTest
                     .AddSqlParameter("@FirstName", "Thomas")
                     .AddSqlParameter("@LastName", "Hardy")
                     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
-                    .ExecuteReader<Customer, Order>(conn, "dbo.GetCustomerAndOrders", (c, o) =>
+                    .ExecuteReader<Customer, Order>("dbo.GetCustomerAndOrders", (c, o) =>
                     {
                         if (cust == null)
                         {
@@ -72,7 +72,7 @@ namespace IntegrationTest
             {              
                 product = conn.Sproc()
                     .AddSqlParameter("@Id", productId)
-                    .ExecuteReader<Product, Supplier>(conn, "[dbo].[GetProductAndSupplier]", (p, s) =>
+                    .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
                     {
                         p.Supplier = s;
 
@@ -99,7 +99,7 @@ namespace IntegrationTest
                 conn.Sproc()                
                 .AddSqlParameter("@OrderId", orderId)
                 .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")   
-                .ExecuteReader<Order, OrderItem, Product>(conn, "dbo.GetOrder", (o, oi, p) =>
+                .ExecuteReader<Order, OrderItem, Product>("dbo.GetOrder", (o, oi, p) =>
                     {
                         Order ord;
                         if (!orderDic.TryGetValue(o.Id, out ord))

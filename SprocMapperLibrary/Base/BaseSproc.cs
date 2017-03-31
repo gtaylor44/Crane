@@ -914,7 +914,7 @@ namespace SprocMapperLibrary
             {
                 ValidateType(tempHashSet, typeof(T8));
                 SprocMapper.MapObject<T8>(sprocObjectMapList, customColumnMappings);
-            }               
+            }
         }
 
         private void ValidateType(HashSet<Type> typeHashSet, Type targetType)

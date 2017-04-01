@@ -36,12 +36,8 @@ namespace SprocMapperLibrary.MySql
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string partitionOn, bool validatePartitionOn,
-            bool validateSelectColumns)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns)
         {
-            if (validatePartitionOn)
-                SprocMapper.ValidatePartitionOn(partitionOn);
-
             // Try open connection if not already open.
             OpenConn(_mySqlConn);
 
@@ -58,8 +54,8 @@ namespace SprocMapperLibrary.MySql
 
                     int[] partitionOnOrdinal = null;
 
-                    if (partitionOn != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, SprocObjectMapList.Count);
+                    if (partitionOnArr != null)
+                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
                     SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
@@ -93,12 +89,8 @@ namespace SprocMapperLibrary.MySql
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string partitionOn,
-            bool validatePartitionOn, bool validateSelectColumns)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns)
         {
-            if (validatePartitionOn)
-                SprocMapper.ValidatePartitionOn(partitionOn);
-
             // Try open connection if not already open.
             await OpenConnAsync(_mySqlConn);
 
@@ -116,8 +108,8 @@ namespace SprocMapperLibrary.MySql
 
                     int[] partitionOnOrdinal = null;
 
-                    if (partitionOn != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOn, SprocObjectMapList.Count);
+                    if (partitionOnArr != null)
+                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
                     SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 

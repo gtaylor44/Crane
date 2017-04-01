@@ -89,12 +89,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn"></param>
         /// <param name="mapCount"></param>
         /// <returns></returns>
-        public static int[] GetOrdinalPartition(List<DataRow> rows, string partitionOn, int mapCount)
+        public static int[] GetOrdinalPartition(List<DataRow> rows, string[] partitionOnArr, int mapCount)
         {
 
             List<int> result = new List<int>();
-            List<string> matched = new List<string>();
-            string[] partitionOnArr = partitionOn.Split('|');
+            List<string> matched = new List<string>();           
 
             if (partitionOnArr.Length != mapCount)
             {
@@ -323,6 +322,7 @@ namespace SprocMapperLibrary
         public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader) where T : new()
         {
             T targetObject = (T)sprocObjectMap.TypeAccessor.CreateNew();
+            int defaultOrNullCounter = 0;
 
             foreach (var column in sprocObjectMap.Columns)
             {
@@ -342,16 +342,19 @@ namespace SprocMapperLibrary
                 object readerObj = reader[ordinal];
 
                 if (readerObj == DBNull.Value)
-                {
+                {             
                     sprocObjectMap.TypeAccessor[targetObject, member.Name] = GetDefaultValue(member, sprocObjectMap.DefaultValueDic);
+                    defaultOrNullCounter++;
                 }
 
                 else
                 {
                     sprocObjectMap.TypeAccessor[targetObject, member.Name] = readerObj;
                 }
-
             }
+         
+            if (defaultOrNullCounter == sprocObjectMap.Columns.Count)
+                return default(T); // All columns are null or default
 
             return targetObject;
         }

@@ -28,6 +28,8 @@ namespace SprocMapperLibrary
         /// </summary>
         protected const bool ValidateSelectColumnsDefault = true;
 
+        private const char PartitionSplitOnChar = '|';
+
         /// <summary>
         /// 
         /// </summary>
@@ -126,8 +128,7 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string partitionOn,
-            bool validatePartitionOn,
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr,
             bool validateSelectColumns);
 
 
@@ -144,8 +145,8 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string partitionOn,
-            bool validatePartitionOn, bool validateSelectColumns);
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr,
+            bool validateSelectColumns);
 
         /// <summary>
         /// 
@@ -221,7 +222,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, false, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns);
         }
 
         /// <summary>
@@ -236,11 +237,15 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1>(string storedProcedure, Action<TResult, TJoin1> callBack,
-            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, 
+            int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
         {
             MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
@@ -251,7 +256,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -274,6 +279,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -284,7 +292,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -309,6 +317,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -320,7 +331,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -347,6 +358,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -359,7 +373,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -389,6 +403,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -402,7 +419,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -434,6 +451,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return ExecuteReaderImpl<TResult>((reader, result) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -448,7 +468,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -482,6 +502,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return ExecuteReaderImpl<TResult>((reader, result) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -497,7 +520,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -519,7 +542,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, false, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns);
         }
 
         /// <summary>
@@ -542,6 +565,9 @@ namespace SprocMapperLibrary
 
             MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -551,7 +577,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -575,6 +601,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -585,7 +614,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -603,13 +632,17 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault,
+            int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
             where TJoin3 : class, new()
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -622,7 +655,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -651,6 +684,9 @@ namespace SprocMapperLibrary
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -663,7 +699,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -683,7 +719,8 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault,
+            int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -692,6 +729,9 @@ namespace SprocMapperLibrary
             where TJoin5 : class, new()
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -706,7 +746,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -727,7 +767,8 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault,
+            int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -737,6 +778,9 @@ namespace SprocMapperLibrary
             where TJoin6 : class, new()
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -752,7 +796,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -774,7 +818,8 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault,
+            int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -785,6 +830,9 @@ namespace SprocMapperLibrary
             where TJoin7 : class, new()
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -801,7 +849,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         /// <summary>
@@ -826,7 +874,8 @@ namespace SprocMapperLibrary
             <TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string storedProcedure,
                 Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack,
                 string partitionOn,
-                bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+                bool validateSelectColumns = ValidateSelectColumnsDefault,
+                int? commandTimeout = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -838,6 +887,9 @@ namespace SprocMapperLibrary
             where TJoin8 : class, new()
         {
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(SprocObjectMapList, CustomColumnMappings);
+
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -855,7 +907,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOn, true, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
         }
 
         private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)

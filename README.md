@@ -161,8 +161,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             cust.CustomerOrders = new List<Order>();
         }
         
-        // There is a left join to order table
-        if (o.Id != default(int))
+        if (o != null)
             cust.CustomerOrders.Add(o);
 
     }, partitionOn: "Id|OrderId");

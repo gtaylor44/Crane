@@ -51,10 +51,10 @@ namespace UnitTest
         [TestMethod]
         public void GetOrdinalPartition_ReturnsCorrectArr()
         {
-            const string partitionOn = "Id|Id";
+            string[] partitionOnArr = "Id|Id".Split('|');
             var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
-            var result = SprocMapper.GetOrdinalPartition(schema, partitionOn, 2);
+            var result = SprocMapper.GetOrdinalPartition(schema, partitionOnArr, 2);
 
             Assert.AreEqual(0, result[0]);
             Assert.AreEqual(3, result[1]);
@@ -64,30 +64,30 @@ namespace UnitTest
         [MyExpectedException(typeof(SprocMapperException), "Invalid number of arguments entered for partitionOn. Expected 2 arguments but instead saw 3 arguments")]
         public void GetOrdinalPartition_ThrowsException_WhenInvalidNumberOfPartitionOnArgumentsEntered()
         {
-            const string partitionOn = "Id|Id|Id";
+            string[] partitionOnArr = "Id|Id|Id".Split('|');
             var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
-            SprocMapper.GetOrdinalPartition(schema, partitionOn, 2);
+            SprocMapper.GetOrdinalPartition(schema, partitionOnArr, 2);
         }
 
         [TestMethod]
         [MyExpectedException(typeof(SprocMapperException), "First partitionOn argument is incorrect. Expected Id but instead saw FirstName")]
         public void GetOrdinalPartition_ThrowsException_WhenFirstColumnNotAMatch()
         {
-            const string partitionOn = "FirstName";
+            string[] partitionOnArr = "FirstName".Split('|');
             var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
-            SprocMapper.GetOrdinalPartition(schema, partitionOn, 1);
+            SprocMapper.GetOrdinalPartition(schema, partitionOnArr, 1);
         }
 
         [TestMethod]
         [MyExpectedException(typeof(SprocMapperException), "Please check that partitionOn arguments are all valid column names. SprocMapper was only able to match the following arguments: Id. Expecting a total of 2 valid arguments.")]
         public void GetOrdinalPartition_ThrowsException_WhenCantFindAllPartitionArguments()
         {
-            const string partitionOn = "Id|MiddleName";
+            string[] partitionOnArr = "Id|MiddleName".Split('|');
             var schema = DataTableFactory.GetTestDataTableV2().Rows.Cast<DataRow>().ToList();
 
-            SprocMapper.GetOrdinalPartition(schema, partitionOn, 2);
+            SprocMapper.GetOrdinalPartition(schema, partitionOnArr, 2);
         }
 
         [TestMethod]

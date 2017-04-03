@@ -28,7 +28,8 @@ END
 ```c#
 using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
 {
-    var products = conn.Sproc().ExecuteReader<Product>("dbo.GetProducts");
+    var products = conn.Sproc()
+    .ExecuteReader<Product>("dbo.GetProducts");
 }
 ```
 -----------------------------
@@ -197,7 +198,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
     .FirstOrDefault();
 }
 ```
-#### Result:
+#### Exception message:
 ```
 'validateSelectColumns' flag is set to TRUE
 

@@ -549,6 +549,61 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
+        /// Perform a select statement returning more than one entity. Please see documentation for more information if you need help. 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <typeparam name="TJoin1"></typeparam>
+        /// <typeparam name="TJoin2"></typeparam>
+        /// <typeparam name="TJoin3"></typeparam>
+        /// <typeparam name="TJoin4"></typeparam>
+        /// <typeparam name="TJoin5"></typeparam>
+        /// <typeparam name="TJoin6"></typeparam>
+        /// <typeparam name="TJoin7"></typeparam>
+        /// <typeparam name="TJoin8"></typeparam>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
+        /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
+        /// <param name="validateSelectColumns"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string storedProcedure,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, string partitionOn,
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            where TResult : class, new()
+            where TJoin1 : class, new()
+            where TJoin2 : class, new()
+            where TJoin3 : class, new()
+            where TJoin4 : class, new()
+            where TJoin5 : class, new()
+            where TJoin6 : class, new()
+            where TJoin7 : class, new()
+            where TJoin8 : class, new()
+        {
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(SprocObjectMapList, CustomColumnMappings);
+
+            SprocMapper.ValidatePartitionOn(partitionOn);
+            var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            return ExecuteReaderImpl<TResult>((reader, result) =>
+            {
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
+                TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
+                TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(SprocObjectMapList[7], reader);
+                TJoin8 obj9 = SprocMapper.GetObject<TJoin8>(SprocObjectMapList[8], reader);
+
+                callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
+
+                result.Add(obj1);
+
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+        }
+
+        /// <summary>
         /// Perform a select statement against a single type.
         /// </summary>
         /// <param name="storedProcedure"></param>

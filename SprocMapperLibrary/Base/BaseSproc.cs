@@ -227,6 +227,30 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
+        /// Perform a select statement returning a single entity. Contains an overload to do some stuff for each iteration (e.g. do some mapping). 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="callBack"></param>
+        /// <param name="validateSelectColumns"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, Action<TResult> callBack,
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            where TResult : class, new()
+        {
+            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            return ExecuteReaderImpl<TResult>((reader, res) =>
+            {
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                callBack.Invoke(obj1);
+                res.Add(obj1);
+
+            }, storedProcedure, commandTimeout, null, validateSelectColumns);
+        }
+
+        /// <summary>
         /// Perform a select statement returning more than one entity. Please see documentation for more information if you need help. 
         /// </summary>
         /// <typeparam name="TResult"></typeparam>

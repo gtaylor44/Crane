@@ -205,7 +205,7 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// Perform a select statement returning a single entity.
+        /// Perform a select statement against a single type.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
@@ -227,7 +227,7 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// Perform a select statement returning a single entity. Contains an overload to do some stuff for each iteration (e.g. do some mapping). 
+        /// Perform a select statement against a single type.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
@@ -549,7 +549,7 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// 
+        /// Perform a select statement against a single type.
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="validateSelectColumns"></param>
@@ -565,6 +565,30 @@ namespace SprocMapperLibrary
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                res.Add(obj1);
+
+            }, storedProcedure, commandTimeout, null, validateSelectColumns);
+        }
+
+        /// <summary>
+        /// Perform a select statement against a single type. 
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="callBack"></param>
+        /// <param name="validateSelectColumns"></param>
+        /// <param name="commandTimeout"></param>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
+        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure, Action<TResult> callBack,
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+             where TResult : class, new()
+        {
+            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
+            {
+                TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
+                callBack.Invoke(obj1);
                 res.Add(obj1);
 
             }, storedProcedure, commandTimeout, null, validateSelectColumns);

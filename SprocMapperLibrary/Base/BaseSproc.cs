@@ -122,8 +122,7 @@ namespace SprocMapperLibrary
         /// <param name="getObjectDel"></param>
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="commandTimeout"></param>
-        /// <param name="partitionOn"></param>
-        /// <param name="validatePartitionOn"></param>
+        /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
@@ -139,8 +138,7 @@ namespace SprocMapperLibrary
         /// <param name="getObjectDel"></param>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
-        /// <param name="partitionOn"></param>
-        /// <param name="validatePartitionOn"></param>
+        /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
@@ -151,11 +149,14 @@ namespace SprocMapperLibrary
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        public BaseSproc AddSqlParameter(SqlParameter item)
+        public BaseSproc AddSqlParameter(SqlParameter sqlParameter)
         {
-            ParamList.Add(item);
+            if (sqlParameter == null)
+                throw new NullReferenceException(nameof(sqlParameter));
+
+            ParamList.Add(sqlParameter);
             return this;
         }
 
@@ -170,7 +171,7 @@ namespace SprocMapperLibrary
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
 
-            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName });
+            ParamList.Add(new SqlParameter() { Value = value ?? DBNull.Value, ParameterName = parameterName });
             return this;
         }
 
@@ -186,7 +187,7 @@ namespace SprocMapperLibrary
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
 
-            ParamList.Add(new SqlParameter() { Value = value, ParameterName = parameterName, SqlDbType = dbType });
+            ParamList.Add(new SqlParameter() { Value = value ?? DBNull.Value, ParameterName = parameterName, SqlDbType = dbType });
             return this;
         }
 

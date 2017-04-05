@@ -10,7 +10,6 @@ namespace SprocMapperLibrary
     /// </summary>
     public static class GenericExtensions
     {
-
         /// <summary>
         /// Extension method for safely getting output parameters from SqlParameter
         /// </summary>
@@ -19,7 +18,8 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public static T GetValueOrDefault<T>(this SqlParameter sqlParameter)
         {
-            if (sqlParameter.Value == DBNull.Value)
+            if (sqlParameter.Value == DBNull.Value 
+                || sqlParameter.Value == null)
             {
                 if (typeof(T).IsValueType)
                     return (T)Activator.CreateInstance(typeof(T));

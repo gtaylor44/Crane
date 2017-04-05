@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data;
 using System.Data.SqlClient;
-using MySql.Data.MySqlClient;
 
 namespace SprocMapperLibrary
 {

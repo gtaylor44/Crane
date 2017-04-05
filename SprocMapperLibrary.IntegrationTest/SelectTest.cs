@@ -30,6 +30,25 @@ namespace IntegrationTest
             }
         }
 
+        [TestMethod]
+        public void GetProducts_WithCallback()
+        {
+            List<Product> productList = new List<Product>();
+            using (
+                SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+            {
+                conn.Sproc()
+                    .CustomColumnMapping<Product>(x => x.Id, "Product Id")
+                    .ExecuteReader<Product>("dbo.GetProducts", (product) =>
+                    {
+                        // do something special with product
+                        productList.Add(product);
+                    });
+
+                Assert.IsTrue(productList.Count > 0);
+            }
+        }
+
         // 1:M relationship example
         [TestMethod]
         public void SelectSingleCustomerAndOrders()

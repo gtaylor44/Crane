@@ -251,6 +251,6 @@ Target model: 'Customer'
 ```
 -----------------------------
 ### Performance
-Internally, SprocMapper uses FastMember for caching property members and mutating values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
+Internally, SprocMapper has a dependency on FastMember for caching property members and efficient reading/writing of property member values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
 Please feel free to blog, compare and review.
 

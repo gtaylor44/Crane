@@ -15,7 +15,7 @@ Key Features:
 Selects all products defined by 'dbo.GetProducts'.
 
 ```sql
-ALTER PROCEDURE [dbo].[GetProducts]
+CREATE PROCEDURE [dbo].[GetProducts]
 AS
 BEGIN
 SELECT p.Id, p.ProductName, p.SupplierId, 
@@ -38,7 +38,7 @@ You can chain the AddSqlParamater method more than once if you have more than on
 to include. 
 
 ```sql
-ALTER PROCEDURE [dbo].[GetProducts]
+CREATE PROCEDURE [dbo].[GetProducts]
 	@SupplierId int
 AS
 BEGIN
@@ -62,7 +62,7 @@ If you're using a column alias in your select statement, add one or
 many custom column mappings depending on your procedure.
 
 ```sql
-ALTER PROCEDURE [dbo].[GetProducts]
+CREATE PROCEDURE [dbo].[GetProducts]
 AS
 BEGIN
 SELECT p.Id as [Product Id], p.ProductName as [Product Name]
@@ -90,7 +90,7 @@ Because SprocMapper reads row by row, some relationships may require an intermed
 The below example retrieves a single product with an Id of 62 and its associated supplier. It's a 1:1 relationship. 
 
 ```sql
-ALTER PROCEDURE [dbo].[GetProductAndSupplier]
+CREATE PROCEDURE [dbo].[GetProductAndSupplier]
 	@Id int
 AS
 BEGIN
@@ -125,10 +125,10 @@ Assert.AreEqual("Chantal Goulet", product?.Supplier.ContactName);
 
 ```
 -----------------------------
-1:M example between customer (if exists) and their order(s).
+Get customer and their order(s).
 
 ```sql
-ALTER PROCEDURE [dbo].[GetCustomerAndOrders]
+CREATE PROCEDURE [dbo].[GetCustomerAndOrders]
 	@FirstName nvarchar(40),
 	@LastName nvarchar(40)
 AS
@@ -172,13 +172,54 @@ Assert.IsNotNull(cust);
 Assert.AreEqual(13, cust.CustomerOrders.Count);
 ```
 -----------------------------
+A slightly more complex example getting all customers and all orders. This demonstrates the use of a dictionary to only get distinct customers. 
+```sql
+CREATE PROCEDURE GetAllCustomersAndOrders
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT *
+	FROM dbo.Customer c
+	LEFT JOIN dbo.[Order] o
+	ON c.Id = o.CustomerId
+END
+GO
+```
+```c#
+Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
+
+using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+{
+	conn.Sproc()
+    .ExecuteReader<Customer, Order>("dbo.GetAllCustomersAndOrders", (c, o) =>
+    {
+    	Customer customer;
+
+        if (!customerDic.TryGetValue(c.Id, out customer))
+        {
+            customer = c;                            
+            customer.CustomerOrders = new List<Order>();
+            customerDic.Add(customer.Id, customer);
+        }
+
+        if (o != null)
+            customer.CustomerOrders.Add(o);
+
+        }, partitionOn: "Id|Id");
+    }
+
+    Assert.IsTrue(customerDic.Count > 0);
+}
+```
+-----------------------------
 SprocMapper validates that all select columns are mapped to a corresponding model property by default. This can be disabled by setting validateSelectColumns to false. 
 The below example sets an alias in stored procedure but because no custom column mapping has been setup, it's not mapped 
 and throws a SprocMapperException. The same exception message is shown if the property does not exist or a custom 
 column mapping is incorrect. Note that when mapping joins, it's important to have accurate 'partitionOn' arguments to avoid mixed results. 
 
 ```sql
-ALTER PROCEDURE [dbo].[GetCustomer]
+CREATE PROCEDURE [dbo].[GetCustomer]
 	@CustomerId int
 AS
 BEGIN
@@ -212,7 +253,7 @@ Target model: 'Customer'
 Execute a stored procedure without a result set.
 
 ```sql
-ALTER PROCEDURE [dbo].[SaveCustomer]
+CREATe PROCEDURE [dbo].[SaveCustomer]
 	@Id int output,
 	@City nvarchar(40),
 	@Country nvarchar(40),

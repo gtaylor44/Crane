@@ -14,13 +14,40 @@ namespace IntegrationTest
     [TestClass]
     public class SelectTest
     {
+        [TestMethod]
+        public void GetAllCustomersAndOrders()
+        {
+            Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
+
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+            {
+                conn.Sproc()
+                    .ExecuteReader<Customer, Order>("dbo.GetAllCustomersAndOrders", (c, o) =>
+                    {
+                        Customer customer;
+
+                        if (!customerDic.TryGetValue(c.Id, out customer))
+                        {
+                            customer = c;                            
+                            customer.CustomerOrders = new List<Order>();
+                            customerDic.Add(customer.Id, customer);
+                        }
+
+                        if (o != null)
+                            customer.CustomerOrders.Add(o);
+
+                    }, partitionOn: "Id|Id");
+            }
+
+            Assert.IsTrue(customerDic.Count > 0);
+        }
+
         // Returns all products with Id and Product Name only
         // Id has an alias of 'Product Id'
         [TestMethod]
         public void GetProducts()
         {
-            using (
-                SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             {
                 var products = conn.Sproc()                  
                     .CustomColumnMapping<Product>(x => x.Id, "Product Id")

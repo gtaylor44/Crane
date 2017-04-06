@@ -3626,6 +3626,13 @@ IF EXISTS(SELECT *
       DROP PROCEDURE [dbo].GetTestDataTypes
   END
 
+  IF EXISTS(SELECT *
+          FROM   INFORMATION_SCHEMA.ROUTINES
+          WHERE  ROUTINE_NAME = 'GetAllCustomersAndOrders'
+                 AND SPECIFIC_SCHEMA = 'dbo')
+  BEGIN
+      DROP PROCEDURE [dbo].GetAllCustomersAndOrders
+  END
 GO
 /****** Object:  StoredProcedure [dbo].[GetProductAndSupplier]    Script Date: 16/02/2017 8:26:05 AM ******/
 SET ANSI_NULLS ON
@@ -3945,5 +3952,21 @@ BEGIN
 
 	SELECT TOP 1 * 
 	FROM dbo.TestDataTypes
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE GetAllCustomersAndOrders
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT *
+	FROM dbo.Customer c
+	LEFT JOIN dbo.[Order] o
+	ON c.Id = o.CustomerId
 END
 GO

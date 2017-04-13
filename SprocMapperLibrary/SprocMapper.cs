@@ -331,7 +331,11 @@ namespace SprocMapperLibrary
 
                 int ordinal;
                 if (!sprocObjectMap.ColumnOrdinalDic.TryGetValue(actualColumn, out ordinal))
+                {
+                    defaultOrNullCounter++;
                     continue;
+                }
+
 
                 Member member;
                 if (!sprocObjectMap.MemberInfoCache.TryGetValue(column, out member))

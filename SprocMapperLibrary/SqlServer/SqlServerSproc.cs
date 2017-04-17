@@ -30,8 +30,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="getObjectDel"></param>
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="commandTimeout"></param>
-        /// <param name="partitionOn"></param>
-        /// <param name="validatePartitionOn"></param>
+        /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,

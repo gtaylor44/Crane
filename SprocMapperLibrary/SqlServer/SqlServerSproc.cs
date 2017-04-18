@@ -41,9 +41,10 @@ namespace SprocMapperLibrary.SqlServer
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn)
         {
+            IEnumerable<TResult> cachedResult = null;
+
             try
-            {
-                IEnumerable<TResult> cachedResult;
+            {                
                 if (_cacheProvider.TryGet("key", out cachedResult))
                 {
                     return cachedResult;
@@ -99,7 +100,7 @@ namespace SprocMapperLibrary.SqlServer
 
             finally
             {
-                if (userConn == null)
+                if (userConn == null && cachedResult == null)
                     _conn.Close();
             }
 

@@ -31,9 +31,11 @@ namespace SprocMapperLibrary.CacheProvider
                     return false;
                 }
 
-                items = res;
-
-                return true;
+                lock (Padlock)
+                {
+                    items = res;
+                    return true;
+                }
             }
         }
 

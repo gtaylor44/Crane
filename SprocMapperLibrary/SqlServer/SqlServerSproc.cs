@@ -15,16 +15,15 @@ namespace SprocMapperLibrary.SqlServer
     public class SqlServerSproc : BaseSproc
     {
         private SqlConnection _conn;
-        private readonly AbstractCacheProvider _cacheProvider;
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="conn"></param>
+        /// <param name="connection"></param>
         /// <param name="cacheProvider"></param>
-        public SqlServerSproc(SqlConnection conn, AbstractCacheProvider cacheProvider) : base()
+        public SqlServerSproc(SqlConnection connection, AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
-            _conn = conn;
-            _cacheProvider = cacheProvider;
+            _conn = connection;
         }
 
         /// <summary>
@@ -37,26 +36,30 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey)
         {
-            IEnumerable<TResult> cachedResult = null;
-
+            var useCache = false;
+            var userProvidedConnection = false;
             try
-            {                
-                if (_cacheProvider.TryGet("key", out cachedResult))
+            {
+                IEnumerable<TResult> cachedResult;
+                if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
                 {
+                    useCache = true;
                     return cachedResult;
                 }
-                // Try open connection if not already open.
-                if (userConn == null)
-                    OpenConn(_conn);
-                else
-                {
-                    _conn = userConn as SqlConnection;
-                }
 
+                userProvidedConnection = userConn != null;
+
+                // Try open connection if not already open.
+                if (!userProvidedConnection)
+                    OpenConn(_conn);
+                else              
+                    _conn = userConn as SqlConnection;
+                
                 List<TResult> result = new List<TResult>();
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
@@ -90,17 +93,17 @@ namespace SprocMapperLibrary.SqlServer
                             getObjectDel(reader, result);
                         }
                     }
-
                 }
 
-                _cacheProvider.Add("key", result);
+                if (cacheKey != null)
+                    CacheProvider.Add(cacheKey, result);
 
                 return result;
             }
 
             finally
             {
-                if (userConn == null && cachedResult == null)
+                if (!userProvidedConnection && !useCache)
                     _conn.Close();
             }
 
@@ -116,21 +119,30 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey)
         {
+            var useCache = false;
+            var userProvidedConnection = false;
             try
             {
-
-                // Try open connection if not already open.
-                if (userConn == null)
-                    await OpenConnAsync(_conn);
-                else
+                IEnumerable<TResult> cachedResult;
+                if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
                 {
-                    _conn = userConn as SqlConnection;
+                    useCache = true;
+                    return cachedResult;
                 }
 
+                userProvidedConnection = userConn != null;
+
+                // Try open connection if not already open.
+                if (!userProvidedConnection)
+                    await OpenConnAsync(_conn);
+                else               
+                    _conn = userConn as SqlConnection;
+                
                 List<TResult> result = new List<TResult>();
 
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
@@ -165,14 +177,17 @@ namespace SprocMapperLibrary.SqlServer
                             getObjectDel(reader, result);
                         }
                     }
-
                 }
+
+                if (cacheKey != null)
+                    CacheProvider.Add(cacheKey, result);
+
                 return result;
             }
 
             finally
             {
-                if (userConn == null)
+                if (!userProvidedConnection && !useCache)
                     _conn.Close();
             }
         }
@@ -192,11 +207,9 @@ namespace SprocMapperLibrary.SqlServer
 
                 if (userConn == null)
                     OpenConn(_conn);
-                else
-                {
+                else                
                     _conn = userConn as SqlConnection;
-                }
-
+                
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
                     SetCommandProps(command, commandTimeout);
@@ -210,7 +223,6 @@ namespace SprocMapperLibrary.SqlServer
                 if (userConn == null)
                     _conn.Close();
             }
-
         }
 
         /// <summary>
@@ -228,10 +240,9 @@ namespace SprocMapperLibrary.SqlServer
 
                 if (userConn == null)
                     await OpenConnAsync(_conn);
-                else
-                {
+                else                
                     _conn = userConn as SqlConnection;
-                }
+                
 
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
@@ -246,7 +257,6 @@ namespace SprocMapperLibrary.SqlServer
                 if (userConn == null)
                     _conn.Close();
             }
-
         }
 
         /// <summary>
@@ -266,9 +276,8 @@ namespace SprocMapperLibrary.SqlServer
                 if (userConn == null)
                     OpenConn(_conn);
                 else
-                {
                     _conn = userConn as SqlConnection;
-                }
+                
 
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
@@ -302,10 +311,9 @@ namespace SprocMapperLibrary.SqlServer
 
                 if (userConn == null)
                     await OpenConnAsync(_conn);
-                else
-                {
+                else              
                     _conn = userConn as SqlConnection;
-                }
+                
               
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {

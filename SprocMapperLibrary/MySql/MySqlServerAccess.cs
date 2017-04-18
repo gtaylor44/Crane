@@ -1,42 +1,29 @@
 ﻿using System;
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using SprocMapperLibrary.Base;
 
-namespace SprocMapperLibrary.SqlServer
+namespace SprocMapperLibrary.MySql
 {
     /// <summary>
     /// 
     /// </summary>
-    public class SqlServerAccess
+    public class MySqlServerAccess
     {
         private AbstractCacheProvider _cacheProvider;
-        private readonly SqlConnection _conn;     
-        private const string InvalidConnMsg = "Please ensure that valid Sql Server Credentials have been passed in.";
+        private readonly MySqlConnection _conn;
+        private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
         private const string InvalidCacheMsg = "Cache provider already registered.";
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionString"></param>
-        public SqlServerAccess(string connectionString)
+        public MySqlServerAccess(string connectionString)
         {
             if (connectionString == null)
                 throw new ArgumentException(InvalidConnMsg);
 
-            _conn = new SqlConnection(connectionString);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="credential"></param>
-        public SqlServerAccess(string connectionString, SqlCredential credential)
-        {
-            if (connectionString == null || credential == null)
-                throw new ArgumentException(InvalidConnMsg);
-
-            _conn = new SqlConnection(connectionString, credential);
+            _conn = new MySqlConnection(connectionString);
         }
 
         /// <summary>
@@ -44,9 +31,9 @@ namespace SprocMapperLibrary.SqlServer
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public SqlServerSproc Sproc()
+        public MySqlSproc Sproc()
         {
-            return new SqlServerSproc(_conn, _cacheProvider);
+            return new MySqlSproc(_conn, _cacheProvider);
         }
 
         /// <summary>

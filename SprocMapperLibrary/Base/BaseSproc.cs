@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FastMember;
+using SprocMapperLibrary.Base;
 
 // ReSharper disable once CheckNamespace
 namespace SprocMapperLibrary
@@ -28,15 +29,22 @@ namespace SprocMapperLibrary
         /// </summary>
         protected const bool ValidateSelectColumnsDefault = true;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        protected readonly AbstractCacheProvider CacheProvider;
+
         private const char PartitionSplitOnChar = '|';
+
 
         /// <summary>
         /// 
         /// </summary>
-        protected BaseSproc() : base()
+        protected BaseSproc(AbstractCacheProvider cacheProvider) : base()
         {
             SprocObjectMapList = new List<ISprocObjectMap>();
             CustomColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
+            CacheProvider = cacheProvider;
         }
 
         /// <summary>
@@ -76,6 +84,14 @@ namespace SprocMapperLibrary
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public abstract Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null, DbConnection conn = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected void ValidateCacheKey()
+        {
+            
+        }
 
         /// <summary>
         /// If a property name does not match the corresponding column in select statement, 
@@ -129,11 +145,12 @@ namespace SprocMapperLibrary
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection conn);
+            bool validateSelectColumns, DbConnection conn, string cacheKey);
 
 
         /// <summary>
@@ -146,11 +163,12 @@ namespace SprocMapperLibrary
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection conn);
+            bool validateSelectColumns, DbConnection conn, string cacheKey);
 
         /// <summary>
         /// 
@@ -218,8 +236,9 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
-        public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure,
+        public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
         {
@@ -230,7 +249,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -242,8 +261,9 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
-        public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, Action<TResult> callBack,
+        public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, Action<TResult> callBack, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
         {
@@ -255,7 +275,7 @@ namespace SprocMapperLibrary
                 callBack.Invoke(obj1);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -269,9 +289,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1>(string storedProcedure, Action<TResult, TJoin1> callBack,
-            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, 
+            string partitionOn, string cacheKey = null, bool validateSelectColumns = ValidateSelectColumnsDefault, 
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -290,7 +311,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -305,8 +326,9 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
-        public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2>(string storedProcedure, Action<TResult, TJoin1, TJoin2> callBack, string partitionOn,
+        public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2>(string storedProcedure, Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -327,7 +349,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -343,8 +365,9 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
-        public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3>(string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn,
+        public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3>(string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -367,7 +390,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -384,9 +407,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, 
-            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
+            string partitionOn, string cacheKey = null, bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -410,7 +434,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -428,9 +452,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -457,7 +482,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -476,9 +501,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -507,7 +533,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -527,9 +553,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -560,7 +587,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -581,9 +608,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string storedProcedure,
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -616,7 +644,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -626,9 +654,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure,
+        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
              where TResult : class, new()
         {
@@ -639,7 +668,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -650,9 +679,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure, Action<TResult> callBack,
+        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure, Action<TResult> callBack, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
              where TResult : class, new()
         {
@@ -664,7 +694,7 @@ namespace SprocMapperLibrary
                 callBack.Invoke(obj1);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -678,9 +708,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1>(string storedProcedure, Action<TResult, TJoin1> callBack,
-            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault,
+            string partitionOn, string cacheKey = null, bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -700,7 +731,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -715,9 +746,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2>(string storedProcedure,
-            Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault,
+            Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null, bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -738,7 +770,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -754,9 +786,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
@@ -780,7 +813,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -797,9 +830,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
@@ -825,7 +859,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -843,9 +877,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
@@ -873,7 +908,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -892,9 +927,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
@@ -924,7 +960,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -944,9 +980,10 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string storedProcedure, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn,
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
@@ -978,7 +1015,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         /// <summary>
@@ -999,11 +1036,12 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="conn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync
             <TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string storedProcedure,
                 Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack,
-                string partitionOn,
+                string partitionOn, string cacheKey = null,
                 bool validateSelectColumns = ValidateSelectColumnsDefault,
                 int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
@@ -1037,7 +1075,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
         }
 
         private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)

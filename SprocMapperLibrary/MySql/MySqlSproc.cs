@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using SprocMapperLibrary.Base;
 
 namespace SprocMapperLibrary.MySql
 {
@@ -19,7 +20,8 @@ namespace SprocMapperLibrary.MySql
         /// 
         /// </summary>
         /// <param name="mySqlConn"></param>
-        public MySqlSproc(MySqlConnection mySqlConn) : base()
+        /// <param name="cacheProvider"></param>
+        public MySqlSproc(MySqlConnection mySqlConn, AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
             _mySqlConn = mySqlConn;
         }
@@ -34,20 +36,31 @@ namespace SprocMapperLibrary.MySql
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey)
         {
+            var useCache = false;
+            var userProvidedConnection = false;
+
             try
             {
+                IEnumerable<TResult> cachedResult;
+                if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+                {
+                    useCache = true;
+                    return cachedResult;
+                }
+
+                userProvidedConnection = userConn != null;
+
                 // Try open connection if not already open.
-                if (userConn == null)
+                if (!userProvidedConnection)
                     OpenConn(_mySqlConn);
                 else
-                {
                     _mySqlConn = userConn as MySqlConnection;
-                }
-                ;
+
                 List<TResult> result = new List<TResult>();
                 using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {
@@ -87,7 +100,7 @@ namespace SprocMapperLibrary.MySql
             }
             finally
             {
-                if (userConn == null)
+                if (!userProvidedConnection && !useCache)
                     _mySqlConn.Close();
             }
 
@@ -103,19 +116,30 @@ namespace SprocMapperLibrary.MySql
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey)
         {
+            var useCache = false;
+            var userProvidedConnection = false;
+
             try
             {
+                IEnumerable<TResult> cachedResult;
+                if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+                {
+                    useCache = true;
+                    return cachedResult;
+                }
+
+                userProvidedConnection = userConn != null;
+
                 // Try open connection if not already open.
-                if (userConn == null)
+                if (!userProvidedConnection)
                     await OpenConnAsync(_mySqlConn);
                 else
-                {
                     _mySqlConn = userConn as MySqlConnection;
-                }
 
                 List<TResult> result = new List<TResult>();
 
@@ -158,7 +182,7 @@ namespace SprocMapperLibrary.MySql
 
             finally
             {
-                if (userConn == null)
+                if (!userProvidedConnection && !useCache)
                     await _mySqlConn.CloseAsync();
             }
         }

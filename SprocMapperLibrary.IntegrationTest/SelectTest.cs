@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,27 +17,26 @@ namespace IntegrationTest
         [TestMethod]
         public void GetAllCustomersAndOrders()
         {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
             Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                conn.Sproc()
-                    .ExecuteReader<Customer, Order>("dbo.GetAllCustomersAndOrders", (c, o) =>
+            dataAccess.Sproc()
+                .ExecuteReader<Customer, Order>("dbo.GetAllCustomersAndOrders", (c, o) =>
+                {
+                    Customer customer;
+
+                    if (!customerDic.TryGetValue(c.Id, out customer))
                     {
-                        Customer customer;
+                        customer = c;
+                        customer.CustomerOrders = new List<Order>();
+                        customerDic.Add(customer.Id, customer);
+                    }
 
-                        if (!customerDic.TryGetValue(c.Id, out customer))
-                        {
-                            customer = c;                            
-                            customer.CustomerOrders = new List<Order>();
-                            customerDic.Add(customer.Id, customer);
-                        }
+                    if (o != null)
+                        customer.CustomerOrders.Add(o);
 
-                        if (o != null)
-                            customer.CustomerOrders.Add(o);
-
-                    }, partitionOn: "Id|Id");
-            }
+                }, partitionOn: "Id|Id");
 
             Assert.IsTrue(customerDic.Count > 0);
         }
@@ -48,61 +46,59 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProducts()
         {
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                var products = conn.Sproc()                  
-                    .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    .ExecuteReader<Product>("dbo.GetProducts");
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-                Assert.IsNotNull(products);
-            }
+            var products = dataAccess.Sproc()
+                .CustomColumnMapping<Product>(x => x.Id, "Product Id")
+                .ExecuteReader<Product>("dbo.GetProducts");
+
+            Assert.IsNotNull(products);
         }
 
         [TestMethod]
         public void GetProducts_WithCallback()
         {
-            List<Product> productList = new List<Product>();
-            using (
-                SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                conn.Sproc()
-                    .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                    .ExecuteReader<Product>("dbo.GetProducts", (product) =>
-                    {
-                        // do something special with product
-                        productList.Add(product);
-                    });
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-                Assert.IsTrue(productList.Count > 0);
-            }
+            List<Product> productList = new List<Product>();
+
+            dataAccess.Sproc()
+                .CustomColumnMapping<Product>(x => x.Id, "Product Id")
+                .ExecuteReader<Product>("dbo.GetProducts", (product) =>
+                {
+                    // do something special with product
+                    productList.Add(product);
+                });
+
+            Assert.IsTrue(productList.Count > 0);
+
         }
 
         // 1:M relationship example
         [TestMethod]
         public void SelectSingleCustomerAndOrders()
         {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
             Customer cust = null;
 
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-
-                conn.Sproc()
-                    .AddSqlParameter("@FirstName", "Thomas")
-                    .AddSqlParameter("@LastName", "Hardy")
-                    .CustomColumnMapping<Order>(x => x.Id, "OrderId")
-                    .ExecuteReader<Customer, Order>("dbo.GetCustomerAndOrders", (c, o) =>
+            dataAccess.Sproc()
+                .AddSqlParameter("@FirstName", "Thomas")
+                .AddSqlParameter("@LastName", "Hardy")
+                .CustomColumnMapping<Order>(x => x.Id, "OrderId")
+                .ExecuteReader<Customer, Order>("dbo.GetCustomerAndOrders", (c, o) =>
+                {
+                    if (cust == null)
                     {
-                        if (cust == null)
-                        {
-                            cust = c;
-                            cust.CustomerOrders = new List<Order>();
-                        }
+                        cust = c;
+                        cust.CustomerOrders = new List<Order>();
+                    }
 
-                        if (o.Id != default(int))
-                            cust.CustomerOrders.Add(o);
+                    if (o.Id != default(int))
+                        cust.CustomerOrders.Add(o);
 
-                    }, partitionOn: "Id|OrderId");
-            }
+                }, partitionOn: "Id|OrderId");
+
 
             Assert.AreEqual(13, cust.CustomerOrders.Count);
             Assert.IsNotNull(cust);
@@ -112,19 +108,20 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProductAndSupplier()
         {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
             int productId = 62;
             Product product = null;
 
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {              
-                product = conn.Sproc()
-                    .AddSqlParameter("@Id", productId)
-                    .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
-                    {
-                        p.Supplier = s;
 
-                    }, partitionOn: "ProductName|Id").FirstOrDefault();
-            }
+            product = dataAccess.Sproc()
+                .AddSqlParameter("@Id", productId)
+                .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
+                {
+                    p.Supplier = s;
+
+                }, partitionOn: "ProductName|Id").FirstOrDefault();
+
 
             Assert.AreEqual("Tarte au sucre", product?.ProductName);
             Assert.AreEqual("Chantal Goulet", product?.Supplier.ContactName);
@@ -135,31 +132,32 @@ namespace IntegrationTest
         [TestMethod]
         public void GetOrderAndProducts()
         {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
             int orderId = 20;
 
             Order order = null;
 
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-                conn.Sproc()                
-                .AddSqlParameter("@OrderId", orderId)
-                .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")   
-                .ExecuteReader<Order, OrderItem, Product>("dbo.GetOrder", (o, oi, p) =>
+            Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
+
+            dataAccess.Sproc()
+            .AddSqlParameter("@OrderId", orderId)
+            .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")
+            .ExecuteReader<Order, OrderItem, Product>("dbo.GetOrder", (o, oi, p) =>
+                {
+                    Order ord;
+                    if (!orderDic.TryGetValue(o.Id, out ord))
                     {
-                        Order ord;
-                        if (!orderDic.TryGetValue(o.Id, out ord))
-                        {
-                            orderDic.Add(o.Id, o);
-                            o.OrderItemList = new List<OrderItem>();
-                        }
+                        orderDic.Add(o.Id, o);
+                        o.OrderItemList = new List<OrderItem>();
+                    }
 
-                        order = orderDic[o.Id];
-                        oi.Product = p;
-                        order.OrderItemList.Add(oi);
-                    }, partitionOn: "Id|unitprice|productname");
-            }
+                    order = orderDic[o.Id];
+                    oi.Product = p;
+                    order.OrderItemList.Add(oi);
+                }, partitionOn: "Id|unitprice|productname");
+
 
             Assert.IsNotNull(order);
         }
@@ -167,43 +165,43 @@ namespace IntegrationTest
         [TestMethod]
         public void GetSuppliers()
         {
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                var suppliers = conn.Sproc().ExecuteReader<Supplier>("dbo.GetSuppliers");
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-                Assert.IsTrue(suppliers.Any());
-            }
+            var suppliers = dataAccess.Sproc().ExecuteReader<Supplier>("dbo.GetSuppliers");
+            Assert.IsTrue(suppliers.Any());
         }
 
         [TestMethod]
         public void GetCustomer()
         {
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                var customer = conn.Sproc()
-                    .AddSqlParameter("@CustomerId", 6)
-                    .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
-                    .FirstOrDefault();
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-                Assert.AreEqual("Hanna", customer?.FirstName);
-                Assert.AreEqual("Moos", customer?.LastName);
-                Assert.AreEqual("Mannheim", customer?.City);
-                Assert.AreEqual("Germany", customer?.Country);
-            }
+
+            var customer = dataAccess.Sproc()
+                .AddSqlParameter("@CustomerId", 6)
+                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
+                .FirstOrDefault();
+
+            Assert.AreEqual("Hanna", customer?.FirstName);
+            Assert.AreEqual("Moos", customer?.LastName);
+            Assert.AreEqual("Mannheim", customer?.City);
+            Assert.AreEqual("Germany", customer?.Country);
+
         }
 
         [TestMethod]
         public void GetSupplierByName()
         {
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                var supplier = conn.Sproc()
-                    .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                    .ExecuteReader<Supplier>("dbo.GetSupplierByName")
-                    .FirstOrDefault();
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-                Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);
-            }
+
+            var supplier = dataAccess.Sproc()
+                .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
+                .ExecuteReader<Supplier>("dbo.GetSupplierByName")
+                .FirstOrDefault();
+
+            Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);
+
         }
 
 
@@ -212,17 +210,18 @@ namespace IntegrationTest
         [MyExpectedException(typeof(SprocMapperException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
         public void CustomColumnName_MustBeUniqueToClass()
         {
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-            {
-                conn.Sproc()
-                    .CustomColumnMapping<Product>(x => x.Package, "ProductName")
-                    .ExecuteReader<Product>("dbo.GetProducts");
-            }
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            dataAccess.Sproc()
+                .CustomColumnMapping<Product>(x => x.Package, "ProductName")
+                .ExecuteReader<Product>("dbo.GetProducts");
         }
 
         [TestMethod]
         public void SaveGetDataTypes()
         {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
             BulkOperations bulk = new BulkOperations();
 
             TestDataType dataTypeTest = new TestDataType()
@@ -263,12 +262,12 @@ namespace IntegrationTest
                     .MatchTargetOn(x => x.IntTest)
                     .Commit(conn);
 
-                var result = conn.Sproc()
-                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes")
+                var result = dataAccess.Sproc()
+                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes", conn: conn)
                     .SingleOrDefault();
 
                 Assert.AreEqual(1, result?.IntTest);
-            }    
+            }
         }
     }
 }

@@ -86,7 +86,7 @@ namespace SprocMapperLibrary
         /// Gets the ordinal as a start index for each column in partitionOn string. 
         /// </summary>
         /// <param name="rows"></param>
-        /// <param name="partitionOn"></param>
+        /// <param name="partitionOnArr"></param>
         /// <param name="mapCount"></param>
         /// <returns></returns>
         public static int[] GetOrdinalPartition(List<DataRow> rows, string[] partitionOnArr, int mapCount)

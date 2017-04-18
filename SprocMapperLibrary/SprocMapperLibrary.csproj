@@ -54,12 +54,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\AbstractCacheProvider.cs" />
     <Compile Include="Base\BaseInitialiser.cs" />
     <Compile Include="Base\BaseSproc.cs" />
     <Compile Include="GenericExtensions.cs" />
     <Compile Include="Interface\INullType.cs" />
     <Compile Include="Interface\ISprocObjectMap.cs" />
     <Compile Include="MySql\DbConnectionExtensions.cs" />
+    <Compile Include="SqlServer\SqlServerAccess.cs" />
     <Compile Include="SqlServer\SqlServerSproc.cs" />
     <Compile Include="MySql\MySqlSproc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

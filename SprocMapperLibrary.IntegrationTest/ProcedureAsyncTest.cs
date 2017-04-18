@@ -17,6 +17,8 @@ namespace IntegrationTest
         [TestMethod]
         public async Task InsertCustomerThenDelete()
         {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
             Customer customer = new Customer()
             {
                 City = "Auckland",
@@ -36,23 +38,23 @@ namespace IntegrationTest
                     conn.Open();
                     SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
 
-                    inserted = await conn.Sproc()
+                    inserted = await dataAccess.Sproc()
                         .AddSqlParameter(idParam)
                         .AddSqlParameter("@City", customer.City)
                         .AddSqlParameter("@Country", customer.Country)
                         .AddSqlParameter("@FirstName", customer.FirstName)
                         .AddSqlParameter("@LastName", customer.LastName)
                         .AddSqlParameter("@Phone", customer.Phone)
-                        .ExecuteNonQueryAsync("dbo.SaveCustomer");
+                        .ExecuteNonQueryAsync("dbo.SaveCustomer", conn: conn);
 
                     int id = idParam.GetValueOrDefault<int>();
 
                     if (id == default(int))
                         throw new InvalidOperationException("Id output not parsed");
 
-                    await conn.Sproc()
+                    await dataAccess.Sproc()
                         .AddSqlParameter("@CustomerId", id)
-                        .ExecuteNonQueryAsync("dbo.DeleteCustomer");
+                        .ExecuteNonQueryAsync("dbo.DeleteCustomer", conn: conn);
 
                 }
 

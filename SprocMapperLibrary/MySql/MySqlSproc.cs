@@ -13,7 +13,7 @@ namespace SprocMapperLibrary.MySql
     /// </summary>
     public class MySqlSproc : BaseSproc
     {
-        private readonly MySqlConnection _mySqlConn;
+        private MySqlConnection _mySqlConn;
 
         /// <summary>
         /// 
@@ -31,50 +31,66 @@ namespace SprocMapperLibrary.MySql
         /// <param name="getObjectDel"></param>
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="commandTimeout"></param>
-        /// <param name="partitionOn"></param>
-        /// <param name="validatePartitionOn"></param>
+        /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
+        /// <param name="userConn"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn)
         {
-            // Try open connection if not already open.
-            OpenConn(_mySqlConn);
-
-            List<TResult> result = new List<TResult>();
-            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+            try
             {
-                // Set common SqlCommand properties
-                SetCommandProps(command, commandTimeout);
-
-                using (var reader = command.ExecuteReader())
+                // Try open connection if not already open.
+                if (userConn == null)
+                    OpenConn(_mySqlConn);
+                else
                 {
-                    DataTable schema = reader.GetSchemaTable();
-                    var rowList = schema?.Rows.Cast<DataRow>().ToList();
-
-                    int[] partitionOnOrdinal = null;
-
-                    if (partitionOnArr != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
-
-                    SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
-
-                    if (validateSelectColumns)
-                        SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal, storedProcedure);
-
-                    SprocMapper.ValidateSchema(schema, SprocObjectMapList);
-
-                    if (!reader.HasRows)
-                        return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
-
-                    while (reader.Read())
-                    {
-                        getObjectDel(reader, result);
-                    }
+                    _mySqlConn = userConn as MySqlConnection;
                 }
+                ;
+                List<TResult> result = new List<TResult>();
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    // Set common SqlCommand properties
+                    SetCommandProps(command, commandTimeout);
 
+                    using (var reader = command.ExecuteReader())
+                    {
+                        DataTable schema = reader.GetSchemaTable();
+                        var rowList = schema?.Rows.Cast<DataRow>().ToList();
+
+                        int[] partitionOnOrdinal = null;
+
+                        if (partitionOnArr != null)
+                            partitionOnOrdinal =
+                                SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
+
+                        SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
+
+                        if (validateSelectColumns)
+                            SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                storedProcedure);
+
+                        SprocMapper.ValidateSchema(schema, SprocObjectMapList);
+
+                        if (!reader.HasRows)
+                            return (List<TResult>) Activator.CreateInstance(typeof(List<TResult>));
+
+                        while (reader.Read())
+                        {
+                            getObjectDel(reader, result);
+                        }
+                    }
+
+                }
+                return result;
             }
-            return result;
+            finally
+            {
+                if (userConn == null)
+                    _mySqlConn.Close();
+            }
+
         }
 
         /// <summary>
@@ -84,51 +100,67 @@ namespace SprocMapperLibrary.MySql
         /// <param name="getObjectDel"></param>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
-        /// <param name="partitionOn"></param>
-        /// <param name="validatePartitionOn"></param>
+        /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
+        /// <param name="userConn"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn)
         {
-            // Try open connection if not already open.
-            await OpenConnAsync(_mySqlConn);
-
-            List<TResult> result = new List<TResult>();
-
-            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+            try
             {
-                // Set common SqlCommand properties
-                SetCommandProps(command, commandTimeout);
-
-                using (var reader = await command.ExecuteReaderAsync())
+                // Try open connection if not already open.
+                if (userConn == null)
+                    await OpenConnAsync(_mySqlConn);
+                else
                 {
-                    DataTable schema = reader.GetSchemaTable();
-                    var rowList = schema?.Rows.Cast<DataRow>().ToList();
-
-                    int[] partitionOnOrdinal = null;
-
-                    if (partitionOnArr != null)
-                        partitionOnOrdinal = SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
-
-                    SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
-
-                    if (validateSelectColumns)
-                        SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal, storedProcedure);
-
-                    SprocMapper.ValidateSchema(schema, SprocObjectMapList);
-
-                    if (!reader.HasRows)
-                        return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
-
-                    while (reader.Read())
-                    {
-                        getObjectDel(reader, result);
-                    }
+                    _mySqlConn = userConn as MySqlConnection;
                 }
 
+                List<TResult> result = new List<TResult>();
+
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    // Set common SqlCommand properties
+                    SetCommandProps(command, commandTimeout);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        DataTable schema = reader.GetSchemaTable();
+                        var rowList = schema?.Rows.Cast<DataRow>().ToList();
+
+                        int[] partitionOnOrdinal = null;
+
+                        if (partitionOnArr != null)
+                            partitionOnOrdinal =
+                                SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
+
+                        SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
+
+                        if (validateSelectColumns)
+                            SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                storedProcedure);
+
+                        SprocMapper.ValidateSchema(schema, SprocObjectMapList);
+
+                        if (!reader.HasRows)
+                            return (List<TResult>) Activator.CreateInstance(typeof(List<TResult>));
+
+                        while (reader.Read())
+                        {
+                            getObjectDel(reader, result);
+                        }
+                    }
+
+                }
+                return result;
             }
-            return result;
+
+            finally
+            {
+                if (userConn == null)
+                    await _mySqlConn.CloseAsync();
+            }
         }
 
         /// <summary>
@@ -136,20 +168,36 @@ namespace SprocMapperLibrary.MySql
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
         /// <returns>Number of affected records.</returns>
-        public override int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null)
+        public override int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null, DbConnection userConn = null)
         {
-            int affectedRecords;
-
-            OpenConn(_mySqlConn);
-
-            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+            try
             {
-                SetCommandProps(command, commandTimeout);
-                affectedRecords = command.ExecuteNonQuery();
+                int affectedRecords;
+
+                // Try open connection if not already open.
+                if (userConn == null)
+                    OpenConn(_mySqlConn);
+                else
+                {
+                    _mySqlConn = userConn as MySqlConnection;
+                }
+
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    SetCommandProps(command, commandTimeout);
+                    affectedRecords = command.ExecuteNonQuery();
+                }
+
+                return affectedRecords;
+            }
+            finally
+            {
+                if (userConn == null)
+                    _mySqlConn.Close();
             }
 
-            return affectedRecords;
         }
 
         /// <summary>
@@ -157,19 +205,36 @@ namespace SprocMapperLibrary.MySql
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
         /// <returns>Number of affected records.</returns>
-        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null)
+        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null, DbConnection userConn = null)
         {
-            int affectedRecords;
-
-            await OpenConnAsync(_mySqlConn);
-            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+            try
             {
-                SetCommandProps(command, commandTimeout);
-                affectedRecords = await command.ExecuteNonQueryAsync();
+                int affectedRecords;
+
+                // Try open connection if not already open.
+                if (userConn == null)
+                    await OpenConnAsync(_mySqlConn);
+                else
+                {
+                    _mySqlConn = userConn as MySqlConnection;
+                }
+
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    SetCommandProps(command, commandTimeout);
+                    affectedRecords = await command.ExecuteNonQueryAsync();
+                }
+
+                return affectedRecords;
+            }
+            finally
+            {
+                if (userConn == null)
+                    await _mySqlConn.CloseAsync();
             }
 
-            return affectedRecords;
         }
 
         /// <summary>
@@ -178,19 +243,36 @@ namespace SprocMapperLibrary.MySql
         /// <typeparam name="T"></typeparam>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public override T ExecuteScalar<T>(string storedProcedure, int? commandTimeout = null)
+        public override T ExecuteScalar<T>(string storedProcedure, int? commandTimeout = null, DbConnection userConn = null)
         {
-            T obj;
-
-            OpenConn(_mySqlConn);
-            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+            try
             {
-                SetCommandProps(command, commandTimeout);
-                obj = (T)command.ExecuteScalar();
+                T obj;
+
+                // Try open connection if not already open.
+                if (userConn == null)
+                    OpenConn(_mySqlConn);
+                else
+                {
+                    _mySqlConn = userConn as MySqlConnection;
+                }
+
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    SetCommandProps(command, commandTimeout);
+                    obj = (T) command.ExecuteScalar();
+                }
+
+                return obj;
+            }
+            finally
+            {
+                if (userConn == null)
+                    _mySqlConn.Close();
             }
 
-            return obj;
         }
 
         /// <summary>
@@ -199,19 +281,37 @@ namespace SprocMapperLibrary.MySql
         /// <typeparam name="T"></typeparam>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public override async Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null)
+        public override async Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null, DbConnection userConn = null)
         {
-            T obj;
-
-            await OpenConnAsync(_mySqlConn);
-            using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+            try
             {
-                SetCommandProps(command, commandTimeout);
-                obj = (T)await command.ExecuteScalarAsync();
+                T obj;
+
+                // Try open connection if not already open.
+                if (userConn == null)
+                    await OpenConnAsync(_mySqlConn);
+                else
+                {
+                    _mySqlConn = userConn as MySqlConnection;
+                }
+
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    SetCommandProps(command, commandTimeout);
+                    obj = (T) await command.ExecuteScalarAsync();
+                }
+
+                return obj;
             }
 
-            return obj;
+            finally
+            {
+                if (userConn == null)
+                    await _mySqlConn.CloseAsync();
+            }
+
         }
     }
 }

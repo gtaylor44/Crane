@@ -9,5 +9,8 @@ namespace SprocMapperLibrary.TestCommon
         {
             return new SqlConnection(ConfigurationManager.ConnectionStrings["SprocMapperTest"].ConnectionString);
         }
+
+        public static string SqlConnectionString => ConfigurationManager.ConnectionStrings["SprocMapperTest"]
+            .ConnectionString;
     }
 }

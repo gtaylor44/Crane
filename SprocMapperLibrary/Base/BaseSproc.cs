@@ -44,34 +44,38 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
-        public abstract int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null);
+        public abstract int ExecuteNonQuery(string storedProcedure, int? commandTimeout = null, DbConnection conn = null);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
-        public abstract Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null);
+        public abstract Task<int> ExecuteNonQueryAsync(string storedProcedure, int? commandTimeout = null, DbConnection conn = null);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public abstract T ExecuteScalar<T>(string storedProcedure, int? commandTimeout = null);
+        public abstract T ExecuteScalar<T>(string storedProcedure, int? commandTimeout = null, DbConnection conn = null);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public abstract Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null);
+        public abstract Task<T> ExecuteScalarAsync<T>(string storedProcedure, int? commandTimeout = null, DbConnection conn = null);
 
         /// <summary>
         /// If a property name does not match the corresponding column in select statement, 
@@ -124,11 +128,12 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns);
+            bool validateSelectColumns, DbConnection conn);
 
 
         /// <summary>
@@ -140,11 +145,12 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns);
+            bool validateSelectColumns, DbConnection conn);
 
         /// <summary>
         /// 
@@ -211,9 +217,10 @@ namespace SprocMapperLibrary
         /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
         {
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -223,7 +230,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -234,9 +241,10 @@ namespace SprocMapperLibrary
         /// <param name="callBack"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, Action<TResult> callBack,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
         {
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -247,7 +255,7 @@ namespace SprocMapperLibrary
                 callBack.Invoke(obj1);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -260,10 +268,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1>(string storedProcedure, Action<TResult, TJoin1> callBack,
             string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, 
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
         {
@@ -281,7 +290,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -295,9 +304,10 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2>(string storedProcedure, Action<TResult, TJoin1, TJoin2> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -317,7 +327,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -332,9 +342,10 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3>(string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -356,7 +367,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -372,9 +383,10 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string storedProcedure, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, 
-            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -398,7 +410,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -415,10 +427,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -444,7 +457,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -462,10 +475,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -493,7 +507,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -512,10 +526,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -545,7 +560,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -565,10 +580,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string storedProcedure,
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, string partitionOn,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -600,7 +616,7 @@ namespace SprocMapperLibrary
 
                 result.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -609,10 +625,11 @@ namespace SprocMapperLibrary
         /// <param name="storedProcedure"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
              where TResult : class, new()
         {
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -622,7 +639,7 @@ namespace SprocMapperLibrary
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -632,10 +649,11 @@ namespace SprocMapperLibrary
         /// <param name="callBack"></param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure, Action<TResult> callBack,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
              where TResult : class, new()
         {
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -646,7 +664,7 @@ namespace SprocMapperLibrary
                 callBack.Invoke(obj1);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns);
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -659,10 +677,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1>(string storedProcedure, Action<TResult, TJoin1> callBack,
             string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
         {
@@ -681,7 +700,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -695,10 +714,11 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2>(string storedProcedure,
             Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -718,7 +738,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -733,11 +753,12 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -759,7 +780,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -775,11 +796,12 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -803,7 +825,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -820,11 +842,12 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -850,7 +873,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -868,11 +891,12 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -900,7 +924,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -919,11 +943,12 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string storedProcedure, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null)
+            int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -953,7 +978,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         /// <summary>
@@ -973,13 +998,14 @@ namespace SprocMapperLibrary
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
         /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
+        /// <param name="conn"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync
             <TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string storedProcedure,
                 Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack,
                 string partitionOn,
                 bool validateSelectColumns = ValidateSelectColumnsDefault,
-                int? commandTimeout = null)
+                int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1011,7 +1037,7 @@ namespace SprocMapperLibrary
 
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn);
         }
 
         private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)

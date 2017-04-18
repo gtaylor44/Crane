@@ -61,10 +61,9 @@ namespace SprocMapperLibrary.SqlServer
         /// </summary>
         /// <param name="cacheProvider"></param>
         /// <typeparam name="T"></typeparam>
-        public void RegisterCacheProvider<T>(AbstractCacheProvider cacheProvider)
-            where T : AbstractCacheProvider
+        public void RegisterCacheProvider(AbstractCacheProvider cacheProvider)
         {
-            if (_cacheProvider == null)
+            if (_cacheProvider != null)
                 throw new InvalidOperationException("Cache provider already registered.");
 
             _cacheProvider = cacheProvider;

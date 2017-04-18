@@ -15,7 +15,7 @@ namespace SprocMapperLibrary.SqlServer
     public class SqlServerSproc : BaseSproc
     {
         private SqlConnection _conn;
-        private AbstractCacheProvider _cacheProvider;
+        private readonly AbstractCacheProvider _cacheProvider;
         /// <summary>
         /// 
         /// </summary>
@@ -43,6 +43,11 @@ namespace SprocMapperLibrary.SqlServer
         {
             try
             {
+                IEnumerable<TResult> cachedResult;
+                if (_cacheProvider.TryGet("key", out cachedResult))
+                {
+                    return cachedResult;
+                }
                 // Try open connection if not already open.
                 if (userConn == null)
                     OpenConn(_conn);
@@ -86,7 +91,9 @@ namespace SprocMapperLibrary.SqlServer
                     }
 
                 }
-                
+
+                _cacheProvider.Add("key", result);
+
                 return result;
             }
 
@@ -114,6 +121,7 @@ namespace SprocMapperLibrary.SqlServer
         {
             try
             {
+
                 // Try open connection if not already open.
                 if (userConn == null)
                     await OpenConnAsync(_conn);

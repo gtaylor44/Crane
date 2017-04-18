@@ -14,7 +14,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <returns></returns>
         public static SqlServerSproc Sproc(this SqlConnection conn)
         {
-            return new SqlServerSproc(conn);
+            return new SqlServerSproc(conn, null);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
+using SprocMapperLibrary.CacheProvider;
 using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
@@ -47,8 +48,16 @@ namespace IntegrationTest
         public void GetProducts()
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            dataAccess.RegisterCacheProvider(new MemoryCacheProvider());
 
             var products = dataAccess.Sproc()
+                .CustomColumnMapping<Product>(x => x.Id, "Product Id")
+                .ExecuteReader<Product>("dbo.GetProducts");
+
+            SqlServerAccess dataAccess1 = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            dataAccess1.RegisterCacheProvider(new MemoryCacheProvider());
+
+            var products2 = dataAccess1.Sproc()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                 .ExecuteReader<Product>("dbo.GetProducts");
 

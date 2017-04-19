@@ -46,6 +46,7 @@ namespace SprocMapperLibrary.MySql
 
             try
             {
+                ValidateCacheKey(cacheKey);
                 IEnumerable<TResult> cachedResult;
                 if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
                 {
@@ -94,8 +95,11 @@ namespace SprocMapperLibrary.MySql
                             getObjectDel(reader, result);
                         }
                     }
-
                 }
+
+                if (cacheKey != null)
+                    CacheProvider.Add(cacheKey, result);
+
                 return result;
             }
             finally
@@ -126,6 +130,7 @@ namespace SprocMapperLibrary.MySql
 
             try
             {
+                ValidateCacheKey(cacheKey);
                 IEnumerable<TResult> cachedResult;
                 if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
                 {
@@ -177,6 +182,10 @@ namespace SprocMapperLibrary.MySql
                     }
 
                 }
+
+                if (cacheKey != null)
+                    CacheProvider.Add(cacheKey, result);
+
                 return result;
             }
 

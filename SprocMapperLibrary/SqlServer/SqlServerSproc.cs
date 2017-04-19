@@ -45,6 +45,7 @@ namespace SprocMapperLibrary.SqlServer
             var userProvidedConnection = false;
             try
             {
+                ValidateCacheKey(cacheKey);
                 IEnumerable<TResult> cachedResult;
                 if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
                 {
@@ -128,6 +129,7 @@ namespace SprocMapperLibrary.SqlServer
             var userProvidedConnection = false;
             try
             {
+                ValidateCacheKey(cacheKey);
                 IEnumerable<TResult> cachedResult;
                 if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
                 {

@@ -20,6 +20,8 @@ namespace IntegrationTest
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
+            dataAccess.RegisterCacheProvider(new MemoryCacheProvider());
+
             Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
             dataAccess.Sproc()
@@ -37,7 +39,7 @@ namespace IntegrationTest
                     if (o != null)
                         customer.CustomerOrders.Add(o);
 
-                }, partitionOn: "Id|Id");
+                }, partitionOn: "Id|Id", cacheKey: "customersandorders");
 
             Assert.IsTrue(customerDic.Count > 0);
         }
@@ -52,14 +54,7 @@ namespace IntegrationTest
 
             var products = dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                .ExecuteReader<Product>("dbo.GetProducts");
-
-            SqlServerAccess dataAccess1 = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
-            dataAccess1.RegisterCacheProvider(new MemoryCacheProvider());
-
-            var products2 = dataAccess1.Sproc()
-                .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                .ExecuteReader<Product>("dbo.GetProducts");
+                .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "products");;
 
             Assert.IsNotNull(products);
         }
@@ -213,8 +208,6 @@ namespace IntegrationTest
 
         }
 
-
-
         [TestMethod]
         [MyExpectedException(typeof(SprocMapperException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
         public void CustomColumnName_MustBeUniqueToClass()
@@ -224,6 +217,15 @@ namespace IntegrationTest
             dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                 .ExecuteReader<Product>("dbo.GetProducts");
+        }
+
+        [TestMethod]
+        [MyExpectedException(typeof(SprocMapperException), "A cache key has been provided without a cache provider. Use the method 'RegisterCacheProvider' to register a cache provider.")]
+        public void CacheKeyNotProvided_ThrowsException()
+        {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", cacheKey: "test");
         }
 
         [TestMethod]

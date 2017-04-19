@@ -7,12 +7,11 @@ namespace SprocMapperLibrary.SqlServer
     /// <summary>
     /// 
     /// </summary>
-    public class SqlServerAccess
+    public class SqlServerAccess : BaseAccess
     {
-        private AbstractCacheProvider _cacheProvider;
         private readonly SqlConnection _conn;     
         private const string InvalidConnMsg = "Please ensure that valid Sql Server Credentials have been passed in.";
-        private const string InvalidCacheMsg = "Cache provider already registered.";
+        
 
         /// <summary>
         /// 
@@ -46,19 +45,9 @@ namespace SprocMapperLibrary.SqlServer
         /// <exception cref="ArgumentException"></exception>
         public SqlServerSproc Sproc()
         {
-            return new SqlServerSproc(_conn, _cacheProvider);
+            return new SqlServerSproc(_conn, CacheProvider);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cacheProvider"></param>
-        public void RegisterCacheProvider(AbstractCacheProvider cacheProvider)
-        {
-            if (_cacheProvider != null)
-                throw new InvalidOperationException(InvalidCacheMsg);
 
-            _cacheProvider = cacheProvider;
-        }
     }
 }

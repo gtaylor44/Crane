@@ -88,9 +88,13 @@ namespace SprocMapperLibrary
         /// <summary>
         /// 
         /// </summary>
-        protected void ValidateCacheKey()
+        protected void ValidateCacheKey(string cacheKey)
         {
-            
+            if (CacheProvider == null && cacheKey != null)
+            {
+                throw new SprocMapperException("A cache key has been provided without a cache provider. " +
+                                                    "Use the method 'RegisterCacheProvider' to register a cache provider.");
+            }
         }
 
         /// <summary>

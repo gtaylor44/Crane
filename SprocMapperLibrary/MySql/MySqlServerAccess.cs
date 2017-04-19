@@ -7,12 +7,10 @@ namespace SprocMapperLibrary.MySql
     /// <summary>
     /// 
     /// </summary>
-    public class MySqlServerAccess
+    public class MySqlServerAccess : BaseAccess
     {
-        private AbstractCacheProvider _cacheProvider;
         private readonly MySqlConnection _conn;
         private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
-        private const string InvalidCacheMsg = "Cache provider already registered.";
 
         /// <summary>
         /// 
@@ -33,19 +31,7 @@ namespace SprocMapperLibrary.MySql
         /// <exception cref="ArgumentException"></exception>
         public MySqlSproc Sproc()
         {
-            return new MySqlSproc(_conn, _cacheProvider);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cacheProvider"></param>
-        public void RegisterCacheProvider(AbstractCacheProvider cacheProvider)
-        {
-            if (_cacheProvider != null)
-                throw new InvalidOperationException(InvalidCacheMsg);
-
-            _cacheProvider = cacheProvider;
+            return new MySqlSproc(_conn, CacheProvider);
         }
     }
 }

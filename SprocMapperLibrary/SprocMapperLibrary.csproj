@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\AbstractCacheProvider.cs" />
+    <Compile Include="Base\BaseAccess.cs" />
     <Compile Include="Base\BaseInitialiser.cs" />
     <Compile Include="Base\BaseSproc.cs" />
     <Compile Include="CacheProvider\MemoryCacheProvider.cs" />

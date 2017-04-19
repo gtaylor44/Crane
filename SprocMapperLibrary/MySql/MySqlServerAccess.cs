@@ -20,7 +20,6 @@ namespace SprocMapperLibrary.MySql
         {
             if (connectionString == null)
                 throw new ArgumentException(InvalidConnMsg);
-
             _conn = new MySqlConnection(connectionString);
         }
 

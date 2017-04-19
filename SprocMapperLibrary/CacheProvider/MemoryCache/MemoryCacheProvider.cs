@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SprocMapperLibrary.Base;
 
 namespace SprocMapperLibrary.CacheProvider.MemoryCache
@@ -49,11 +50,34 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         }
 
         /// <summary>
-        /// 
+        /// Remove an item in the cache at a specified key.
         /// </summary>
         public override void Remove(string key)
         {
             lock (Padlock)
+            {
+                MemoryCacheSingleton.Instance.Remove(key);
+            }
+        }
+
+        /// <summary>
+        /// Removes all items from cache.
+        /// </summary>
+        public void RemoveAll()
+        {
+            foreach (var element in MemoryCacheSingleton.Instance)
+            {
+                MemoryCacheSingleton.Instance.Remove(element.Key);
+            }
+        }
+
+        /// <summary>
+        /// Removes a given array of keys from cache.
+        /// </summary>
+        /// <param name="keys"></param>
+        public void RemoveAll(string[] keys)
+        {
+            foreach (var key in keys)
             {
                 MemoryCacheSingleton.Instance.Remove(key);
             }

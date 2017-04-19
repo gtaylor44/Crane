@@ -91,7 +91,7 @@ SprocMapper supports caching for tuning application performance. Here's how to r
 _sqlAccess.RegisterCacheProvider(new MemoryCacheProvider());
 ```
 
-Currently only MemoryCacheProvider (which uses MemoryCache provided by .NET) is provided. You can easily implement your own cache provider (e.g. Redis) by implementing 
+Currently only MemoryCacheProvider (which uses MemoryCache by .NET) is provided. You can easily implement your own cache provider (e.g. Redis) by implementing 
 AbstractCacheProvider. If you do implement your own cache provider, I would appreciate if you could also create a pull request 
 so others can benefit from your work. 
 

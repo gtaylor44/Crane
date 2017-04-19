@@ -5,6 +5,7 @@ SprocMapper is an easy to use object-relational mapper specifically designed for
 Key Features:
  * Support: SQL Server and MySql
  * Specificially designed for working with stored procedures.
+ * Caching
  * Drastically Speed up the time it takes to map a stored procedure in the application layer. Minimise the risk of common mistakes that occur when mapping manually. 
  * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues. 
  * Validate that all columns in select statement are mapped to a corresponding model property (this can optionally be disabled). 

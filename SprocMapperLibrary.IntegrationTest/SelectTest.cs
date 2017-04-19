@@ -214,7 +214,7 @@ namespace IntegrationTest
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            dataAccess.Sproc()
+            dataAccess.Sproc()           
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                 .ExecuteReader<Product>("dbo.GetProducts");
         }

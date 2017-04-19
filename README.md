@@ -9,6 +9,14 @@ Key Features:
  * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues. 
  * Validate that all columns in select statement are mapped to a corresponding model property (this can optionally be disabled). 
  
+# Getting started
+```c#
+Sql Server
+private readonly SqlServerAccess _sqlAccess = new SqlServerAccess("your connection string");
+
+// MYSQL Server
+private readonly MySqlServerAccess _mySqlAccess = new SqlServerAccess("your connection string");
+```
 
 ## Examples
 
@@ -26,11 +34,8 @@ END
 ```
 
 ```c#
-using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{
-    var products = conn.Sproc()
-    .ExecuteReader<Product>("dbo.GetProducts");
-}
+// Returns IEnumerable of type Product.
+var products = _sqlAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts");
 ```
 -----------------------------
 Easily add parameters. The below example gets all products with a supplier id of 2.
@@ -50,12 +55,11 @@ END
 ```
 
 ```c#
-using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{   
-    var products = conn.Sproc()
+ 
+var products = _sqlAccess.Sproc()
     .AddSqlParameter("@SupplierId", 2)
     .ExecuteReader<Product>("dbo.GetProducts");
-}
+
 ```
 -----------------------------
 If you're using a column alias in your select statement, add one or
@@ -72,14 +76,47 @@ END
 ```
 
 ```c#
-using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{
-    var products = conn.Sproc()
+    var products = _sqlAccess.Sproc()
     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
     .CustomColumnMapping<Product>(x => x.ProductName, "Product Name")
     .ExecuteReader<Product>("dbo.GetProducts");
-}
 ```
+-----------------------------
+## Caching
+
+SprocMapper supports caching for tuning your application performance. Here's how to register a cache provider:
+
+```c#
+_sqlAccess.RegisterCacheProvider(new MemoryCacheProvider());
+```
+
+Currently only MemoryCacheProvider is provided. You can easily implement your own cache provider (e.g. Redis) by implementing 
+AbstractCacheProvider. If you do implement your own cache provider, I would appreciate if you could also create a pull request 
+so others can benefit from your work. 
+
+Once a cache provider is registered, you can supply 'cacheKey' as a named parameter to ExecuteReader commands. 
+
+```c#
+dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", cacheKey: "customer_x_products");
+```
+
+If you want to force refresh the cache so a fresh copy is retrieved next call, you can use the RemoveFromCache method.
+
+```c#
+dataAccess.RemoveFromCache("customer_x_products");
+```
+-----------------------------
+
+## Reusing an existing DbConnection
+SprocMapper by default will manage the connection for you. If however you're in a TransactionScope and want to reuse an existing DbConnection and 
+not have SprocMapper open and close the connection for you, you can supply the named parameter 'conn'.
+
+```c#
+dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", conn: conn);
+```
+
+Note: 95% of the time you don't need this. Let SprocMapper handle the connection for you for most cases. 
+
 -----------------------------
 Join up to eight other related entities. When mapping a join you must supply the **partitionOn** and **callback** parameters.
 Please observe the below procedure carefully and pay special attention to the columns 'ProductName' and 'Id'.
@@ -108,17 +145,15 @@ END
 
 ```c#
 Product product = null;
-
-using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{    
-    product = conn.Sproc()
+ 
+product = _sqlAccess.Sproc()
     .AddSqlParameter("@Id", 62)
     .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
     {
         p.Supplier = s;
     }, partitionOn: "ProductName|Id")
     .FirstOrDefault();
-}
+
 
 Assert.AreEqual("Tarte au sucre", product?.ProductName);
 Assert.AreEqual("Chantal Goulet", product?.Supplier.ContactName);
@@ -148,9 +183,7 @@ END
 ```c#
 Customer cust = null;
 
-using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{
-    conn.Sproc()
+_sqlAccess.Sproc()
     .AddSqlParameter("@FirstName", "Thomas")
     .AddSqlParameter("@LastName", "Hardy")
     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
@@ -166,7 +199,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
             cust.CustomerOrders.Add(o);
 
     }, partitionOn: "Id|OrderId");
-}
+
 
 Assert.IsNotNull(cust);
 Assert.AreEqual(13, cust.CustomerOrders.Count);
@@ -189,9 +222,8 @@ GO
 ```c#
 Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
-using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{
-	conn.Sproc()
+
+_sqlAccess.Sproc()
     .ExecuteReader<Customer, Order>("dbo.GetAllCustomersAndOrders", (c, o) =>
     {
     	Customer customer;
@@ -210,7 +242,7 @@ using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
     }
 
     Assert.IsTrue(customerDic.Count > 0);
-}
+
 ```
 -----------------------------
 SprocMapper validates that all select columns are mapped to a corresponding model property by default. This can be disabled by setting validateSelectColumns to false. 
@@ -231,13 +263,12 @@ BEGIN
 END
 ```
 ```c#
-using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
-{
-    Customer customer = conn.Sproc() 
+
+Customer customer = _sqlAccess.Sproc() 
     .AddSqlParameter("@CustomerId", 6)
     .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
     .FirstOrDefault();
-}
+
 ```
 #### Exception message:
 ```

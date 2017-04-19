@@ -16,7 +16,7 @@ Key Features:
 private readonly SqlServerAccess _sqlAccess = new SqlServerAccess("your connection string");
 
 // MYSQL Server
-private readonly MySqlServerAccess _mySqlAccess = new SqlServerAccess("your connection string");
+private readonly MySqlServerAccess _mySqlAccess = new MySqlServerAccess("your connection string");
 ```
 
 ## Examples

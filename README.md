@@ -110,10 +110,10 @@ dataAccess.RemoveFromCache("customer_x_products");
 
 ## Reusing an existing DbConnection
 SprocMapper by default will manage the connection for you. If however you're in a TransactionScope and want to reuse an existing DbConnection and 
-not have SprocMapper open and close the connection for you, you can supply the named parameter 'conn'.
+not have SprocMapper open and close the connection for you, you can supply the named parameter 'unmanagedConn'.
 
 ```c#
-dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", conn: conn);
+dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", unmanagedConn: conn);
 ```
 
 Note: 95% of the time you don't need this. Let SprocMapper handle the connection for you for most cases. 

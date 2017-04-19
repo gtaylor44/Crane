@@ -248,6 +248,8 @@ _sqlAccess.Sproc()
 
 ```
 -----------------------------
+## Catch bugs early
+
 SprocMapper validates that all select columns are mapped to a corresponding model property by default. This can be disabled by setting validateSelectColumns to false. 
 The below example sets an alias in stored procedure but because no custom column mapping has been setup, it's not mapped 
 and throws a SprocMapperException. The same exception message is shown if the property does not exist or a custom 
@@ -285,6 +287,6 @@ Target model: 'Customer'
 ```
 -----------------------------
 ### Performance
-Internally, SprocMapper has a dependency on FastMember for caching property members and efficient reading/writing of property member values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
+Internally, SprocMapper has a dependency on FastMember for efficient dynamic reading/writing of property member values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
 Please feel free to blog, compare and review.
 

@@ -37,22 +37,14 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="validateSelectColumns"></param>
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDel"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey, Action saveCacheDel)
         {
-            var useCache = false;
             var userProvidedConnection = false;
             try
             {
-                ValidateCacheKey(cacheKey);
-                IEnumerable<TResult> cachedResult;
-                if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
-                {
-                    useCache = true;
-                    return cachedResult;
-                }
-
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -97,14 +89,14 @@ namespace SprocMapperLibrary.SqlServer
                 }
 
                 if (cacheKey != null)
-                    CacheProvider.Add(cacheKey, result);
+                    saveCacheDel();
 
                 return result;
             }
 
             finally
             {
-                if (!userProvidedConnection && !useCache)
+                if (!userProvidedConnection)
                     _conn.Close();
             }
 
@@ -121,22 +113,14 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="validateSelectColumns"></param>
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDel"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey, Action saveCacheDel)
         {
-            var useCache = false;
             var userProvidedConnection = false;
             try
             {
-                ValidateCacheKey(cacheKey);
-                IEnumerable<TResult> cachedResult;
-                if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
-                {
-                    useCache = true;
-                    return cachedResult;
-                }
-
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -182,14 +166,14 @@ namespace SprocMapperLibrary.SqlServer
                 }
 
                 if (cacheKey != null)
-                    CacheProvider.Add(cacheKey, result);
+                    saveCacheDel();
 
                 return result;
             }
 
             finally
             {
-                if (!userProvidedConnection && !useCache)
+                if (!userProvidedConnection)
                     _conn.Close();
             }
         }

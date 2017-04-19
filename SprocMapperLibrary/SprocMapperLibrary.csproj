@@ -59,7 +59,16 @@
     <Compile Include="Base\BaseAccess.cs" />
     <Compile Include="Base\BaseInitialiser.cs" />
     <Compile Include="Base\BaseSproc.cs" />
-    <Compile Include="CacheProvider\MemoryCacheProvider.cs" />
+    <Compile Include="CacheProvider\MemoryCache\MemoryCacheProvider.cs" />
+    <Compile Include="CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
+    <Compile Include="Model\EightJoin.cs" />
+    <Compile Include="Model\FiveJoin.cs" />
+    <Compile Include="Model\FourJoin.cs" />
+    <Compile Include="Model\OneJoin.cs" />
+    <Compile Include="Model\SevenJoin.cs" />
+    <Compile Include="Model\SixJoin.cs" />
+    <Compile Include="Model\ThreeJoin.cs" />
+    <Compile Include="Model\TwoJoin.cs" />
     <Compile Include="GenericExtensions.cs" />
     <Compile Include="Interface\INullType.cs" />
     <Compile Include="Interface\ISprocObjectMap.cs" />

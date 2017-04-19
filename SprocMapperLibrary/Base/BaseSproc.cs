@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FastMember;
 using SprocMapperLibrary.Base;
+using SprocMapperLibrary.Model;
 
 // ReSharper disable once CheckNamespace
 namespace SprocMapperLibrary
@@ -150,11 +152,12 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="conn"></param>
         /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDel"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection conn, string cacheKey);
+            bool validateSelectColumns, DbConnection conn, string cacheKey, Action saveCacheDel);
 
 
         /// <summary>
@@ -168,11 +171,12 @@ namespace SprocMapperLibrary
         /// <param name="validateSelectColumns"></param>
         /// <param name="conn"></param>
         /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDel"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection conn, string cacheKey);
+            bool validateSelectColumns, DbConnection conn, string cacheKey, Action saveCacheDel);
 
         /// <summary>
         /// 
@@ -246,14 +250,29 @@ namespace SprocMapperLibrary
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<TResult> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                return cachedResult;
+            }
+
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            List<TResult> cacheList = new List<TResult>();
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
+                if (cacheKey != null)
+                {
+                    cacheList.Add(obj1);
+                }
+
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -271,16 +290,37 @@ namespace SprocMapperLibrary
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
             where TResult : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<TResult> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item);
+                }
+            }
+
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            List<TResult> cacheList = new List<TResult>();
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
-                callBack.Invoke(obj1);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
+                if (cacheKey != null)
+                {
+                    cacheList.Add(obj1);
+                }
+
+                callBack.Invoke(obj1);
+
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
+
+
 
         /// <summary>
         /// Perform a select statement returning more than one entity. Please see documentation for more information if you need help. 
@@ -301,21 +341,40 @@ namespace SprocMapperLibrary
             where TResult : class, new()
             where TJoin1 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<OneJoin<TResult, TJoin1>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1);
+                }
+            }
+
             MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
+            List<OneJoin<TResult, TJoin1>> cacheList = new List<OneJoin<TResult, TJoin1>>();
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new OneJoin<TResult, TJoin1>
+                    {
+                        Result = obj1,
+                        Join1 = obj2             
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -338,22 +397,43 @@ namespace SprocMapperLibrary
             where TJoin1 : class, new()
             where TJoin2 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<TwoJoin<TResult, TJoin1, TJoin2>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            List<TwoJoin<TResult, TJoin1, TJoin2>> cacheList = new List<TwoJoin<TResult, TJoin1, TJoin2>>();
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
                 TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new TwoJoin<TResult, TJoin1, TJoin2>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -378,23 +458,44 @@ namespace SprocMapperLibrary
             where TJoin2 : class, new()
             where TJoin3 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
+            List<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>> cacheList = new List<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>>();
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
                 TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
                 TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -421,11 +522,23 @@ namespace SprocMapperLibrary
             where TJoin3 : class, new()
             where TJoin4 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
+
+            List<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>> cacheList = new List<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>>();
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -433,12 +546,23 @@ namespace SprocMapperLibrary
                 TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
                 TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
                 TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                res.Add(obj1);
+                
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4, 
+                        Join4 = obj5
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -468,11 +592,22 @@ namespace SprocMapperLibrary
             where TJoin4 : class, new()
             where TJoin5 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
+            List<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>> cacheList = new List<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>>();
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
@@ -481,12 +616,24 @@ namespace SprocMapperLibrary
                 TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
                 TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
                 TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -518,12 +665,23 @@ namespace SprocMapperLibrary
             where TJoin5 : class, new()
             where TJoin6 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
-            return ExecuteReaderImpl<TResult>((reader, result) =>
+            List<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>> cacheList = new List<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>>();
+            return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
@@ -532,12 +690,25 @@ namespace SprocMapperLibrary
                 TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
                 TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
                 TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6,
+                        Join6 = obj7
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-                result.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -571,12 +742,25 @@ namespace SprocMapperLibrary
             where TJoin6 : class, new()
             where TJoin7 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
-            return ExecuteReaderImpl<TResult>((reader, result) =>
+            List<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>> cacheList
+                = new List<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>>();
+
+            return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
@@ -586,12 +770,26 @@ namespace SprocMapperLibrary
                 TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
                 TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
                 TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(SprocObjectMapList[7], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6,
+                        Join6 = obj7,
+                        Join7 = obj8
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-                result.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -627,12 +825,25 @@ namespace SprocMapperLibrary
             where TJoin7 : class, new()
             where TJoin8 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7, item.Join8);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
-            return ExecuteReaderImpl<TResult>((reader, result) =>
+            List<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>> cacheList
+                = new List<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>>();
+
+            return ExecuteReaderImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
@@ -643,12 +854,27 @@ namespace SprocMapperLibrary
                 TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
                 TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(SprocObjectMapList[7], reader);
                 TJoin8 obj9 = SprocMapper.GetObject<TJoin8>(SprocObjectMapList[8], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6,
+                        Join6 = obj7,
+                        Join7 = obj8,
+                        Join8 = obj9
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-                result.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -665,14 +891,29 @@ namespace SprocMapperLibrary
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
              where TResult : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<TResult> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                return cachedResult;
+            }
+
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            List<TResult> cacheList = new List<TResult>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
+                if (cacheKey != null)
+                {
+                    cacheList.Add(obj1);
+                }
+
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -690,15 +931,34 @@ namespace SprocMapperLibrary
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection conn = null)
              where TResult : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<TResult> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item);
+                }
+            }
+
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+
+            List<TResult> cacheList = new List<TResult>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
-                callBack.Invoke(obj1);
                 res.Add(obj1);
 
-            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey);
+                if (cacheKey != null)
+                {
+                    cacheList.Add(obj1);
+                }
+
+                callBack.Invoke(obj1);
+
+            }, storedProcedure, commandTimeout, null, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -720,22 +980,41 @@ namespace SprocMapperLibrary
             where TResult : class, new()
             where TJoin1 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<OneJoin<TResult, TJoin1>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1);
+                }
+            }
 
             MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
 
+            List<OneJoin<TResult, TJoin1>> cacheList = new List<OneJoin<TResult, TJoin1>>();
+
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new OneJoin<TResult, TJoin1>
+                    {
+                        Result = obj1,
+                        Join1 = obj2
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -759,22 +1038,43 @@ namespace SprocMapperLibrary
             where TJoin1 : class, new()
             where TJoin2 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<TwoJoin<TResult, TJoin1, TJoin2>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            List<TwoJoin<TResult, TJoin1, TJoin2>> cacheList = new List<TwoJoin<TResult, TJoin1, TJoin2>>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
                 TResult obj1 = SprocMapper.GetObject<TResult>(SprocObjectMapList[0], reader);
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
                 TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new TwoJoin<TResult, TJoin1, TJoin2>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -801,10 +1101,22 @@ namespace SprocMapperLibrary
             where TJoin2 : class, new()
             where TJoin3 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            List<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>> cacheList = new List<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -812,12 +1124,22 @@ namespace SprocMapperLibrary
                 TJoin1 obj2 = SprocMapper.GetObject<TJoin1>(SprocObjectMapList[1], reader);
                 TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
                 TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -846,10 +1168,23 @@ namespace SprocMapperLibrary
             where TJoin3 : class, new()
             where TJoin4 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+
+            List<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>> cacheList = new List<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -858,12 +1193,23 @@ namespace SprocMapperLibrary
                 TJoin2 obj3 = SprocMapper.GetObject<TJoin2>(SprocObjectMapList[2], reader);
                 TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
                 TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -894,10 +1240,22 @@ namespace SprocMapperLibrary
             where TJoin4 : class, new()
             where TJoin5 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            List<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>> cacheList = new List<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -907,12 +1265,24 @@ namespace SprocMapperLibrary
                 TJoin3 obj4 = SprocMapper.GetObject<TJoin3>(SprocObjectMapList[3], reader);
                 TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
                 TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -945,10 +1315,22 @@ namespace SprocMapperLibrary
             where TJoin5 : class, new()
             where TJoin6 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            List<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>> cacheList = new List<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -959,12 +1341,25 @@ namespace SprocMapperLibrary
                 TJoin4 obj5 = SprocMapper.GetObject<TJoin4>(SprocObjectMapList[4], reader);
                 TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
                 TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6,
+                        Join6 = obj7
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -999,10 +1394,23 @@ namespace SprocMapperLibrary
             where TJoin6 : class, new()
             where TJoin7 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            List<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>> cacheList
+                = new List<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -1014,12 +1422,26 @@ namespace SprocMapperLibrary
                 TJoin5 obj6 = SprocMapper.GetObject<TJoin5>(SprocObjectMapList[5], reader);
                 TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
                 TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(SprocObjectMapList[7], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6,
+                        Join6 = obj7,
+                        Join7 = obj8
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1058,10 +1480,23 @@ namespace SprocMapperLibrary
             where TJoin7 : class, new()
             where TJoin8 : class, new()
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>> cachedResult;
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                foreach (var item in cachedResult)
+                {
+                    callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7, item.Join8);
+                }
+            }
+
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(SprocObjectMapList, CustomColumnMappings);
 
             SprocMapper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
+
+            List<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>> cacheList
+                = new List<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>>();
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -1074,12 +1509,27 @@ namespace SprocMapperLibrary
                 TJoin6 obj7 = SprocMapper.GetObject<TJoin6>(SprocObjectMapList[6], reader);
                 TJoin7 obj8 = SprocMapper.GetObject<TJoin7>(SprocObjectMapList[7], reader);
                 TJoin8 obj9 = SprocMapper.GetObject<TJoin8>(SprocObjectMapList[7], reader);
+                res.Add(obj1);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(new EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>
+                    {
+                        Result = obj1,
+                        Join1 = obj2,
+                        Join2 = obj3,
+                        Join3 = obj4,
+                        Join4 = obj5,
+                        Join5 = obj6,
+                        Join6 = obj7,
+                        Join7 = obj8,
+                        Join8 = obj9
+                    });
+                }
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-                res.Add(obj1);
-
-            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey);
+            }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, conn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)

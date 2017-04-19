@@ -20,8 +20,6 @@ namespace IntegrationTest
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            dataAccess.RegisterCacheProvider(new MemoryCacheProvider());
-
             Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
             dataAccess.Sproc()
@@ -39,7 +37,7 @@ namespace IntegrationTest
                     if (o != null)
                         customer.CustomerOrders.Add(o);
 
-                }, partitionOn: "Id|Id", cacheKey: "customersandorders");
+                }, partitionOn: "Id|Id");
 
             Assert.IsTrue(customerDic.Count > 0);
         }
@@ -50,11 +48,10 @@ namespace IntegrationTest
         public void GetProducts()
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
-            dataAccess.RegisterCacheProvider(new MemoryCacheProvider());
 
             var products = dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "products");;
+                .ExecuteReader<Product>("dbo.GetProducts");;
 
             Assert.IsNotNull(products);
         }

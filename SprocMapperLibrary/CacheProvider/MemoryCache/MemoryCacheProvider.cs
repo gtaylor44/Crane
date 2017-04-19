@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Caching;
 using SprocMapperLibrary.Base;
 
-namespace SprocMapperLibrary.CacheProvider
+namespace SprocMapperLibrary.CacheProvider.MemoryCache
 {  
     /// <summary>
     /// 
@@ -14,7 +13,6 @@ namespace SprocMapperLibrary.CacheProvider
         /// 
         /// </summary>
         internal static readonly object Padlock = new object();
-        internal static readonly MemoryCache Cache = new MemoryCache("CachingProvider");
 
         /// <summary>
         /// 
@@ -23,7 +21,7 @@ namespace SprocMapperLibrary.CacheProvider
         {
             lock (Padlock)
             {
-                var res = (IEnumerable<T>)Cache[key];
+                var res = (IEnumerable<T>)MemoryCacheSingleton.Instance[key];
 
                 if (res == null)
                 {
@@ -46,7 +44,7 @@ namespace SprocMapperLibrary.CacheProvider
         {
             lock (Padlock)
             {
-                Cache.Add(key, items, DateTimeOffset.MaxValue);
+                MemoryCacheSingleton.Instance.Add(key, items, DateTimeOffset.MaxValue);
             }
         }
 
@@ -57,7 +55,7 @@ namespace SprocMapperLibrary.CacheProvider
         {
             lock (Padlock)
             {
-                Cache.Remove(key);
+                MemoryCacheSingleton.Instance.Remove(key);
             }
         }
     }

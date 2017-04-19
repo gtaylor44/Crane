@@ -294,10 +294,16 @@ namespace SprocMapperLibrary
 
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var enumerable = cachedResult.ToList();
+                foreach (var item in enumerable)
                 {
                     callBack.Invoke(item);
                 }
+
+                return enumerable;
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -318,8 +324,6 @@ namespace SprocMapperLibrary
 
             }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
-
-
 
         /// <summary>
         /// Perform a select statement returning more than one entity. Please see documentation for more information if you need help. 
@@ -344,10 +348,16 @@ namespace SprocMapperLibrary
             IEnumerable<OneJoin<TResult, TJoin1>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var oneJoins = cachedResult.ToList();
+                foreach (var item in oneJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1);
                 }
+
+                return oneJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -400,10 +410,16 @@ namespace SprocMapperLibrary
             IEnumerable<TwoJoin<TResult, TJoin1, TJoin2>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var twoJoins = cachedResult.ToList();
+                foreach (var item in twoJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2);
                 }
+
+                return twoJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -461,10 +477,16 @@ namespace SprocMapperLibrary
             IEnumerable<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var threeJoins = cachedResult.ToList();
+                foreach (var item in threeJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3);
                 }
+
+                return threeJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -525,10 +547,16 @@ namespace SprocMapperLibrary
             IEnumerable<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var fourJoins = cachedResult.ToList();
+                foreach (var item in fourJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4);
                 }
+
+                return fourJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -595,10 +623,17 @@ namespace SprocMapperLibrary
             IEnumerable<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var fiveJoins = cachedResult.ToList();
+                foreach (var item in fiveJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5);
                 }
+
+                return fiveJoins.Select(x => x.Result);
+
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -668,10 +703,16 @@ namespace SprocMapperLibrary
             IEnumerable<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var sixJoins = cachedResult.ToList();
+                foreach (var item in sixJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6);
                 }
+
+                return sixJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -745,10 +786,16 @@ namespace SprocMapperLibrary
             IEnumerable<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var sevenJoins = cachedResult.ToList();
+                foreach (var item in sevenJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7);
                 }
+
+                return sevenJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -828,10 +875,16 @@ namespace SprocMapperLibrary
             IEnumerable<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var eightJoins = cachedResult.ToList();
+                foreach (var item in eightJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7, item.Join8);
                 }
+
+                return eightJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(SprocObjectMapList, CustomColumnMappings);
@@ -935,10 +988,16 @@ namespace SprocMapperLibrary
 
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var enumerable = cachedResult.ToList(); ;
+                foreach (var item in enumerable)
                 {
                     callBack.Invoke(item);
                 }
+
+                return enumerable;
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -983,10 +1042,16 @@ namespace SprocMapperLibrary
             IEnumerable<OneJoin<TResult, TJoin1>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var oneJoins = cachedResult.ToList();
+                foreach (var item in oneJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1);
                 }
+
+                return oneJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1041,10 +1106,16 @@ namespace SprocMapperLibrary
             IEnumerable<TwoJoin<TResult, TJoin1, TJoin2>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var twoJoins = cachedResult.ToList();
+                foreach (var item in twoJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2);
                 }
+
+                return twoJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1104,10 +1175,16 @@ namespace SprocMapperLibrary
             IEnumerable<ThreeJoin<TResult, TJoin1, TJoin2, TJoin3>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var threeJoins = cachedResult.ToList();
+                foreach (var item in threeJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3);
                 }
+
+                return threeJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1171,10 +1248,16 @@ namespace SprocMapperLibrary
             IEnumerable<FourJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var fourJoins = cachedResult.ToList();
+                foreach (var item in fourJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4);
                 }
+
+                return fourJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1243,10 +1326,16 @@ namespace SprocMapperLibrary
             IEnumerable<FiveJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var fiveJoins = cachedResult.ToList();
+                foreach (var item in fiveJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5);
                 }
+
+                return fiveJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1318,10 +1407,16 @@ namespace SprocMapperLibrary
             IEnumerable<SixJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var sixJoins = cachedResult.ToList();
+                foreach (var item in sixJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6);
                 }
+
+                return sixJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1397,10 +1492,16 @@ namespace SprocMapperLibrary
             IEnumerable<SevenJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var sevenJoins = cachedResult.ToList();
+                foreach (var item in sevenJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7);
                 }
+
+                return sevenJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1483,10 +1584,16 @@ namespace SprocMapperLibrary
             IEnumerable<EightJoin<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>> cachedResult;
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
-                foreach (var item in cachedResult)
+                if (cachedResult == null)
+                    return null;
+
+                var eightJoins = cachedResult.ToList();
+                foreach (var item in eightJoins)
                 {
                     callBack.Invoke(item.Result, item.Join1, item.Join2, item.Join3, item.Join4, item.Join5, item.Join6, item.Join7, item.Join8);
                 }
+
+                return eightJoins.Select(x => x.Result);
             }
 
             MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(SprocObjectMapList, CustomColumnMappings);

@@ -11,7 +11,7 @@ Key Features:
  
 # Getting started
 ```c#
-Sql Server
+// Sql Server
 private readonly SqlServerAccess _sqlAccess = new SqlServerAccess("your connection string");
 
 // MYSQL Server
@@ -84,7 +84,7 @@ END
 -----------------------------
 ## Caching
 
-SprocMapper supports caching for tuning your application performance. Here's how to register a cache provider:
+SprocMapper supports caching for tuning application performance. Here's how to register a cache provider:
 
 ```c#
 _sqlAccess.RegisterCacheProvider(new MemoryCacheProvider());
@@ -118,6 +118,8 @@ dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", conn: conn);
 Note: 95% of the time you don't need this. Let SprocMapper handle the connection for you for most cases. 
 
 -----------------------------
+## Table Joins
+
 Join up to eight other related entities. When mapping a join you must supply the **partitionOn** and **callback** parameters.
 Please observe the below procedure carefully and pay special attention to the columns 'ProductName' and 'Id'.
 These are the two arguments for the partitionOn parameter. partitionOn arguments are separated by a pipe '|'. The callback parameter 

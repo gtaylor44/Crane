@@ -271,7 +271,7 @@ namespace IntegrationTest
                     .Commit(conn);
 
                 var result = dataAccess.Sproc()
-                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes", conn: conn)
+                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes", unmanagedConn: conn)
                     .SingleOrDefault();
 
                 Assert.AreEqual(1, result?.IntTest);

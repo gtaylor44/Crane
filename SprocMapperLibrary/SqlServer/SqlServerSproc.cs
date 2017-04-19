@@ -97,7 +97,7 @@ namespace SprocMapperLibrary.SqlServer
             finally
             {
                 if (!userProvidedConnection)
-                    _conn.Close();
+                    _conn.Dispose();
             }
 
         }
@@ -174,7 +174,7 @@ namespace SprocMapperLibrary.SqlServer
             finally
             {
                 if (!userProvidedConnection)
-                    _conn.Close();
+                    _conn.Dispose();
             }
         }
 
@@ -207,7 +207,7 @@ namespace SprocMapperLibrary.SqlServer
             finally
             {
                 if (userConn == null)
-                    _conn.Close();
+                    _conn.Dispose();
             }
         }
 
@@ -241,7 +241,7 @@ namespace SprocMapperLibrary.SqlServer
             finally
             {
                 if (userConn == null)
-                    _conn.Close();
+                    _conn.Dispose();
             }
         }
 
@@ -277,7 +277,7 @@ namespace SprocMapperLibrary.SqlServer
             finally
             {
                 if (userConn == null)
-                    _conn.Close();
+                    _conn.Dispose();
             }
         }
 
@@ -313,7 +313,7 @@ namespace SprocMapperLibrary.SqlServer
             finally
             {
                 if (userConn == null)
-                    _conn.Close();
+                    _conn.Dispose();
             }
 
         }

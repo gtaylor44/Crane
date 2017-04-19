@@ -220,5 +220,14 @@ namespace IntegrationTest
 
         }
 
+        [TestMethod]
+        [MyExpectedException(typeof(SprocMapperException), "A cache key has been provided without a cache provider. Use the method 'RegisterCacheProvider' to register a cache provider.")]
+        public async Task CacheKeyNotProvided_ThrowsException()
+        {
+            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            await dataAccess.Sproc().ExecuteReaderAsync<Product>("dbo.GetProducts", cacheKey: "test");
+        }
+
     }
 }

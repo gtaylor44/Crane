@@ -1,5 +1,4 @@
 ﻿using System;
-using MySql.Data.MySqlClient;
 using SprocMapperLibrary.Base;
 
 namespace SprocMapperLibrary.MySql
@@ -9,7 +8,7 @@ namespace SprocMapperLibrary.MySql
     /// </summary>
     public class MySqlServerAccess : BaseAccess
     {
-        private readonly MySqlConnection _conn;
+        private readonly string _connectionString;
         private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
 
         /// <summary>
@@ -18,9 +17,7 @@ namespace SprocMapperLibrary.MySql
         /// <param name="connectionString"></param>
         public MySqlServerAccess(string connectionString)
         {
-            if (connectionString == null)
-                throw new ArgumentException(InvalidConnMsg);
-            _conn = new MySqlConnection(connectionString);
+            _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
         }
 
         /// <summary>
@@ -30,7 +27,7 @@ namespace SprocMapperLibrary.MySql
         /// <exception cref="ArgumentException"></exception>
         public MySqlSproc Sproc()
         {
-            return new MySqlSproc(_conn, CacheProvider);
+            return new MySqlSproc(_connectionString, CacheProvider);
         }
     }
 }

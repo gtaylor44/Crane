@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.Model;
+using SprocMapperLibrary.CacheProvider.MemoryCache;
 using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
@@ -51,9 +49,11 @@ namespace IntegrationTest
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
+            dataAccess.RegisterCacheProvider(new MemoryCacheProvider());
+
             var products = dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
-                .ExecuteReader<Product>("dbo.GetProducts");;
+                .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "GetProducts");
 
             Assert.IsNotNull(products);
         }

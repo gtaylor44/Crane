@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SprocMapperLibrary.Base
+namespace SprocMapperLibrary.CacheProvider
 {
     /// <summary>
     /// 
@@ -27,5 +27,16 @@ namespace SprocMapperLibrary.Base
         /// Clears a single cached list at the specified key.
         /// </summary>
         public abstract void Remove(string key);
+
+        /// <summary>
+        /// Removes a given array of keys from cache.
+        /// </summary>
+        /// <param name="keys"></param>
+        public abstract void Remove(string[] keys);
+
+        /// <summary>
+        /// Removes all keys from cache.
+        /// </summary>
+        public abstract void ResetCache();
     }
 }

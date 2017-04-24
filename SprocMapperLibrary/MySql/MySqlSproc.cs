@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using SprocMapperLibrary.Base;
+using SprocMapperLibrary.CacheProvider;
 
 namespace SprocMapperLibrary.MySql
 {
@@ -15,15 +15,16 @@ namespace SprocMapperLibrary.MySql
     public class MySqlSproc : BaseSproc
     {
         private MySqlConnection _mySqlConn;
+        private readonly string _connectionString;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="mySqlConn"></param>
+        /// <param name="connectionString"></param>
         /// <param name="cacheProvider"></param>
-        public MySqlSproc(MySqlConnection mySqlConn, AbstractCacheProvider cacheProvider) : base(cacheProvider)
+        public MySqlSproc(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
-            _mySqlConn = mySqlConn;
+            _connectionString = connectionString;
         }
 
         /// <summary>
@@ -50,7 +51,11 @@ namespace SprocMapperLibrary.MySql
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
+                {
+                    _mySqlConn = new MySqlConnection(_connectionString);
                     OpenConn(_mySqlConn);
+                }
+                    
                 else
                     _mySqlConn = unmanagedConn as MySqlConnection;
 
@@ -125,7 +130,11 @@ namespace SprocMapperLibrary.MySql
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
+                {
+                    _mySqlConn = new MySqlConnection(_connectionString);
                     await OpenConnAsync(_mySqlConn);
+                }
+                    
                 else
                     _mySqlConn = unmanagedConn as MySqlConnection;
 
@@ -194,7 +203,11 @@ namespace SprocMapperLibrary.MySql
 
                 // Try open connection if not already open.
                 if (unmanagedConn == null)
+                {
+                    _mySqlConn = new MySqlConnection(_connectionString);
                     OpenConn(_mySqlConn);
+                }
+                    
                 else
                 {
                     _mySqlConn = unmanagedConn as MySqlConnection;
@@ -231,7 +244,11 @@ namespace SprocMapperLibrary.MySql
 
                 // Try open connection if not already open.
                 if (unmanagedConn == null)
+                {
+                    _mySqlConn = new MySqlConnection(_connectionString);
                     await OpenConnAsync(_mySqlConn);
+                }
+                    
                 else
                 {
                     _mySqlConn = unmanagedConn as MySqlConnection;
@@ -269,7 +286,11 @@ namespace SprocMapperLibrary.MySql
 
                 // Try open connection if not already open.
                 if (unmanagedConn == null)
+                {
+                    _mySqlConn = new MySqlConnection(_connectionString);
                     OpenConn(_mySqlConn);
+                }
+                    
                 else
                 {
                     _mySqlConn = unmanagedConn as MySqlConnection;
@@ -307,7 +328,11 @@ namespace SprocMapperLibrary.MySql
 
                 // Try open connection if not already open.
                 if (unmanagedConn == null)
+                {
+                    _mySqlConn = new MySqlConnection(_connectionString);
                     await OpenConnAsync(_mySqlConn);
+                }
+                    
                 else
                 {
                     _mySqlConn = unmanagedConn as MySqlConnection;

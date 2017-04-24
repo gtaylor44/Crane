@@ -55,7 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base\AbstractCacheProvider.cs" />
+    <Compile Include="CacheProvider\AbstractCacheProvider.cs" />
     <Compile Include="Base\BaseAccess.cs" />
     <Compile Include="Base\BaseInitialiser.cs" />
     <Compile Include="Base\BaseSproc.cs" />

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using SprocMapperLibrary.Base;
 
 namespace SprocMapperLibrary.CacheProvider.MemoryCache
 {  
@@ -16,7 +14,7 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         internal static readonly object Padlock = new object();
 
         /// <summary>
-        /// 
+        /// Returns true and initialises output param items if exists in cache, otherwise returns false and default collection. 
         /// </summary>
         public override bool TryGet<T>(string key, out IEnumerable<T> items)
         {
@@ -39,7 +37,7 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         }
 
         /// <summary>
-        /// 
+        /// Adds an IEnumerable to cache with given key. 
         /// </summary>
         public override void Add<T>(string key, IEnumerable<T> items)
         {
@@ -61,9 +59,21 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         }
 
         /// <summary>
-        /// Removes all items from cache.
+        /// Removes a given array of keys from cache.
         /// </summary>
-        public void RemoveAll()
+        /// <param name="keys"></param>
+        public override void Remove(string[] keys)
+        {
+            foreach (var key in keys)
+            {
+                MemoryCacheSingleton.Instance.Remove(key);
+            }
+        }
+
+        /// <summary>
+        /// Removes all keys from cache.
+        /// </summary>
+        public override void ResetCache()
         {
             foreach (var element in MemoryCacheSingleton.Instance)
             {
@@ -71,16 +81,5 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
             }
         }
 
-        /// <summary>
-        /// Removes a given array of keys from cache.
-        /// </summary>
-        /// <param name="keys"></param>
-        public void RemoveAll(string[] keys)
-        {
-            foreach (var key in keys)
-            {
-                MemoryCacheSingleton.Instance.Remove(key);
-            }
-        }
     }
 }

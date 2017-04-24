@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using SprocMapperLibrary.Base;
+using SprocMapperLibrary.CacheProvider;
 
 namespace SprocMapperLibrary.SqlServer
 {
@@ -16,15 +16,23 @@ namespace SprocMapperLibrary.SqlServer
     {
         private SqlConnection _conn;
 
+        private readonly string _connectionString;
+        private readonly SqlCredential _credential;
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="connection"></param>
+        /// <param name="connectionString"></param>
+        /// <param name="credential"></param>
         /// <param name="cacheProvider"></param>
-        public SqlServerSproc(SqlConnection connection, AbstractCacheProvider cacheProvider) : base(cacheProvider)
+        public SqlServerSproc(string connectionString, SqlCredential credential,
+            AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
-            _conn = connection;
+            _connectionString = connectionString;
+            _credential = credential;
         }
+
+
 
         /// <summary>
         /// Performs synchronous version of stored procedure.
@@ -49,7 +57,13 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
+                {
+                    _conn = _credential == null ? new SqlConnection(_connectionString) 
+                        : new SqlConnection(_connectionString, _credential);
+
                     OpenConn(_conn);
+                }
+                    
                 else              
                     _conn = userConn as SqlConnection;
                 
@@ -125,7 +139,13 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
+                {
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
                     await OpenConnAsync(_conn);
+                }
+                    
                 else               
                     _conn = userConn as SqlConnection;
                 
@@ -192,7 +212,13 @@ namespace SprocMapperLibrary.SqlServer
                 int affectedRecords;
 
                 if (userConn == null)
+                {
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
                     OpenConn(_conn);
+                }
+                    
                 else                
                     _conn = userConn as SqlConnection;
                 
@@ -225,7 +251,13 @@ namespace SprocMapperLibrary.SqlServer
                 int affectedRecords;
 
                 if (userConn == null)
+                {
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
                     await OpenConnAsync(_conn);
+                }
+                    
                 else                
                     _conn = userConn as SqlConnection;
                 
@@ -260,7 +292,13 @@ namespace SprocMapperLibrary.SqlServer
                 T obj;
 
                 if (userConn == null)
+                {
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
                     OpenConn(_conn);
+                }
+                    
                 else
                     _conn = userConn as SqlConnection;
                 
@@ -296,7 +334,13 @@ namespace SprocMapperLibrary.SqlServer
                 T obj;
 
                 if (userConn == null)
+                {
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
                     await OpenConnAsync(_conn);
+                }
+                    
                 else              
                     _conn = userConn as SqlConnection;
                 

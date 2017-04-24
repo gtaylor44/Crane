@@ -9,8 +9,10 @@ namespace SprocMapperLibrary.SqlServer
     /// </summary>
     public class SqlServerAccess : BaseAccess
     {
-        private readonly SqlConnection _conn;     
         private const string InvalidConnMsg = "Please ensure that valid Sql Server Credentials have been passed in.";
+
+        private readonly string _connectionString;
+        private readonly SqlCredential _credential;
         
 
         /// <summary>
@@ -19,10 +21,8 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="connectionString"></param>
         public SqlServerAccess(string connectionString)
         {
-            if (connectionString == null)
-                throw new ArgumentException(InvalidConnMsg);
-
-            _conn = new SqlConnection(connectionString);
+            _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
+            _credential = null;
         }
 
         /// <summary>
@@ -35,7 +35,8 @@ namespace SprocMapperLibrary.SqlServer
             if (connectionString == null || credential == null)
                 throw new ArgumentException(InvalidConnMsg);
 
-            _conn = new SqlConnection(connectionString, credential);
+            _connectionString = connectionString;
+            _credential = credential;
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <exception cref="ArgumentException"></exception>
         public SqlServerSproc Sproc()
         {
-            return new SqlServerSproc(_conn, CacheProvider);
+            return new SqlServerSproc(_connectionString, _credential, CacheProvider);
         }
 
 

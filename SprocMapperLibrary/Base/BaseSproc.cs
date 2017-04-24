@@ -7,7 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FastMember;
-using SprocMapperLibrary.Base;
+using SprocMapperLibrary.CacheProvider;
 using SprocMapperLibrary.Model;
 
 // ReSharper disable once CheckNamespace

@@ -56,17 +56,15 @@ namespace SprocMapperLibrary.SqlServer
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                {
+                if (!userProvidedConnection)               
                     _conn = _credential == null ? new SqlConnection(_connectionString) 
                         : new SqlConnection(_connectionString, _credential);
-
-                    OpenConn(_conn);
-                }
-                    
+                                       
                 else              
                     _conn = userConn as SqlConnection;
-                
+
+                OpenConn(_conn);
+
                 List<TResult> result = new List<TResult>();
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
@@ -138,17 +136,15 @@ namespace SprocMapperLibrary.SqlServer
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                {
+                if (!userProvidedConnection)                
                     _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
-
-                    await OpenConnAsync(_conn);
-                }
-                    
+                        : new SqlConnection(_connectionString, _credential);                  
+                                 
                 else               
                     _conn = userConn as SqlConnection;
-                
+
+                await OpenConnAsync(_conn);
+
                 List<TResult> result = new List<TResult>();
 
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
@@ -211,17 +207,15 @@ namespace SprocMapperLibrary.SqlServer
             {
                 int affectedRecords;
 
-                if (userConn == null)
-                {
+                if (userConn == null)                
                     _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
-
-                    OpenConn(_conn);
-                }
-                    
+                        : new SqlConnection(_connectionString, _credential);                    
+                  
                 else                
                     _conn = userConn as SqlConnection;
-                
+
+                OpenConn(_conn);
+
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
                     SetCommandProps(command, commandTimeout);
@@ -250,17 +244,14 @@ namespace SprocMapperLibrary.SqlServer
             {
                 int affectedRecords;
 
-                if (userConn == null)
-                {
+                if (userConn == null)   
                     _conn = _credential == null ? new SqlConnection(_connectionString)
                         : new SqlConnection(_connectionString, _credential);
-
-                    await OpenConnAsync(_conn);
-                }
-                    
+    
                 else                
                     _conn = userConn as SqlConnection;
-                
+
+                await OpenConnAsync(_conn);
 
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
@@ -291,17 +282,14 @@ namespace SprocMapperLibrary.SqlServer
             {
                 T obj;
 
-                if (userConn == null)
-                {
+                if (userConn == null)                
                     _conn = _credential == null ? new SqlConnection(_connectionString)
                         : new SqlConnection(_connectionString, _credential);
-
-                    OpenConn(_conn);
-                }
-                    
+                   
                 else
                     _conn = userConn as SqlConnection;
-                
+
+                OpenConn(_conn);
 
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
@@ -333,18 +321,15 @@ namespace SprocMapperLibrary.SqlServer
             {
                 T obj;
 
-                if (userConn == null)
-                {
+                if (userConn == null)                
                     _conn = _credential == null ? new SqlConnection(_connectionString)
                         : new SqlConnection(_connectionString, _credential);
-
-                    await OpenConnAsync(_conn);
-                }
-                    
+           
                 else              
                     _conn = userConn as SqlConnection;
-                
-              
+
+                await OpenConnAsync(_conn);
+
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
                     SetCommandProps(command, commandTimeout);

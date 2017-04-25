@@ -50,14 +50,13 @@ namespace SprocMapperLibrary.MySql
                 userProvidedConnection = unmanagedConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                {
+                if (!userProvidedConnection)                
                     _mySqlConn = new MySqlConnection(_connectionString);
-                    OpenConn(_mySqlConn);
-                }
                     
                 else
                     _mySqlConn = unmanagedConn as MySqlConnection;
+
+                OpenConn(_mySqlConn);
 
                 List<TResult> result = new List<TResult>();
                 using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
@@ -129,14 +128,13 @@ namespace SprocMapperLibrary.MySql
                 userProvidedConnection = unmanagedConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                {
+                if (!userProvidedConnection)                
                     _mySqlConn = new MySqlConnection(_connectionString);
-                    await OpenConnAsync(_mySqlConn);
-                }
-                    
+                                                       
                 else
                     _mySqlConn = unmanagedConn as MySqlConnection;
+
+                await OpenConnAsync(_mySqlConn);
 
                 List<TResult> result = new List<TResult>();
 
@@ -202,16 +200,13 @@ namespace SprocMapperLibrary.MySql
                 int affectedRecords;
 
                 // Try open connection if not already open.
-                if (unmanagedConn == null)
-                {
+                if (unmanagedConn == null)                
                     _mySqlConn = new MySqlConnection(_connectionString);
-                    OpenConn(_mySqlConn);
-                }
-                    
-                else
-                {
+                                   
+                else                
                     _mySqlConn = unmanagedConn as MySqlConnection;
-                }
+                
+                OpenConn(_mySqlConn);
 
                 using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {
@@ -243,16 +238,13 @@ namespace SprocMapperLibrary.MySql
                 int affectedRecords;
 
                 // Try open connection if not already open.
-                if (unmanagedConn == null)
-                {
+                if (unmanagedConn == null)             
                     _mySqlConn = new MySqlConnection(_connectionString);
-                    await OpenConnAsync(_mySqlConn);
-                }
-                    
-                else
-                {
+                                                       
+                else                
                     _mySqlConn = unmanagedConn as MySqlConnection;
-                }
+                
+                await OpenConnAsync(_mySqlConn);
 
                 using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {
@@ -285,16 +277,13 @@ namespace SprocMapperLibrary.MySql
                 T obj;
 
                 // Try open connection if not already open.
-                if (unmanagedConn == null)
-                {
+                if (unmanagedConn == null)                
                     _mySqlConn = new MySqlConnection(_connectionString);
-                    OpenConn(_mySqlConn);
-                }
-                    
-                else
-                {
+                                    
+                else                
                     _mySqlConn = unmanagedConn as MySqlConnection;
-                }
+                
+                OpenConn(_mySqlConn);
 
                 using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {
@@ -327,16 +316,13 @@ namespace SprocMapperLibrary.MySql
                 T obj;
 
                 // Try open connection if not already open.
-                if (unmanagedConn == null)
-                {
+                if (unmanagedConn == null)               
                     _mySqlConn = new MySqlConnection(_connectionString);
-                    await OpenConnAsync(_mySqlConn);
-                }
-                    
-                else
-                {
+                                                 
+                else                
                     _mySqlConn = unmanagedConn as MySqlConnection;
-                }
+                
+                await OpenConnAsync(_mySqlConn);
 
                 using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {

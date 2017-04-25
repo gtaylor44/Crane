@@ -82,7 +82,7 @@ namespace SprocMapperLibrary.MySql
                             SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
                                 storedProcedure);
 
-                        SprocMapper.ValidateSchema(schema, SprocObjectMapList);
+                        SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
 
                         if (!reader.HasRows)
                             return (List<TResult>) Activator.CreateInstance(typeof(List<TResult>));
@@ -162,7 +162,7 @@ namespace SprocMapperLibrary.MySql
                             SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
                                 storedProcedure);
 
-                        SprocMapper.ValidateSchema(schema, SprocObjectMapList);
+                        SprocMapper.ValidateSchema(schema, SprocObjectMapList , partitionOnOrdinal);
 
                         if (!reader.HasRows)
                             return (List<TResult>) Activator.CreateInstance(typeof(List<TResult>));

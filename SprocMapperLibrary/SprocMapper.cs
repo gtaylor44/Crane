@@ -222,35 +222,74 @@ namespace SprocMapperLibrary
             return true;
         }
 
-        public static void ValidateSchema(DataTable schema, List<ISprocObjectMap> sprocObjectMapList)
+        public static void ValidateSchema(DataTable schema, List<ISprocObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
-            var dataRowLIst = schema?.Rows.Cast<DataRow>();
+            var rows = schema?.Rows.Cast<DataRow>().ToList();
 
-            if (dataRowLIst != null)
+            if (rows == null)
+                return;
+
+            if (sprocObjectMapList.Count == 1)
             {
-                foreach (var occurence in dataRowLIst)
+                ISprocObjectMap map = sprocObjectMapList.ElementAt(0);
+                foreach (var row in rows)
                 {
-                    string schemaColumn = (string)occurence["ColumnName"];
-                    foreach (var map in sprocObjectMapList)
+                    string currColumn = row["ColumnName"].ToString();
+
+                    map.Columns.ToList().ForEach(x =>
                     {
+                        if (map.CustomColumnMappings.ContainsKey(x))
+                        {
+                            if (map.CustomColumnMappings[x].Equals(currColumn,
+                                StringComparison.Ordinal))
+                            {
+                                ValidateColumn(map, x, row);
+                            }
+                        }
+                        else if (x.Equals(currColumn,
+                            StringComparison.Ordinal))
+                        {
+                            ValidateColumn(map, x, row);
+
+                        }
+                    });
+                }
+            }
+
+            else
+            {
+                int currMap = 0;
+
+                foreach (var map in sprocObjectMapList)
+                {
+                    int minRange = partitionOnOrdinal[currMap];
+                    int maxRange = (sprocObjectMapList.Count - 1) == currMap ? rows.Count : partitionOnOrdinal[currMap + 1];
+
+                    for (int i = minRange; i < maxRange; i++)
+                    {
+                        string currColumn = rows[i]["ColumnName"].ToString();
+
                         map.Columns.ToList().ForEach(x =>
                         {
                             if (map.CustomColumnMappings.ContainsKey(x))
                             {
-                                if (map.CustomColumnMappings[x].Equals(schemaColumn,
+                                if (map.CustomColumnMappings[x].Equals(currColumn,
                                     StringComparison.Ordinal))
                                 {
-                                    ValidateColumn(map, x, occurence);
+                                    ValidateColumn(map, x, rows[i]);
                                 }
                             }
-                            else if (x.Equals(schemaColumn,
+                            else if (x.Equals(currColumn,
                                 StringComparison.Ordinal))
                             {
-                                ValidateColumn(map, x, occurence);
+                                ValidateColumn(map, x, rows[i]);
 
                             }
                         });
+
                     }
+
+                    currMap++;
                 }
             }
         }

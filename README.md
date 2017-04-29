@@ -27,9 +27,9 @@ Selects all products defined by 'dbo.GetProducts'.
 CREATE PROCEDURE [dbo].[GetProducts]
 AS
 BEGIN
-	SELECT p.Id, p.ProductName, p.SupplierId, 
-    	p.UnitPrice, p.Package, p.IsDiscontinued 
-    	FROM dbo.Product p
+    SELECT p.Id, p.ProductName, p.SupplierId, 
+    p.UnitPrice, p.Package, p.IsDiscontinued 
+    FROM dbo.Product p
 END
 
 ```
@@ -48,10 +48,10 @@ CREATE PROCEDURE [dbo].[GetProducts]
 	@SupplierId int
 AS
 BEGIN
-	SELECT p.Id, p.ProductName, p.UnitPrice,
-	p.Package, p.IsDiscontinued 
-    	FROM dbo.Product p
-    	WHERE p.SupplierId = @SupplierId
+    SELECT p.Id, p.ProductName, p.UnitPrice,
+    p.Package, p.IsDiscontinued 
+    FROM dbo.Product p
+    WHERE p.SupplierId = @SupplierId
 END
 ```
 
@@ -70,8 +70,8 @@ many custom column mappings depending on your procedure.
 CREATE PROCEDURE [dbo].[GetProducts]
 AS
 BEGIN
-	SELECT p.Id as [Product Id], p.ProductName as [Product Name]
-	FROM dbo.Product p
+    SELECT p.Id as [Product Id], p.ProductName as [Product Name]
+    FROM dbo.Product p
 END
 
 ```
@@ -134,15 +134,15 @@ CREATE PROCEDURE [dbo].[GetProductAndSupplier]
 	@Id int
 AS
 BEGIN
-	SET NOCOUNT ON;
+    SET NOCOUNT ON;
     
-	SELECT p.ProductName, p.UnitPrice, p.Package, p.IsDiscontinued,
-	s.Id, s.CompanyName, s.ContactName, s.ContactTitle, s.City, 
-        s.Country, s.Phone, s.Fax 
-	FROM dbo.Product p
-	INNER JOIN dbo.Supplier s
-	ON p.SupplierId = s.Id
-	WHERE p.Id = @Id
+    SELECT p.ProductName, p.UnitPrice, p.Package, p.IsDiscontinued,
+    s.Id, s.CompanyName, s.ContactName, s.ContactTitle, s.City, 
+    s.Country, s.Phone, s.Fax 
+    FROM dbo.Product p
+    INNER JOIN dbo.Supplier s
+    ON p.SupplierId = s.Id
+    WHERE p.Id = @Id
 END
 ```
 
@@ -171,15 +171,15 @@ CREATE PROCEDURE [dbo].[GetCustomerAndOrders]
 	@LastName nvarchar(40)
 AS
 BEGIN
-	SET NOCOUNT ON;
+    SET NOCOUNT ON;
 
-	SELECT c.Id, c.FirstName, c.LastName, c.City, c.Country, c.Phone, 
-	o.Id as [OrderId], o.OrderDate, o.OrderNumber, o.TotalAmount
-	FROM dbo.Customer c
-	LEFT JOIN dbo.[Order] o
-	ON o.CustomerId = c.Id
-	WHERE c.FirstName = @FirstName
-	AND c.LastName = @LastName
+    SELECT c.Id, c.FirstName, c.LastName, c.City, c.Country, c.Phone, 
+    o.Id as [OrderId], o.OrderDate, o.OrderNumber, o.TotalAmount
+    FROM dbo.Customer c
+    LEFT JOIN dbo.[Order] o
+    ON o.CustomerId = c.Id
+    WHERE c.FirstName = @FirstName
+    AND c.LastName = @LastName
 END
 ```
 
@@ -213,12 +213,12 @@ A slightly more complex example getting all customers and all orders. This demon
 CREATE PROCEDURE GetAllCustomersAndOrders
 AS
 BEGIN
-	SET NOCOUNT ON;
+    SET NOCOUNT ON;
 
-	SELECT *
-	FROM dbo.Customer c
-	LEFT JOIN dbo.[Order] o
-	ON c.Id = o.CustomerId
+    SELECT *
+    FROM dbo.Customer c
+    LEFT JOIN dbo.[Order] o
+    ON c.Id = o.CustomerId
 END
 GO
 ```
@@ -260,11 +260,11 @@ CREATE PROCEDURE [dbo].[GetCustomer]
 	@CustomerId int
 AS
 BEGIN
-	SET NOCOUNT ON;
+    SET NOCOUNT ON;
 
-	SELECT c.FirstName as [First Name], c.LastName, c.City, c.Country, c.Phone 
-	FROM Customer c 
-	WHERE Id = @CustomerId
+    SELECT c.FirstName as [First Name], c.LastName, c.City, c.Country, c.Phone 
+    FROM Customer c 
+    WHERE Id = @CustomerId
 END
 ```
 ```c#

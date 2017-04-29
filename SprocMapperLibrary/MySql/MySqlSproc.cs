@@ -66,6 +66,9 @@ namespace SprocMapperLibrary.MySql
 
                     using (var reader = command.ExecuteReader())
                     {
+                        if (!reader.HasRows)
+                            return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
+
                         DataTable schema = reader.GetSchemaTable();
                         var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
@@ -82,9 +85,6 @@ namespace SprocMapperLibrary.MySql
                                 storedProcedure);
 
                         SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
-
-                        if (!reader.HasRows)
-                            return (List<TResult>) Activator.CreateInstance(typeof(List<TResult>));
 
                         while (reader.Read())
                         {
@@ -145,6 +145,9 @@ namespace SprocMapperLibrary.MySql
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
+                        if (!reader.HasRows)
+                            return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
+
                         DataTable schema = reader.GetSchemaTable();
                         var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
@@ -161,9 +164,6 @@ namespace SprocMapperLibrary.MySql
                                 storedProcedure);
 
                         SprocMapper.ValidateSchema(schema, SprocObjectMapList , partitionOnOrdinal);
-
-                        if (!reader.HasRows)
-                            return (List<TResult>) Activator.CreateInstance(typeof(List<TResult>));
 
                         while (reader.Read())
                         {

@@ -27,9 +27,9 @@ Selects all products defined by 'dbo.GetProducts'.
 CREATE PROCEDURE [dbo].[GetProducts]
 AS
 BEGIN
-SELECT p.Id, p.ProductName, p.SupplierId, 
-p.UnitPrice, p.Package, p.IsDiscontinued 
-FROM dbo.Product p
+	SELECT p.Id, p.ProductName, p.SupplierId, 
+    	p.UnitPrice, p.Package, p.IsDiscontinued 
+    	FROM dbo.Product p
 END
 
 ```
@@ -48,10 +48,10 @@ CREATE PROCEDURE [dbo].[GetProducts]
 	@SupplierId int
 AS
 BEGIN
-SELECT p.Id, p.ProductName, p.UnitPrice,
-p.Package, p.IsDiscontinued 
-FROM dbo.Product p
-WHERE p.SupplierId = @SupplierId
+	SELECT p.Id, p.ProductName, p.UnitPrice,
+	p.Package, p.IsDiscontinued 
+    	FROM dbo.Product p
+    	WHERE p.SupplierId = @SupplierId
 END
 ```
 
@@ -70,8 +70,8 @@ many custom column mappings depending on your procedure.
 CREATE PROCEDURE [dbo].[GetProducts]
 AS
 BEGIN
-SELECT p.Id as [Product Id], p.ProductName as [Product Name]
-FROM dbo.Product p
+	SELECT p.Id as [Product Id], p.ProductName as [Product Name]
+	FROM dbo.Product p
 END
 
 ```
@@ -138,7 +138,7 @@ BEGIN
     
 	SELECT p.ProductName, p.UnitPrice, p.Package, p.IsDiscontinued,
 	s.Id, s.CompanyName, s.ContactName, s.ContactTitle, s.City, 
-    s.Country, s.Phone, s.Fax 
+        s.Country, s.Phone, s.Fax 
 	FROM dbo.Product p
 	INNER JOIN dbo.Supplier s
 	ON p.SupplierId = s.Id

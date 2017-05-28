@@ -48,9 +48,10 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProducts()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
-
-            dataAccess.RegisterCacheProvider(new MemoryCacheProvider());
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString)
+            {
+                CacheProvider = new MemoryCacheProvider()
+            };
 
             var products = dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")

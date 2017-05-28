@@ -14,7 +14,7 @@ namespace SprocMapperLibrary.Base
         /// <summary>
         /// 
         /// </summary>
-        protected AbstractCacheProvider CacheProvider;
+        public AbstractCacheProvider CacheProvider;
 
         /// <summary>
         /// 

@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
 using SprocMapperLibrary.CacheProvider.MemoryCache;
+using SprocMapperLibrary.Interface;
 using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
@@ -18,7 +19,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetAllCustomersAndOrders()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
@@ -47,7 +48,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProducts()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             dataAccess.RegisterCacheProvider(new MemoryCacheProvider());
 
@@ -61,7 +62,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProducts_WithCallback()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             List<Product> productList = new List<Product>();
 
@@ -81,7 +82,7 @@ namespace IntegrationTest
         [TestMethod]
         public void SelectSingleCustomerAndOrders()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             Customer cust = null;
 
@@ -111,7 +112,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProductAndSupplier()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             int productId = 62;
             Product product = null;
@@ -135,7 +136,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetOrderAndProducts()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             int orderId = 20;
 
@@ -168,7 +169,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetSuppliers()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var suppliers = dataAccess.Sproc().ExecuteReader<Supplier>("dbo.GetSuppliers");
             Assert.IsTrue(suppliers.Any());
@@ -177,7 +178,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetCustomer()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
 
             var customer = dataAccess.Sproc()
@@ -195,7 +196,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetSupplierByName()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
 
             var supplier = dataAccess.Sproc()
@@ -211,7 +212,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(SprocMapperException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
         public void CustomColumnName_MustBeUniqueToClass()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             dataAccess.Sproc()           
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
@@ -222,7 +223,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(SprocMapperException), "A cache key has been provided without a cache provider. Use the method 'RegisterCacheProvider' to register a cache provider.")]
         public void CacheKeyNotProvided_ThrowsException()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", cacheKey: "test");
         }
@@ -230,7 +231,7 @@ namespace IntegrationTest
         [TestMethod]
         public void SaveGetDataTypes()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             BulkOperations bulk = new BulkOperations();
 

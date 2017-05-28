@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Data.SqlClient;
 using SprocMapperLibrary.Base;
+using SprocMapperLibrary.Interface;
 
 namespace SprocMapperLibrary.SqlServer
 {
     /// <summary>
     /// 
     /// </summary>
-    public class SqlServerAccess : BaseAccess
+    public class SqlServerAccess : BaseAccess, ISprocMapperAccess
     {
         private const string InvalidConnMsg = "Please ensure that valid Sql Server Credentials have been passed in.";
 
@@ -44,11 +45,9 @@ namespace SprocMapperLibrary.SqlServer
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public SqlServerSproc Sproc()
+        public BaseSproc Sproc()
         {
             return new SqlServerSproc(_connectionString, _credential, CacheProvider);
         }
-
-
     }
 }

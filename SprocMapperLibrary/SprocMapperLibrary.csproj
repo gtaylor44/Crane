@@ -61,6 +61,7 @@
     <Compile Include="Base\BaseSproc.cs" />
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheProvider.cs" />
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
+    <Compile Include="Interface\ISprocMapperAccess.cs" />
     <Compile Include="Model\EightJoin.cs" />
     <Compile Include="Model\FiveJoin.cs" />
     <Compile Include="Model\FourJoin.cs" />

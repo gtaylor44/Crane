@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
+using SprocMapperLibrary.Interface;
 using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
@@ -21,7 +22,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetProducts()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var products = await dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
@@ -36,7 +37,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task SelectSingleCustomerAndOrders()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             Customer cust = null;
 
 
@@ -66,7 +67,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetProductAndSupplier()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             int productId = 62;
             Product product = null;
 
@@ -89,7 +90,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetOrderAndProducts()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             int orderId = 20;
 
             Order order = null;
@@ -121,7 +122,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetSuppliers()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var suppliers = await dataAccess.Sproc().ExecuteReaderAsync<Supplier>("dbo.GetSuppliers");
 
@@ -132,7 +133,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetCustomer()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var customer = (await dataAccess.Sproc()
                 .AddSqlParameter("@CustomerId", 6)
@@ -149,7 +150,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetSupplierByName()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var supplier = (await dataAccess.Sproc()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
@@ -163,7 +164,8 @@ namespace IntegrationTest
         [TestMethod]
         public async Task InsertCustomerThenDelete()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
             Customer customer = new Customer()
             {
                 City = "Auckland",
@@ -212,7 +214,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(SprocMapperException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
         public async Task CustomColumnName_MustBeUniqueToClass()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             await dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
@@ -224,7 +226,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(SprocMapperException), "A cache key has been provided without a cache provider. Use the method 'RegisterCacheProvider' to register a cache provider.")]
         public async Task CacheKeyNotProvided_ThrowsException()
         {
-            SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             await dataAccess.Sproc().ExecuteReaderAsync<Product>("dbo.GetProducts", cacheKey: "test");
         }

@@ -1,12 +1,13 @@
 ﻿using System;
 using SprocMapperLibrary.Base;
+using SprocMapperLibrary.Interface;
 
 namespace SprocMapperLibrary.MySql
 {
     /// <summary>
     /// 
     /// </summary>
-    public class MySqlServerAccess : BaseAccess
+    public class MySqlServerAccess : BaseAccess, ISprocMapperAccess
     {
         private readonly string _connectionString;
         private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
@@ -25,7 +26,7 @@ namespace SprocMapperLibrary.MySql
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public MySqlSproc Sproc()
+        public BaseSproc Sproc()
         {
             return new MySqlSproc(_connectionString, CacheProvider);
         }

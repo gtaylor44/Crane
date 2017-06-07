@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
+using SprocMapperLibrary.CacheProvider;
 using SprocMapperLibrary.CacheProvider.MemoryCache;
 using SprocMapperLibrary.Interface;
 using SprocMapperLibrary.SqlServer;
@@ -48,10 +50,15 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProducts()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString)
+            var cacheProvider = new MemoryCacheProvider();
+
+            cacheProvider.AddPolicy("GetProducts", new SprocCachePolicy()
             {
-                CacheProvider = new MemoryCacheProvider()
-            };
+                InfiniteExpiration = true
+            });
+
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);
+
 
             var products = dataAccess.Sproc()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")

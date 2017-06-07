@@ -1,5 +1,6 @@
 ﻿using System;
 using SprocMapperLibrary.Base;
+using SprocMapperLibrary.CacheProvider;
 using SprocMapperLibrary.Interface;
 
 namespace SprocMapperLibrary.MySql
@@ -16,9 +17,11 @@ namespace SprocMapperLibrary.MySql
         /// 
         /// </summary>
         /// <param name="connectionString"></param>
-        public MySqlServerAccess(string connectionString)
+        /// <param name="cacheProvider"></param>
+        public MySqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
         {
             _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
+            CacheProvider = cacheProvider;
         }
 
         /// <summary>

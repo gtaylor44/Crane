@@ -107,7 +107,30 @@ If you want to force refresh the cache so a fresh copy is retrieved next call, y
 dataAccess.RemoveFromCache("customer_x_products");
 ```
 -----------------------------
+## Advanced Caching
 
+Apply policies to cache keys globally or with a regular expresssion. 
+
+```c#
+var cacheProvider = new MemoryCacheProvider();
+
+// Global policy applied if nothing specific is found. 
+cacheProvider.SetGlobalPolicy(new SprocCachePolicy()
+{
+    InfiniteExpiration = true
+});
+
+// This will have precedence over global or default policy 
+cacheProvider.AddPolicy("GetProducts", new SprocCachePolicy()
+{
+    CacheKeyRegExp = @"user-products-.*",
+    AbsoluteExpiration = TimeSpan.FromMinutes(30)
+});
+
+_sqlAccess.RegisterCacheProvider(new MemoryCacheProvider());
+```
+
+-----------------------------
 ## Reusing an existing DbConnection
 SprocMapper by default will manage the connection for you. If however you're in a TransactionScope and want to reuse an existing DbConnection and 
 not have SprocMapper open and close the connection for you, you can supply the named parameter 'unmanagedConn'.

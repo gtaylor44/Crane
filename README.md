@@ -114,16 +114,17 @@ Apply policies to cache keys globally or with a regular expresssion.
 ```c#
 var cacheProvider = new MemoryCacheProvider();
 
+// Note: Default policy if global or custom policies not added is infinite expiration. 
+
 // Global policy applied if nothing specific is found. 
 cacheProvider.SetGlobalPolicy(new SprocCachePolicy()
 {
-    InfiniteExpiration = true
+    AbsoluteExpiration = TimeSpan.FromDays(1)
 });
 
-// This will have precedence over global or default policy 
-cacheProvider.AddPolicy("GetProducts", new SprocCachePolicy()
+// Regular expression will have precedence over global or default policy. Add as many policies as you need.  
+cacheProvider.AddPolicy(@"user-products-.*", new SprocCachePolicy()
 {
-    CacheKeyRegExp = @"user-products-.*",
     AbsoluteExpiration = TimeSpan.FromMinutes(30)
 });
 

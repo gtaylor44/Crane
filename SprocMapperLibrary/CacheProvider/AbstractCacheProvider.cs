@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace SprocMapperLibrary.CacheProvider
 {
@@ -38,5 +39,18 @@ namespace SprocMapperLibrary.CacheProvider
         /// Removes all keys from cache.
         /// </summary>
         public abstract void ResetCache();
+
+        /// <summary>
+        /// Set a custom policy on all cached items.
+        /// </summary>
+        /// <param name="policy">The custom policy.</param>
+        public abstract void SetGlobalPolicy(SprocCachePolicy policy);
+
+        /// <summary>
+        /// Set a custom policy for a regular expression. If the regular expression matches, this policy will take precedence over the global policy (if one is set) and default policy. 
+        /// </summary>
+        /// <param name="regularExpression">The regular express pattern to match.</param>
+        /// <param name="policy">The custom policy.</param>
+        public abstract void AddPolicy(string regularExpression, SprocCachePolicy policy);
     }
 }

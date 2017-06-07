@@ -42,11 +42,16 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         public override void Add<T>(string key, IEnumerable<T> items)
         {
             SprocCachePolicy cacheStrategy = GetCachingStrategy(key);
-            var mappedCacheStrategy = MapCacheItemPolicy(cacheStrategy);
+
+            var cachePolicy = new CacheItemPolicy
+            {
+                AbsoluteExpiration = cacheStrategy.InfiniteExpiration
+                    ? ObjectCache.InfiniteAbsoluteExpiration : GetDateTimeOffsetFromTimespan(cacheStrategy.AbsoluteExpiration)
+            };
 
             lock (Padlock)
             {
-                MemoryCacheSingleton.Instance.Add(key, items, mappedCacheStrategy);
+                MemoryCacheSingleton.Instance.Add(key, items, cachePolicy);
             }
         }
 
@@ -82,15 +87,6 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
             {
                 MemoryCacheSingleton.Instance.Remove(element.Key);
             }
-        }
-
-        private CacheItemPolicy MapCacheItemPolicy(SprocCachePolicy sprocCachePolicy)
-        {
-            return new CacheItemPolicy
-            {
-                AbsoluteExpiration = sprocCachePolicy.InfiniteExpiration
-                ? ObjectCache.InfiniteAbsoluteExpiration : GetDateTimeOffsetFromTimespan(sprocCachePolicy.AbsoluteExpiration)
-            };
         }
     }
 }

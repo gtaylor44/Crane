@@ -127,7 +127,7 @@ cacheProvider.AddPolicy("GetProducts", new SprocCachePolicy()
     AbsoluteExpiration = TimeSpan.FromMinutes(30)
 });
 
-_sqlAccess.RegisterCacheProvider(new MemoryCacheProvider());
+_sqlAccess.RegisterCacheProvider(cacheProvider);
 ```
 
 -----------------------------

@@ -57,10 +57,9 @@ namespace SprocMapperLibrary.CacheProvider
         public abstract void Remove(string key);
 
         /// <summary>
-        /// Removes a given array of keys from cache.
+        /// Clears all cached lists matching the specified regular expression.
         /// </summary>
-        /// <param name="keys"></param>
-        public abstract void Remove(string[] keys);
+        public abstract void RemoveMatchingKeys(string regex);
 
         /// <summary>
         /// Removes all keys from cache.

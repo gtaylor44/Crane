@@ -22,13 +22,13 @@ namespace SprocMapperLibrary.Interface
         /// 
         /// </summary>
         /// <param name="key"></param>
-        void RemoveFromCache(string key);
+        void RemoveKeyFromCache(string key);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="keys"></param>
-        void RemoveFromCache(string[] keys);
+        /// <param name="regex"></param>
+        void RemoveMatchingKeysFromCache(string regex);
 
         /// <summary>
         /// 

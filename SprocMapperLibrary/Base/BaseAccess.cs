@@ -41,29 +41,24 @@ namespace SprocMapperLibrary.Base
         /// </summary>
         /// <param name="key"></param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void RemoveFromCache(string key)
+        public void RemoveKeyFromCache(string key)
         {
-            if (CacheProvider == null)
-            {
+            if (CacheProvider == null)            
                 throw new InvalidOperationException(NoCacheRegisteredMsg);
-            }
-
+            
             CacheProvider.Remove(key);
         }
 
         /// <summary>
-        /// Removes a list of cached results. 
+        /// 
         /// </summary>
-        /// <param name="keys"></param>
-        /// <exception cref="InvalidOperationException"></exception>
-        public void RemoveFromCache(string[] keys)
+        /// <param name="regex"></param>
+        public void RemoveMatchingKeysFromCache(string regex)
         {
             if (CacheProvider == null)
-            {
                 throw new InvalidOperationException(NoCacheRegisteredMsg);
-            }
 
-            CacheProvider.Remove(keys);
+            CacheProvider.RemoveMatchingKeys(regex);
         }
 
         /// <summary>

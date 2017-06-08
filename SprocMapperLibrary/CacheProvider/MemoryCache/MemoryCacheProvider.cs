@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Caching;
+using System.Text.RegularExpressions;
 
 namespace SprocMapperLibrary.CacheProvider.MemoryCache
 {  
@@ -66,15 +67,18 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
             }
         }
 
-        /// <summary>
-        /// Removes a given array of keys from cache.
-        /// </summary>
-        /// <param name="keys"></param>
-        public override void Remove(string[] keys)
+        /// <inheritdoc />
+        public override void RemoveMatchingKeys(string regex)
         {
-            foreach (var key in keys)
+            lock (Padlock)
             {
-                MemoryCacheSingleton.Instance.Remove(key);
+                foreach (var element in MemoryCacheSingleton.Instance)
+                {
+                    if (Regex.IsMatch(element.Key, regex))
+                    {
+                        MemoryCacheSingleton.Instance.Remove(element.Key);
+                    }
+                }
             }
         }
 
@@ -83,9 +87,12 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         /// </summary>
         public override void ResetCache()
         {
-            foreach (var element in MemoryCacheSingleton.Instance)
+            lock (Padlock)
             {
-                MemoryCacheSingleton.Instance.Remove(element.Key);
+                foreach (var element in MemoryCacheSingleton.Instance)
+                {
+                    MemoryCacheSingleton.Instance.Remove(element.Key);
+                }
             }
         }
     }

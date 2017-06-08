@@ -64,6 +64,10 @@ namespace IntegrationTest
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                 .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "GetProducts");
 
+            var products2 = dataAccess.Sproc()
+                .CustomColumnMapping<Product>(x => x.Id, "Product Id")
+                .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "GetProducts");
+
             Assert.IsNotNull(products);
         }
 

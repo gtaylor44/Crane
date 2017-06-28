@@ -257,6 +257,13 @@ namespace SprocMapperLibrary
                 return cachedResult;
             }
 
+            // Better option than checking string, then decimal, etc etc. 
+            if (typeof(TResult).IsValueType)
+            {
+                
+            }
+
+            // TODO: Refactor to above strategy...
             if (typeof(TResult) == typeof(string))
             {
                 List<string> stringCacheList = new List<string>();

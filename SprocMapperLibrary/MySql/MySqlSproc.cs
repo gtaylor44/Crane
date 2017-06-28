@@ -39,9 +39,11 @@ namespace SprocMapperLibrary.MySql
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
+        /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, 
+            string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
 
@@ -67,24 +69,27 @@ namespace SprocMapperLibrary.MySql
                     using (var reader = command.ExecuteReader())
                     {
                         if (!reader.HasRows)
-                            return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
+                            return new List<TResult>();
 
-                        DataTable schema = reader.GetSchemaTable();
-                        var rowList = schema?.Rows.Cast<DataRow>().ToList();
+                        if (!valueOrStringType)
+                        {
+                            DataTable schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
-                        int[] partitionOnOrdinal = null;
+                            int[] partitionOnOrdinal = null;
 
-                        if (partitionOnArr != null)
-                            partitionOnOrdinal =
-                                SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
+                            if (partitionOnArr != null)
+                                partitionOnOrdinal =
+                                    SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
-                        SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
-                        if (validateSelectColumns)
-                            SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
-                                storedProcedure);
+                            if (validateSelectColumns)
+                                SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    storedProcedure);
 
-                        SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+                        }
 
                         while (reader.Read())
                         {
@@ -117,9 +122,11 @@ namespace SprocMapperLibrary.MySql
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
+        /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, 
+            string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
 
@@ -148,29 +155,31 @@ namespace SprocMapperLibrary.MySql
                         if (!reader.HasRows)
                             return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
 
-                        DataTable schema = reader.GetSchemaTable();
-                        var rowList = schema?.Rows.Cast<DataRow>().ToList();
+                        if (!valueOrStringType)
+                        {
+                            DataTable schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
-                        int[] partitionOnOrdinal = null;
+                            int[] partitionOnOrdinal = null;
 
-                        if (partitionOnArr != null)
-                            partitionOnOrdinal =
-                                SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
+                            if (partitionOnArr != null)
+                                partitionOnOrdinal =
+                                    SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
-                        SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
-                        if (validateSelectColumns)
-                            SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
-                                storedProcedure);
+                            if (validateSelectColumns)
+                                SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    storedProcedure);
 
-                        SprocMapper.ValidateSchema(schema, SprocObjectMapList , partitionOnOrdinal);
+                            SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+                        }
 
                         while (reader.Read())
                         {
                             getObjectDel(reader, result);
                         }
                     }
-
                 }
 
                 if (cacheKey != null)

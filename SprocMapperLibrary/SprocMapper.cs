@@ -96,10 +96,8 @@ namespace SprocMapperLibrary
             List<string> matched = new List<string>();           
 
             if (partitionOnArr.Length != mapCount)
-            {
                 throw new SprocMapperException($"Invalid number of arguments entered for partitionOn. Expected {mapCount} arguments but instead saw {partitionOnArr.Length} arguments");
-            }
-
+            
             int currPartition = 0;
 
             for (int i = 0; i < rows.Count; i++)

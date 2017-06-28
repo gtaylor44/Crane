@@ -44,86 +44,11 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
+        /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey, Action saveCacheDel)
-        {
-            var userProvidedConnection = false;
-            try
-            {
-                userProvidedConnection = userConn != null;
-
-                // Try open connection if not already open.
-                if (!userProvidedConnection)               
-                    _conn = _credential == null ? new SqlConnection(_connectionString) 
-                        : new SqlConnection(_connectionString, _credential);
-                                       
-                else              
-                    _conn = userConn as SqlConnection;
-
-                OpenConn(_conn);
-
-                List<TResult> result = new List<TResult>();
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
-                {
-                    // Set common SqlCommand properties
-                    SetCommandProps(command, commandTimeout);
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (!reader.HasRows)
-                            return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
-
-                        DataTable schema = reader.GetSchemaTable();
-                        var rowList = schema?.Rows.Cast<DataRow>().ToList();
-
-                        int[] partitionOnOrdinal = null;
-
-                        if (partitionOnArr != null)
-                            partitionOnOrdinal =
-                                SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
-
-                        SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
-
-                        if (validateSelectColumns)
-                            SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
-                                storedProcedure);
-
-                        SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
-
-                        while (reader.Read())
-                        {
-                            getObjectDel(reader, result);
-                        }
-                    }
-                }
-
-                if (cacheKey != null)
-                    saveCacheDel();
-
-                return result;
-            }
-
-            finally
-            {
-                if (!userProvidedConnection)
-                    _conn.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="getStringDel"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="partitionOnArr"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="userConn"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="saveCacheDel"></param>
-        /// <returns></returns>
-        protected IEnumerable<string> ExecuteReaderImpl(Action<DbDataReader, List<string>> getStringDel, string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey, Action saveCacheDel)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, 
+            string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
             try
@@ -140,7 +65,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 OpenConn(_conn);
 
-                List<string> result = new List<string>();
+                List<TResult> result = new List<TResult>();
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
                     // Set common SqlCommand properties
@@ -149,20 +74,31 @@ namespace SprocMapperLibrary.SqlServer
                     using (var reader = command.ExecuteReader())
                     {
                         if (!reader.HasRows)
-                            return new List<string>();
+                            return new List<TResult>();
 
-                        DataTable schema = reader.GetSchemaTable();
-                        //var rowList = schema?.Rows.Cast<DataRow>().ToList();
+                        if (!valueOrStringType)
+                        {
+                            DataTable schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
-                        //if (validateSelectColumns)
-                        //    SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
-                        //        storedProcedure);
+                            int[] partitionOnOrdinal = null;
 
-                        //SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+                            if (partitionOnArr != null)
+                                partitionOnOrdinal =
+                                    SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
+
+                            SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
+
+                            if (validateSelectColumns)
+                                SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    storedProcedure);
+
+                            SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+                        }
 
                         while (reader.Read())
                         {
-                            getStringDel(reader, result);
+                            getObjectDel(reader, result);
                         }
                     }
                 }
@@ -192,9 +128,11 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
+        /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey, Action saveCacheDel)
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, 
+            string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
             try
@@ -202,11 +140,11 @@ namespace SprocMapperLibrary.SqlServer
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)                
+                if (!userProvidedConnection)
                     _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);                  
-                                 
-                else               
+                        : new SqlConnection(_connectionString, _credential);
+
+                else
                     _conn = userConn as SqlConnection;
 
                 await OpenConnAsync(_conn);
@@ -221,24 +159,27 @@ namespace SprocMapperLibrary.SqlServer
                     using (var reader = await command.ExecuteReaderAsync())
                     {
                         if (!reader.HasRows)
-                            return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
+                            return new List<TResult>();
 
-                        DataTable schema = reader.GetSchemaTable();
-                        var rowList = schema?.Rows.Cast<DataRow>().ToList();
+                        if (!valueOrStringType)
+                        {
+                            DataTable schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
-                        int[] partitionOnOrdinal = null;
+                            int[] partitionOnOrdinal = null;
 
-                        if (partitionOnArr != null)
-                            partitionOnOrdinal =
-                                SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
+                            if (partitionOnArr != null)
+                                partitionOnOrdinal =
+                                    SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
-                        SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
-                        if (validateSelectColumns)
-                            SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
-                                storedProcedure);
+                            if (validateSelectColumns)
+                                SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    storedProcedure);
 
-                        SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+                        }
 
                         while (reader.Read())
                         {
@@ -273,11 +214,11 @@ namespace SprocMapperLibrary.SqlServer
             {
                 int affectedRecords;
 
-                if (userConn == null)                
+                if (userConn == null)
                     _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);                    
-                  
-                else                
+                        : new SqlConnection(_connectionString, _credential);
+
+                else
                     _conn = userConn as SqlConnection;
 
                 OpenConn(_conn);
@@ -310,11 +251,11 @@ namespace SprocMapperLibrary.SqlServer
             {
                 int affectedRecords;
 
-                if (userConn == null)   
+                if (userConn == null)
                     _conn = _credential == null ? new SqlConnection(_connectionString)
                         : new SqlConnection(_connectionString, _credential);
-    
-                else                
+
+                else
                     _conn = userConn as SqlConnection;
 
                 await OpenConnAsync(_conn);
@@ -348,10 +289,10 @@ namespace SprocMapperLibrary.SqlServer
             {
                 T obj;
 
-                if (userConn == null)                
+                if (userConn == null)
                     _conn = _credential == null ? new SqlConnection(_connectionString)
                         : new SqlConnection(_connectionString, _credential);
-                   
+
                 else
                     _conn = userConn as SqlConnection;
 
@@ -360,7 +301,7 @@ namespace SprocMapperLibrary.SqlServer
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
                     SetCommandProps(command, commandTimeout);
-                    obj = (T) command.ExecuteScalar();
+                    obj = (T)command.ExecuteScalar();
                 }
 
                 return obj;
@@ -387,11 +328,11 @@ namespace SprocMapperLibrary.SqlServer
             {
                 T obj;
 
-                if (userConn == null)                
+                if (userConn == null)
                     _conn = _credential == null ? new SqlConnection(_connectionString)
                         : new SqlConnection(_connectionString, _credential);
-           
-                else              
+
+                else
                     _conn = userConn as SqlConnection;
 
                 await OpenConnAsync(_conn);
@@ -399,7 +340,7 @@ namespace SprocMapperLibrary.SqlServer
                 using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
                 {
                     SetCommandProps(command, commandTimeout);
-                    obj = (T) await command.ExecuteScalarAsync();
+                    obj = (T)await command.ExecuteScalarAsync();
                 }
 
                 return obj;

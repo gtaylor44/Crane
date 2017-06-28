@@ -153,11 +153,12 @@ namespace SprocMapperLibrary
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
+        /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel);
+            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
 
 
         /// <summary>
@@ -172,11 +173,12 @@ namespace SprocMapperLibrary
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
+        /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel);
+            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
 
         /// <summary>
         /// 
@@ -257,33 +259,24 @@ namespace SprocMapperLibrary
                 return cachedResult;
             }
 
-            // Better option than checking if string, or decimal, or integer, etc. 
+            List<TResult> cacheList = new List<TResult>();
+
             if (typeof(TResult).IsValueType || typeof(TResult) == typeof(string))
             {
-                
-            }
-
-            // TODO: Refactor to above strategy...
-            if (typeof(TResult) == typeof(string))
-            {
-                List<string> stringCacheList = new List<string>();
-
-                return ExecuteReaderImpl<string>((reader, res) =>
+                return ExecuteReaderImpl<TResult>((reader, res) =>
                 {
-                    string obj1 = reader[0].ToString();
+                    TResult obj1 = (TResult)reader[0];
                     res.Add(obj1);
 
                     if (cacheKey != null)
                     {
-                        stringCacheList.Add(obj1);
+                        cacheList.Add(obj1);
                     }
 
-                }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, stringCacheList)) as IEnumerable<TResult>;
+                }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
-
-            List<TResult> cacheList = new List<TResult>();
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
@@ -298,36 +291,6 @@ namespace SprocMapperLibrary
             }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <returns></returns>
-        //public IEnumerable<string> ExecuteReader(string storedProcedure, string cacheKey = null,
-        //    bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
-        //{
-        //    ValidateCacheKey(cacheKey);
-        //    IEnumerable<string> cachedResult;
-
-        //    if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
-        //    {
-        //        return cachedResult;
-        //    }
-
-        //    List<string> cacheList = new List<string>();
-
-        //    return ExecuteReaderImpl<string>((reader, res) =>
-        //    {
-        //        string obj1 = reader[0].ToString();
-        //        res.Add(obj1);
-
-        //        if (cacheKey != null)
-        //        {
-        //            cacheList.Add(obj1);
-        //        }
-
-        //    }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
-        //}
-
         /// <summary>
         /// Perform a select statement against a single type.
         /// </summary>
@@ -341,7 +304,6 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, Action<TResult> callBack, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
-            where TResult : class, new()
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -360,9 +322,26 @@ namespace SprocMapperLibrary
                 return enumerable;
             }
 
-            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
-
             List<TResult> cacheList = new List<TResult>();
+
+            if (typeof(TResult).IsValueType || typeof(TResult) == typeof(string))
+            {
+                return ExecuteReaderImpl<TResult>((reader, res) =>
+                {
+                    TResult obj1 = (TResult)reader[0];
+                    res.Add(obj1);
+
+                    if (cacheKey != null)
+                    {
+                        cacheList.Add(obj1);
+                    }
+
+                    callBack.Invoke(obj1);
+
+                }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+            }
+
+            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
@@ -995,7 +974,6 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
-             where TResult : class, new()
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -1005,9 +983,24 @@ namespace SprocMapperLibrary
                 return cachedResult;
             }
 
-            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
-
             List<TResult> cacheList = new List<TResult>();
+
+            if (typeof(TResult).IsValueType || typeof(TResult) == typeof(string))
+            {
+                return ExecuteReaderImpl<TResult>((reader, res) =>
+                {
+                    TResult obj1 = (TResult)reader[0];
+                    res.Add(obj1);
+
+                    if (cacheKey != null)
+                    {
+                        cacheList.Add(obj1);
+                    }
+
+                }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+            }
+
+            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -1035,7 +1028,6 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string storedProcedure, Action<TResult> callBack, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
-             where TResult : class, new()
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -1054,9 +1046,26 @@ namespace SprocMapperLibrary
                 return enumerable;
             }
 
-            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
-
             List<TResult> cacheList = new List<TResult>();
+
+            if (typeof(TResult).IsValueType || typeof(TResult) == typeof(string))
+            {
+                return ExecuteReaderImpl<TResult>((reader, res) =>
+                {
+                    TResult obj1 = (TResult)reader[0];
+                    res.Add(obj1);
+
+                    if (cacheKey != null)
+                    {
+                        cacheList.Add(obj1);
+                    }
+
+                    callBack.Invoke(obj1);
+
+                }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+            }
+
+            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings); 
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {

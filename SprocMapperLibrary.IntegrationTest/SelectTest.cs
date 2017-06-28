@@ -18,15 +18,6 @@ namespace IntegrationTest
     [TestClass]
     public class SelectTest
     {
-        [TestMethod]
-        public void Test()
-        {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
-
-            var result = dataAccess.Sproc()
-                .AddSqlParameter("@UserId", "3f665e9c-57d0-4a8f-ad27-c202c70ae14b")
-                .ExecuteReader<string>("[Authentication].[FindRoleByUserId]");
-        }
 
         [TestMethod]
         public void GetAllCustomersAndOrders()

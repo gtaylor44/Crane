@@ -257,8 +257,8 @@ namespace SprocMapperLibrary
                 return cachedResult;
             }
 
-            // Better option than checking string, then decimal, etc etc. 
-            if (typeof(TResult).IsValueType)
+            // Better option than checking if string, or decimal, or integer, etc. 
+            if (typeof(TResult).IsValueType || typeof(TResult) == typeof(string))
             {
                 
             }

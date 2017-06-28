@@ -248,7 +248,6 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string storedProcedure, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
-            where TResult : class, new()
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -256,6 +255,23 @@ namespace SprocMapperLibrary
             if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
             {
                 return cachedResult;
+            }
+
+            if (typeof(TResult) == typeof(string))
+            {
+                List<string> stringCacheList = new List<string>();
+
+                return ExecuteReaderImpl<string>((reader, res) =>
+                {
+                    string obj1 = reader[0].ToString();
+                    res.Add(obj1);
+
+                    if (cacheKey != null)
+                    {
+                        stringCacheList.Add(obj1);
+                    }
+
+                }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, stringCacheList)) as IEnumerable<TResult>;
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -274,6 +290,36 @@ namespace SprocMapperLibrary
 
             }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <returns></returns>
+        //public IEnumerable<string> ExecuteReader(string storedProcedure, string cacheKey = null,
+        //    bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        //{
+        //    ValidateCacheKey(cacheKey);
+        //    IEnumerable<string> cachedResult;
+
+        //    if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+        //    {
+        //        return cachedResult;
+        //    }
+
+        //    List<string> cacheList = new List<string>();
+
+        //    return ExecuteReaderImpl<string>((reader, res) =>
+        //    {
+        //        string obj1 = reader[0].ToString();
+        //        res.Add(obj1);
+
+        //        if (cacheKey != null)
+        //        {
+        //            cacheList.Add(obj1);
+        //        }
+
+        //    }, storedProcedure, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+        //}
 
         /// <summary>
         /// Perform a select statement against a single type.

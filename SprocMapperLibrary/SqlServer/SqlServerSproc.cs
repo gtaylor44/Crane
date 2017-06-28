@@ -32,8 +32,6 @@ namespace SprocMapperLibrary.SqlServer
             _credential = credential;
         }
 
-
-
         /// <summary>
         /// Performs synchronous version of stored procedure.
         /// </summary>
@@ -111,7 +109,75 @@ namespace SprocMapperLibrary.SqlServer
                 if (!userProvidedConnection)
                     _conn.Dispose();
             }
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="getStringDel"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="partitionOnArr"></param>
+        /// <param name="validateSelectColumns"></param>
+        /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDel"></param>
+        /// <returns></returns>
+        protected IEnumerable<string> ExecuteReaderImpl(Action<DbDataReader, List<string>> getStringDel, string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, string cacheKey, Action saveCacheDel)
+        {
+            var userProvidedConnection = false;
+            try
+            {
+                userProvidedConnection = userConn != null;
+
+                // Try open connection if not already open.
+                if (!userProvidedConnection)
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
+                else
+                    _conn = userConn as SqlConnection;
+
+                OpenConn(_conn);
+
+                List<string> result = new List<string>();
+                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                {
+                    // Set common SqlCommand properties
+                    SetCommandProps(command, commandTimeout);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                            return new List<string>();
+
+                        DataTable schema = reader.GetSchemaTable();
+                        //var rowList = schema?.Rows.Cast<DataRow>().ToList();
+
+                        //if (validateSelectColumns)
+                        //    SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                        //        storedProcedure);
+
+                        //SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
+
+                        while (reader.Read())
+                        {
+                            getStringDel(reader, result);
+                        }
+                    }
+                }
+
+                if (cacheKey != null)
+                    saveCacheDel();
+
+                return result;
+            }
+
+            finally
+            {
+                if (!userProvidedConnection)
+                    _conn.Dispose();
+            }
         }
 
         /// <summary>

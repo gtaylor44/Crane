@@ -358,7 +358,7 @@ namespace SprocMapperLibrary
         /// <param name="sprocObjectMap"></param>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader) where T : new()
+        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)
         {
             T targetObject = (T)sprocObjectMap.TypeAccessor.CreateNew();
             int defaultOrNullCounter = 0;

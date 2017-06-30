@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
@@ -103,6 +104,62 @@ namespace SprocMapperLibrary.MySql
 
                 return result;
             }
+            finally
+            {
+                if (!userProvidedConnection)
+                    _mySqlConn.Dispose();
+            }
+        }
+
+        /// <inheritdoc />
+        protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
+            string storedProcedure, int? commandTimeout, DbConnection userConn)
+        {
+            var userProvidedConnection = false;
+            try
+            {
+                userProvidedConnection = userConn != null;
+
+                // Try open connection if not already open.
+                if (!userProvidedConnection)
+                    _mySqlConn = new MySqlConnection(_connectionString);
+
+                else
+                    _mySqlConn = userConn as MySqlConnection;
+
+                OpenConn(_mySqlConn);
+
+                List<dynamic> result = new List<dynamic>();
+
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    // Set common SqlCommand properties
+                    SetCommandProps(command, commandTimeout);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                            return new List<dynamic>();
+
+                        DataTable schema = reader.GetSchemaTable();
+
+                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
+
+                        while (reader.Read())
+                        {
+                            dynamic expando = new ExpandoObject();
+
+                            foreach (var col in dynamicColumnDic)
+                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+
+                            getObjectDel(expando, result);
+                        }
+                    }
+                }
+
+                return result;
+            }
+
             finally
             {
                 if (!userProvidedConnection)

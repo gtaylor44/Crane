@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -160,6 +161,15 @@ namespace SprocMapperLibrary
             string storedProcedure, int? commandTimeout, string[] partitionOnArr,
             bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="getObjectDel"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
+        protected abstract IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
+            string storedProcedure, int? commandTimeout, DbConnection userConn);
 
         /// <summary>
         /// Performs asynchronous version of stored procedure.
@@ -236,6 +246,36 @@ namespace SprocMapperLibrary
 
             ParamList.AddRange(sqlParameterCollection);
             return this;
+        }
+
+        /// <summary>
+        /// Caching is not currently supported for Dynamic Reader
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="unmanagedConn"></param>
+        public IEnumerable<dynamic> ExecuteReader(string storedProcedure, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        {
+            return ExecuteDynamicReaderImpl((row, list) =>
+            {
+                list.Add(row);
+            }, storedProcedure, commandTimeout, unmanagedConn);
+        }
+
+        /// <summary>
+        /// Caching is not currently supported for Dynamic Reader
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="callBack"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="unmanagedConn"></param>
+        public IEnumerable<dynamic> ExecuteReader(string storedProcedure, Action<dynamic> callBack, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        {
+            return ExecuteDynamicReaderImpl((row, list) =>
+            {
+                callBack.Invoke(row);
+                list.Add(row);
+            }, storedProcedure, commandTimeout, unmanagedConn);
         }
 
         /// <summary>

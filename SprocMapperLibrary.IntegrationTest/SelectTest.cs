@@ -19,6 +19,45 @@ namespace IntegrationTest
     public class SelectTest
     {
 
+        // Returns all products with Id and Product Name only
+        // Id has an alias of 'Product Id'
+        [TestMethod]
+        public void GetProductsDynamic()
+        {
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            var productList = dataAccess.Sproc().ExecuteReader("dbo.GetProducts")
+                .ToList()
+                .ConvertAll(x => new Product()
+            {
+                Id = x.ProductId,
+                ProductName = x.ProductName
+            });
+
+            Assert.IsTrue(productList.Any());
+        }
+
+        // Returns all products with Id and Product Name only
+        // Id has an alias of 'Product Id'
+        [TestMethod]
+        public void GetProductsDynamicWithCallback()
+        {
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            List<Product> productList = new List<Product>();
+            dataAccess.Sproc()
+                .ExecuteReader("dbo.GetProducts", (x) =>
+                {
+                    productList.Add(new Product()
+                    {
+                        Id = x.ProductId,
+                        ProductName = x.ProductName
+                    });
+                });
+
+            Assert.IsTrue(productList.Any());
+        }
+
         [TestMethod]
         public void GetAllCustomersAndOrders()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Linq.Expressions;
@@ -347,6 +348,29 @@ namespace SprocMapperLibrary
 
             return columns;
 
+        }
+
+        public static Dictionary<int, string> GetColumnsForDynamicQuery(DataTable schema)
+        {            
+            var rowList = schema?.Rows.Cast<DataRow>().ToList();
+            Dictionary<int, string> dynamicColumnDic = new Dictionary<int, string>();
+
+            if (rowList != null)
+                foreach (DataRow dr in rowList)
+                {
+                    int ordinalAsInt = int.Parse(dr["ColumnOrdinal"].ToString());
+                    string strippedColumnName = dr["ColumnName"]?.ToString().Replace(" ", string.Empty);
+
+                    if (strippedColumnName == null)
+                        throw new SprocMapperException("There was a probelm retrieving column.");
+
+                    if (dynamicColumnDic.ContainsValue(strippedColumnName))
+                        throw new SprocMapperException($"Duplicate column name in stored procedure detected: {strippedColumnName}");
+
+                    dynamicColumnDic.Add(ordinalAsInt, strippedColumnName);
+                }
+
+            return dynamicColumnDic;
         }
 
         /// <summary>

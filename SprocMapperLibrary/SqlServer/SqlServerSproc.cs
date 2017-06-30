@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using FastMember;
 using SprocMapperLibrary.CacheProvider;
 
 namespace SprocMapperLibrary.SqlServer
@@ -33,6 +35,69 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="getObjectDel"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
+        protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
+            string storedProcedure, int? commandTimeout, DbConnection userConn)
+        {
+            var userProvidedConnection = false;
+            try
+            {
+                userProvidedConnection = userConn != null;
+
+                // Try open connection if not already open.
+                if (!userProvidedConnection)
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
+                else
+                    _conn = userConn as SqlConnection;
+
+                OpenConn(_conn);
+
+                List<dynamic> result = new List<dynamic>();
+
+                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                {
+                    // Set common SqlCommand properties
+                    SetCommandProps(command, commandTimeout);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                            return new List<dynamic>();
+
+                        DataTable schema = reader.GetSchemaTable();
+
+                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
+
+                        while (reader.Read())
+                        {
+                            dynamic expando = new ExpandoObject();
+
+                            foreach (var col in dynamicColumnDic)                                                          
+                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+                            
+                            getObjectDel(expando, result);
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            finally
+            {
+                if (!userProvidedConnection)
+                    _conn.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Performs synchronous version of stored procedure.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
@@ -47,7 +112,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, 
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
             string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
@@ -131,7 +196,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, 
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
             string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;

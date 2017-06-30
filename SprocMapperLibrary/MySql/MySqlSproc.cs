@@ -113,7 +113,7 @@ namespace SprocMapperLibrary.MySql
 
         /// <inheritdoc />
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn)
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
         {
             var userProvidedConnection = false;
             try
@@ -156,6 +156,68 @@ namespace SprocMapperLibrary.MySql
                         }
                     }
                 }
+
+                if (cacheKey != null)
+                    saveCacheDel();
+
+                return result;
+            }
+
+            finally
+            {
+                if (!userProvidedConnection)
+                    _mySqlConn.Dispose();
+            }
+        }
+
+        /// <inheritdoc />
+        protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
+        {
+            var userProvidedConnection = false;
+            try
+            {
+                userProvidedConnection = userConn != null;
+
+                // Try open connection if not already open.
+                if (!userProvidedConnection)
+                    _mySqlConn = new MySqlConnection(_connectionString);
+
+                else
+                    _mySqlConn = userConn as MySqlConnection;
+
+                await OpenConnAsync(_mySqlConn);
+
+                List<dynamic> result = new List<dynamic>();
+
+                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                {
+                    // Set common SqlCommand properties
+                    SetCommandProps(command, commandTimeout);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (!reader.HasRows)
+                            return new List<dynamic>();
+
+                        DataTable schema = reader.GetSchemaTable();
+
+                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
+
+                        while (await reader.ReadAsync())
+                        {
+                            dynamic expando = new ExpandoObject();
+
+                            foreach (var col in dynamicColumnDic)
+                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+
+                            getObjectDel(expando, result);
+                        }
+                    }
+                }
+
+                if (cacheKey != null)
+                    saveCacheDel();
 
                 return result;
             }
@@ -232,7 +294,7 @@ namespace SprocMapperLibrary.MySql
                             SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
 
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             getObjectDel(reader, result);
                         }

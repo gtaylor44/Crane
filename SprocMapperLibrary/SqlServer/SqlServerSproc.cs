@@ -41,8 +41,10 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDel"></param>
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn)
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
         {
             var userProvidedConnection = false;
             try
@@ -86,6 +88,77 @@ namespace SprocMapperLibrary.SqlServer
                         }
                     }
                 }
+
+                if (cacheKey != null)
+                    saveCacheDel();
+
+                return result;
+            }
+
+            finally
+            {
+                if (!userProvidedConnection)
+                    _conn.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="getObjectDel"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDel"></param>
+        protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
+        {
+            var userProvidedConnection = false;
+            try
+            {
+                userProvidedConnection = userConn != null;
+
+                // Try open connection if not already open.
+                if (!userProvidedConnection)
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+
+                else
+                    _conn = userConn as SqlConnection;
+
+                await OpenConnAsync(_conn);
+
+                List<dynamic> result = new List<dynamic>();
+
+                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                {
+                    // Set common SqlCommand properties
+                    SetCommandProps(command, commandTimeout);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (!reader.HasRows)
+                            return new List<dynamic>();
+
+                        DataTable schema = reader.GetSchemaTable();
+
+                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
+
+                        while (await reader.ReadAsync())
+                        {
+                            dynamic expando = new ExpandoObject();
+
+                            foreach (var col in dynamicColumnDic)
+                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+
+                            getObjectDel(expando, result);
+                        }
+                    }
+                }
+
+                if (cacheKey != null)
+                    saveCacheDel();
 
                 return result;
             }
@@ -246,7 +319,7 @@ namespace SprocMapperLibrary.SqlServer
                             SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
 
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             getObjectDel(reader, result);
                         }

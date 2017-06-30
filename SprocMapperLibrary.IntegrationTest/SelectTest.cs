@@ -26,7 +26,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var productList = dataAccess.Sproc().ExecuteReader("dbo.GetProducts")
+            var productList = dataAccess.Sproc().ExecuteReader<dynamic>("dbo.GetProducts")
                 .ToList()
                 .ConvertAll(x => new Product()
             {

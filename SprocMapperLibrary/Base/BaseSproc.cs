@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -168,8 +167,22 @@ namespace SprocMapperLibrary
         /// <param name="storedProcedure"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDe"></param>
         protected abstract IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn);
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="getObjectDel"></param>
+        /// <param name="storedProcedure"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="userConn"></param>
+        /// <param name="cacheKey"></param>
+        /// <param name="saveCacheDe"></param>
+        protected abstract Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe);
 
         /// <summary>
         /// Performs asynchronous version of stored procedure.
@@ -249,33 +262,67 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// Caching is not currently supported for Dynamic Reader
+        /// 
         /// </summary>
         /// <param name="storedProcedure"></param>
+        /// <param name="cacheKey"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
-        public IEnumerable<dynamic> ExecuteReader(string storedProcedure, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public IEnumerable<dynamic> ExecuteReader(string storedProcedure, string cacheKey = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<dynamic> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                return cachedResult;
+            }
+
+            List<dynamic> cacheList = new List<dynamic>();
+
             return ExecuteDynamicReaderImpl((row, list) =>
             {
                 list.Add(row);
-            }, storedProcedure, commandTimeout, unmanagedConn);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(row);
+                }
+
+            }, storedProcedure, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
-        /// Caching is not currently supported for Dynamic Reader
+        /// 
         /// </summary>
         /// <param name="storedProcedure"></param>
         /// <param name="callBack"></param>
+        /// <param name="cacheKey"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
-        public IEnumerable<dynamic> ExecuteReader(string storedProcedure, Action<dynamic> callBack, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public IEnumerable<dynamic> ExecuteReader(string storedProcedure, Action<dynamic> callBack, string cacheKey = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<dynamic> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                return cachedResult;
+            }
+
+            List<dynamic> cacheList = new List<dynamic>();
+
             return ExecuteDynamicReaderImpl((row, list) =>
             {
                 callBack.Invoke(row);
                 list.Add(row);
-            }, storedProcedure, commandTimeout, unmanagedConn);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(row);
+                }
+
+            }, storedProcedure, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -301,7 +348,23 @@ namespace SprocMapperLibrary
 
             List<TResult> cacheList = new List<TResult>();
 
-            if (typeof(TResult).IsValueType || typeof(TResult) == typeof(string))
+            var type = typeof(TResult);
+
+            if (type == typeof(object))
+            {
+                return ExecuteDynamicReaderImpl((row, list) =>
+                {
+                    list.Add(row);
+
+                    if (cacheKey != null)
+                    {
+                        cacheList.Add(row);
+                    }
+
+                }, storedProcedure, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
+            }
+
+            if (type.IsValueType || type == typeof(string))
             {
                 return ExecuteReaderImpl<TResult>((reader, res) =>
                 {
@@ -364,7 +427,24 @@ namespace SprocMapperLibrary
 
             List<TResult> cacheList = new List<TResult>();
 
-            if (typeof(TResult).IsValueType || typeof(TResult) == typeof(string))
+            var type = typeof(TResult);
+
+            if (type == typeof(object))
+            {
+                return ExecuteDynamicReaderImpl((row, list) =>
+                {
+                    callBack.Invoke(row);
+                    list.Add(row);
+
+                    if (cacheKey != null)
+                    {
+                        cacheList.Add(row);
+                    }
+
+                }, storedProcedure, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
+            } 
+
+            if (type.IsValueType || type == typeof(string))
             {
                 return ExecuteReaderImpl<TResult>((reader, res) =>
                 {
@@ -1000,6 +1080,70 @@ namespace SprocMapperLibrary
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
             }, storedProcedure, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="cacheKey"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="unmanagedConn"></param>
+        public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string storedProcedure, string cacheKey = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<dynamic> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                return cachedResult;
+            }
+
+            List<dynamic> cacheList = new List<dynamic>();
+
+            return await ExecuteDynamicReaderImplAsync((row, list) =>
+            {
+                list.Add(row);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(row);
+                }
+
+            }, storedProcedure, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="callBack"></param>
+        /// <param name="cacheKey"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="unmanagedConn"></param>
+        public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string storedProcedure, Action<dynamic> callBack, string cacheKey = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        {
+            ValidateCacheKey(cacheKey);
+            IEnumerable<dynamic> cachedResult;
+
+            if (cacheKey != null && CacheProvider.TryGet(cacheKey, out cachedResult))
+            {
+                return cachedResult;
+            }
+
+            List<dynamic> cacheList = new List<dynamic>();
+
+            return await ExecuteDynamicReaderImplAsync((row, list) =>
+            {
+                callBack.Invoke(row);
+                list.Add(row);
+
+                if (cacheKey != null)
+                {
+                    cacheList.Add(row);
+                }
+
+            }, storedProcedure, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>

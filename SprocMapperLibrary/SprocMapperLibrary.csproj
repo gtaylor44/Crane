@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -63,14 +64,6 @@
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
     <Compile Include="CacheProvider\SprocCachePolicy.cs" />
     <Compile Include="Interface\ISprocMapperAccess.cs" />
-    <Compile Include="Model\EightJoin.cs" />
-    <Compile Include="Model\FiveJoin.cs" />
-    <Compile Include="Model\FourJoin.cs" />
-    <Compile Include="Model\OneJoin.cs" />
-    <Compile Include="Model\SevenJoin.cs" />
-    <Compile Include="Model\SixJoin.cs" />
-    <Compile Include="Model\ThreeJoin.cs" />
-    <Compile Include="Model\TwoJoin.cs" />
     <Compile Include="GenericExtensions.cs" />
     <Compile Include="Interface\INullType.cs" />
     <Compile Include="Interface\ISprocObjectMap.cs" />

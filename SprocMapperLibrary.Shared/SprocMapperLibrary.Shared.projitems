@@ -9,6 +9,9 @@
     <Import_RootNamespace>SprocMapperLibrary.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseInitialiser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseSproc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\EightJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\FiveJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\FourJoin.cs" />
@@ -17,5 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\SixJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\ThreeJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TwoJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SprocMapperException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SprocObjectMap.cs" />
   </ItemGroup>
 </Project>

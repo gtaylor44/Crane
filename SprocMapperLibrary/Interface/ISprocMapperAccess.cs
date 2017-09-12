@@ -27,12 +27,6 @@ namespace SprocMapperLibrary.Interface
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="regex"></param>
-        void RemoveMatchingKeysFromCache(string regex);
-
-        /// <summary>
-        /// 
-        /// </summary>
         void ResetCache();
     }
 }

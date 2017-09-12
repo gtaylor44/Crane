@@ -13,12 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary", "Sproc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.Core", "SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj", "{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SprocMapperLibrary.Shared", "SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.shproj", "{B9BC7633-AB6D-4F64-A2A5-6B52C835DC5B}"
-EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.projitems*{b9bc7633-ab6d-4f64-a2a5-6b52c835dc5b}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

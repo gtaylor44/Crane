@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>b9bc7633-ab6d-4f64-a2a5-6b52c835dc5b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SprocMapperLibrary.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseInitialiser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseSproc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCacheProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\MemoryCache\MemoryCacheProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\SprocCachePolicy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GenericExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\INullType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocMapperAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocObjectMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\EightJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\FiveJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\FourJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\OneJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\SevenJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\SixJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\ThreeJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\TwoJoin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MySql\MySqlServerAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MySql\MySqlSproc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SprocMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SprocMapperException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SprocObjectMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SqlServer\SqlServerAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SqlServer\SqlServerSproc.cs" />
+  </ItemGroup>
+</Project>

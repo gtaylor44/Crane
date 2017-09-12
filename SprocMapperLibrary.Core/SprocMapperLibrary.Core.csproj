@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <VersionPrefix>1.0</VersionPrefix>
+    <AssemblyTitle>SprocMapperLibrary.Core</AssemblyTitle>
+    <Description>Sprocmapper Library</Description>
+    <Copyright>Copyright © Greg Taylor 2017</Copyright>
+    <SignAssembly>True</SignAssembly>
+  </PropertyGroup>
+  <Import Project="..\SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.projitems" Label="Shared" />
+  <ItemGroup>
+    <PackageReference Include="FastMember" Version="1.1.0" />
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+  </ItemGroup>
+</Project>

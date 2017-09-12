@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.UnitTest", "SprocMapperLibrary.UnitTest\SprocMapperLibrary.UnitTest.csproj", "{F18E9219-B104-4B23-A0CC-520653D40A43}"
 EndProject
@@ -11,7 +11,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.TestComm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary", "SprocMapperLibrary\SprocMapperLibrary.csproj", "{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.Core", "SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj", "{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SprocMapperLibrary.Shared", "SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.shproj", "{B9BC7633-AB6D-4F64-A2A5-6B52C835DC5B}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.projitems*{b9bc7633-ab6d-4f64-a2a5-6b52c835dc5b}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -33,8 +40,15 @@ Global
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CA05D4D2-2122-49CB-8D87-893C5E24895C}
 	EndGlobalSection
 EndGlobal

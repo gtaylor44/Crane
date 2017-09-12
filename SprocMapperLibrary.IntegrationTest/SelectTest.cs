@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
 using SprocMapperLibrary.CacheProvider;
@@ -26,7 +28,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var productList = dataAccess.Sproc().ExecuteReader<dynamic>("dbo.GetProducts")
+            var productList = dataAccess.Sproc().ExecuteReader("dbo.GetProducts")
                 .ToList()
                 .ConvertAll(x => new Product()
             {
@@ -108,7 +110,19 @@ namespace IntegrationTest
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                 .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "GetProducts");
 
-            Assert.IsNotNull(products);
+            Assert.IsTrue(products2.Count() > 0);
+        }
+
+        [TestMethod]
+        public void GetProductsTextQuery()
+        {
+            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            var products = dataAccess.Sproc()
+                .AddSqlParameter("@SupplierId", 1)
+                .ExecuteReader<Product>("SELECT * FROM dbo.Product WHERE SupplierId = @SupplierId", commandType: CommandType.Text);
+
+            Assert.IsTrue(products.Count() == 3);
         }
 
         [TestMethod]

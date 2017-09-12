@@ -19,7 +19,6 @@ namespace SprocMapperLibrary.SqlServer
         private SqlConnection _conn;
 
         private readonly string _connectionString;
-        private readonly SqlCredential _credential;
 
         /// <summary>
         /// 
@@ -27,11 +26,9 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="connectionString"></param>
         /// <param name="credential"></param>
         /// <param name="cacheProvider"></param>
-        public SqlServerSproc(string connectionString, SqlCredential credential,
-            AbstractCacheProvider cacheProvider) : base(cacheProvider)
+        public SqlServerSproc(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
-            _credential = credential;
         }
 
         /// <summary>
@@ -55,8 +52,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -74,6 +70,8 @@ namespace SprocMapperLibrary.SqlServer
                     {
                         if (!reader.HasRows)
                             return new List<dynamic>();
+
+                        var test = reader.GetColumnSchema();
 
                         DataTable schema = reader.GetSchemaTable();
 
@@ -124,8 +122,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -199,8 +196,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -284,8 +280,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -359,8 +354,7 @@ namespace SprocMapperLibrary.SqlServer
                 int affectedRecords;
 
                 if (userConn == null)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -397,8 +391,7 @@ namespace SprocMapperLibrary.SqlServer
                 int affectedRecords;
 
                 if (userConn == null)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -436,8 +429,7 @@ namespace SprocMapperLibrary.SqlServer
                 T obj;
 
                 if (userConn == null)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -476,8 +468,7 @@ namespace SprocMapperLibrary.SqlServer
                 T obj;
 
                 if (userConn == null)
-                    _conn = _credential == null ? new SqlConnection(_connectionString)
-                        : new SqlConnection(_connectionString, _credential);
+                    _conn = new SqlConnection(_connectionString);
 
                 else
                     _conn = userConn as SqlConnection;

@@ -6,8 +6,8 @@ using System.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprocMapperLibrary;
 using SprocMapperLibrary.SqlServer;
-using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
+using SprocMapperLibrary.TestCommon;
 
 namespace IntegrationTest
 {

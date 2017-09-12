@@ -9,7 +9,6 @@
     <Import_RootNamespace>SprocMapperLibrary.TestShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DataTableFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Customer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Order.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\OrderItem.cs" />

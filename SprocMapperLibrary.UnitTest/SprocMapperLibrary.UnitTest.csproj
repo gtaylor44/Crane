@@ -70,16 +70,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DataTableFactory.cs" />
     <Compile Include="ObjectMappingTest.cs" />
     <Compile Include="OrdinalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ValidateSelectColumnsTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SprocMapperLibrary.TestCommon\SprocMapperLibrary.TestCommon.csproj">
-      <Project>{77ad5839-9475-4d85-b432-13caa263db7c}</Project>
-      <Name>SprocMapperLibrary.TestCommon</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SprocMapperLibrary\SprocMapperLibrary.csproj">
       <Project>{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}</Project>
       <Name>SprocMapperLibrary</Name>

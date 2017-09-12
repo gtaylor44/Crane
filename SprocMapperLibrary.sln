@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.UnitTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.IntegrationTest", "SprocMapperLibrary.IntegrationTest\SprocMapperLibrary.IntegrationTest.csproj", "{ADB34AAB-E2A3-4B55-87E6-EE3481982758}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.TestCommon", "SprocMapperLibrary.TestCommon\SprocMapperLibrary.TestCommon.csproj", "{77AD5839-9475-4D85-B432-13CAA263DB7C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary", "SprocMapperLibrary\SprocMapperLibrary.csproj", "{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprocMapperLibrary.Core", "SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj", "{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}"
@@ -35,10 +33,6 @@ Global
 		{ADB34AAB-E2A3-4B55-87E6-EE3481982758}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADB34AAB-E2A3-4B55-87E6-EE3481982758}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADB34AAB-E2A3-4B55-87E6-EE3481982758}.Release|Any CPU.Build.0 = Release|Any CPU
-		{77AD5839-9475-4D85-B432-13CAA263DB7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77AD5839-9475-4D85-B432-13CAA263DB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77AD5839-9475-4D85-B432-13CAA263DB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77AD5839-9475-4D85-B432-13CAA263DB7C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.ActiveCfg = Release|Any CPU

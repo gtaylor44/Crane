@@ -19,9 +19,17 @@ private readonly ISprocMapperAccess _sqlAccess = new SqlServerAccess("your conne
 private readonly ISprocMapperAccess _mySqlAccess = new MySqlServerAccess("your connection string");
 
 // Use your favourite DI framework...
+
+// .NET Core
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddTransient<ISprocMapperAccess>(x => new SqlServerAccess("your connection string", new MemoryCacheProvider()));
+    services.AddMvc();
+}
+
 // Autofac
 var builder = new ContainerBuilder();
-builder.Register<ISprocMapperAccess>(x => new SqlServerAccess(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString, new MemoryCacheProvider())).InstancePerDependency();
+builder.Register<ISprocMapperAccess>(x => new SqlServerAccess("your connection string", new MemoryCacheProvider())).InstancePerDependency();
 
 Container = builder.Build();
 

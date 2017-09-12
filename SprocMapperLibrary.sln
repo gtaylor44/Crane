@@ -9,13 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.Integrat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary", "SprocMapperLibrary\SprocMapperLibrary.csproj", "{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprocMapperLibrary.Core", "SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj", "{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SprocMapperLibrary.Shared", "SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.shproj", "{ADB65E5B-BD5D-4BD5-8262-DDFCCFF937F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprocMapperLibrary.Core.IntegrationTest", "SprocMapperLibrary.Core.IntegrationTest\SprocMapperLibrary.Core.IntegrationTest.csproj", "{D00B13BA-FD18-4A40-84F4-C06974797C8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprocMapperLibrary.Core", "SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj", "{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprocMapperLibrary.Core.IntegrationTest", "SprocMapperLibrary.Core.IntegrationTest\SprocMapperLibrary.Core.IntegrationTest.csproj", "{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SprocMapperLibrary.TestShared", "SprocMapperLibrary.TestShared\SprocMapperLibrary.TestShared.shproj", "{07F5D8EA-4321-4A9F-BA96-71B34BD9B04A}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SprocMapperLibrary.Shared", "SprocMapperLibrary.Shared\SprocMapperLibrary.Shared.shproj", "{ADB65E5B-BD5D-4BD5-8262-DDFCCFF937F8}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -41,19 +41,19 @@ Global
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {CA05D4D2-2122-49CB-8D87-893C5E24895C}
+		SolutionGuid = {BABC4160-41F6-4EE6-8686-62975E6575F8}
 	EndGlobalSection
 EndGlobal

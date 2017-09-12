@@ -12,6 +12,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseAccess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseInitialiser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseSproc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\INullType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocMapperAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocObjectMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\EightJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\FiveJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\FourJoin.cs" />

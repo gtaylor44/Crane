@@ -61,9 +61,6 @@
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
     <Compile Include="CacheProvider\SprocCachePolicy.cs" />
     <Compile Include="GenericExtensions.cs" />
-    <Compile Include="Interface\ISprocMapperAccess.cs" />
-    <Compile Include="Interface\INullType.cs" />
-    <Compile Include="Interface\ISprocObjectMap.cs" />
     <Compile Include="MySql\MySqlServerAccess.cs" />
     <Compile Include="SqlServer\SqlServerAccess.cs" />
     <Compile Include="SqlServer\SqlServerSproc.cs" />

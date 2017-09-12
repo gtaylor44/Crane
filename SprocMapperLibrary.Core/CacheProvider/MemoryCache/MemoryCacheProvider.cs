@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Collections.Generic;
-using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 
 namespace SprocMapperLibrary.CacheProvider.MemoryCache
@@ -49,7 +49,7 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
             var cachePolicy = new MemoryCacheEntryOptions
             {
                 AbsoluteExpiration = cacheStrategy.InfiniteExpiration
-                    ? ObjectCache.InfiniteAbsoluteExpiration : GetDateTimeOffsetFromTimespan(cacheStrategy.AbsoluteExpiration)
+                    ? DateTimeOffset.MaxValue : GetDateTimeOffsetFromTimespan(cacheStrategy.AbsoluteExpiration)
             };
 
             lock (Padlock)

@@ -11,9 +11,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.TestComm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary", "SprocMapperLibrary\SprocMapperLibrary.csproj", "{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprocMapperLibrary.Core", "SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj", "{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprocMapperLibrary.Core", "SprocMapperLibrary.Core\SprocMapperLibrary.Core.csproj", "{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprocMapperLibrary.Core.IntegrationTest", "SprocMapperLibrary.Core.IntegrationTest\SprocMapperLibrary.Core.IntegrationTest.csproj", "{D00B13BA-FD18-4A40-84F4-C06974797C8D}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SprocMapperLibrary.TestShared", "SprocMapperLibrary.TestShared\SprocMapperLibrary.TestShared.shproj", "{07F5D8EA-4321-4A9F-BA96-71B34BD9B04A}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SprocMapperLibrary.TestShared\SprocMapperLibrary.TestShared.projitems*{07f5d8ea-4321-4a9f-ba96-71b34bd9b04a}*SharedItemsImports = 13
+		SprocMapperLibrary.TestShared\SprocMapperLibrary.TestShared.projitems*{f18e9219-b104-4b23-a0cc-520653d40a43}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -39,6 +47,10 @@ Global
 		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E22B1BF2-03AA-4576-85E4-7F1FCBE09F8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D00B13BA-FD18-4A40-84F4-C06974797C8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

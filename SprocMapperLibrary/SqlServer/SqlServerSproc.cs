@@ -6,23 +6,21 @@ using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using FastMember;
 using SprocMapperLibrary.CacheProvider;
 
 namespace SprocMapperLibrary.SqlServer
 {
+    /// <inheritdoc />
     /// <summary>
-    /// 
     /// </summary>
     public class SqlServerSproc : BaseSproc
     {
         private SqlConnection _conn;
-
         private readonly string _connectionString;
         private readonly SqlCredential _credential;
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="credential"></param>
@@ -34,19 +32,19 @@ namespace SprocMapperLibrary.SqlServer
             _credential = credential;
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="getObjectDel"></param>
-        /// <param name="storedProcedure"></param>
+        /// <param name="command"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
         /// <param name="commandType"></param>
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, 
-            CommandType commandType)
+            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, 
+            CommandType? commandType)
         {
             var userProvidedConnection = false;
             try
@@ -63,19 +61,19 @@ namespace SprocMapperLibrary.SqlServer
 
                 OpenConn(_conn);
 
-                List<dynamic> result = new List<dynamic>();
+                var result = new List<dynamic>();
 
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                using (var cmd = new SqlCommand(command, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(command, commandTimeout, commandType);
-
-                    using (var reader = command.ExecuteReader())
+                    SetCommandProps(cmd, commandTimeout, commandType);
+                    
+                    using (var reader = cmd.ExecuteReader())
                     {
                         if (!reader.HasRows)
                             return new List<dynamic>();
 
-                        DataTable schema = reader.GetSchemaTable();
+                        var schema = reader.GetSchemaTable();
 
                         var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
 
@@ -104,18 +102,18 @@ namespace SprocMapperLibrary.SqlServer
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="getObjectDel"></param>
-        /// <param name="storedProcedure"></param>
+        /// <param name="command"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
         /// <param name="commandType"></param>
         protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType commandType)
+            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType? commandType)
         {
             var userProvidedConnection = false;
             try
@@ -134,18 +132,17 @@ namespace SprocMapperLibrary.SqlServer
 
                 List<dynamic> result = new List<dynamic>();
 
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(command, commandTimeout, commandType);
+                    SetCommandProps(cmd, commandTimeout, commandType);
 
-                    using (var reader = await command.ExecuteReaderAsync())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (!reader.HasRows)
                             return new List<dynamic>();
 
-                        DataTable schema = reader.GetSchemaTable();
-
+                        var schema = reader.GetSchemaTable();
                         var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
 
                         while (await reader.ReadAsync())
@@ -173,12 +170,13 @@ namespace SprocMapperLibrary.SqlServer
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Performs synchronous version of stored procedure.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
-        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
@@ -189,8 +187,8 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
-            string cacheKey, Action saveCacheDel, CommandType commandType, bool valueOrStringType = false)
+            string command, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
+            string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
             try
@@ -207,13 +205,13 @@ namespace SprocMapperLibrary.SqlServer
 
                 OpenConn(_conn);
 
-                List<TResult> result = new List<TResult>();
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                var result = new List<TResult>();
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(command, commandTimeout, commandType);
+                    SetCommandProps(cmd, commandTimeout, commandType);
 
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         if (!reader.HasRows)
                             return new List<TResult>();
@@ -233,7 +231,7 @@ namespace SprocMapperLibrary.SqlServer
 
                             if (validateSelectColumns)
                                 SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
-                                    storedProcedure);
+                                    command);
 
                             SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
@@ -258,12 +256,13 @@ namespace SprocMapperLibrary.SqlServer
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Performs asynchronous version of stored procedure.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
-        /// <param name="storedProcedure"></param>
+        /// <param name="command"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>
@@ -274,8 +273,8 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
-            string cacheKey, Action saveCacheDel, CommandType commandType, bool valueOrStringType = false)
+            string command, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
+            string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
             try
@@ -292,14 +291,14 @@ namespace SprocMapperLibrary.SqlServer
 
                 await OpenConnAsync(_conn);
 
-                List<TResult> result = new List<TResult>();
+                var result = new List<TResult>();
 
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                using (var cmd = new SqlCommand(command, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(command, commandTimeout, commandType);
+                    SetCommandProps(cmd, commandTimeout, commandType);
 
-                    using (var reader = await command.ExecuteReaderAsync())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (!reader.HasRows)
                             return new List<TResult>();
@@ -319,7 +318,7 @@ namespace SprocMapperLibrary.SqlServer
 
                             if (validateSelectColumns)
                                 SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
-                                    storedProcedure);
+                                    command);
 
                             SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
@@ -344,15 +343,16 @@ namespace SprocMapperLibrary.SqlServer
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Execute a MSSql stored procedure synchronously.
         /// </summary>
-        /// <param name="storedProcedure"></param>
+        /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
         /// <returns>Number of affected records.</returns>
-        public override int ExecuteNonQuery(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection userConn = null)
+        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
         {
             try
             {
@@ -367,10 +367,10 @@ namespace SprocMapperLibrary.SqlServer
 
                 OpenConn(_conn);
 
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    affectedRecords = command.ExecuteNonQuery();
+                    SetCommandProps(cmd, commandTimeout, commandType);
+                    affectedRecords = cmd.ExecuteNonQuery();
                 }
 
                 return affectedRecords;
@@ -382,15 +382,16 @@ namespace SprocMapperLibrary.SqlServer
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Execute a stored procedure asynchronously.
         /// </summary>
-        /// <param name="storedProcedure"></param>
+        /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
         /// <returns>Number of affected records.</returns>
-        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection userConn = null)
+        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
         {
             try
             {
@@ -405,10 +406,10 @@ namespace SprocMapperLibrary.SqlServer
 
                 await OpenConnAsync(_conn);
 
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    affectedRecords = await command.ExecuteNonQueryAsync();
+                    SetCommandProps(cmd, commandTimeout, commandType);
+                    affectedRecords = await cmd.ExecuteNonQueryAsync();
                 }
 
                 return affectedRecords;
@@ -420,16 +421,16 @@ namespace SprocMapperLibrary.SqlServer
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="storedProcedure"></param>
+        /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public override T ExecuteScalar<T>(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection userConn = null)
+        public override T ExecuteScalar<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
         {
             try
             {
@@ -444,10 +445,10 @@ namespace SprocMapperLibrary.SqlServer
 
                 OpenConn(_conn);
 
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    obj = (T)command.ExecuteScalar();
+                    SetCommandProps(cmd, commandTimeout, commandType);
+                    obj = (T)cmd.ExecuteScalar();
                 }
 
                 return obj;
@@ -460,16 +461,16 @@ namespace SprocMapperLibrary.SqlServer
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="storedProcedure"></param>
+        /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="userConn"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public override async Task<T> ExecuteScalarAsync<T>(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection userConn = null)
+        public override async Task<T> ExecuteScalarAsync<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
         {
             try
             {
@@ -484,10 +485,10 @@ namespace SprocMapperLibrary.SqlServer
 
                 await OpenConnAsync(_conn);
 
-                using (SqlCommand command = new SqlCommand(storedProcedure, _conn))
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    obj = (T)await command.ExecuteScalarAsync();
+                    SetCommandProps(cmd, commandTimeout, commandType);
+                    obj = (T)await cmd.ExecuteScalarAsync();
                 }
 
                 return obj;

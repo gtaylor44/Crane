@@ -30,12 +30,21 @@ namespace SprocMapperLibrary.SqlServer
         /// 
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public BaseSproc Sproc()
         {
             return new SqlServerSproc(_connectionString, CacheProvider);
         }
 
-        
+        public BaseCommand Command()
+        {
+            return new SqlServerCommand(_connectionString);
+        }
+
+        public BaseQuery Query()
+        {
+            return new SqlServerQuery(_connectionString, CacheProvider);
+        }
+
+
     }
 }

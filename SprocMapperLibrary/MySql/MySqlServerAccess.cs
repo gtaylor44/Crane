@@ -35,5 +35,15 @@ namespace SprocMapperLibrary.MySql
         {
             return new MySqlSproc(_connectionString, CacheProvider);
         }
+
+        public BaseCommand Command()
+        {
+            throw new NotImplementedException();
+        }
+
+        public BaseQuery Query()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

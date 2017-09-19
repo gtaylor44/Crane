@@ -59,6 +59,14 @@ namespace SprocMapperLibrary.SqlServer
             return new SqlServerSproc(_connectionString, _credential, CacheProvider);
         }
 
-        
+        public BaseCommand Command()
+        {
+            throw new NotImplementedException();
+        }
+
+        public BaseQuery Query()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

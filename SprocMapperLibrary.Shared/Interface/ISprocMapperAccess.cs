@@ -15,6 +15,16 @@ namespace SprocMapperLibrary.Interface
         /// <summary>
         /// 
         /// </summary>
+        BaseCommand Command();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        BaseQuery Query();
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="cacheProvider"></param>
         void RegisterCacheProvider(AbstractCacheProvider cacheProvider);
 

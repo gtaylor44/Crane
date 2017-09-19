@@ -10,16 +10,16 @@ using SprocMapperLibrary.CacheProvider;
 
 namespace SprocMapperLibrary.MySql
 {
+    /// <inheritdoc />
     /// <summary>
-    /// 
     /// </summary>
     public class MySqlSproc : BaseSproc
     {
         private MySqlConnection _mySqlConn;
         private readonly string _connectionString;
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="cacheProvider"></param>
@@ -28,6 +28,7 @@ namespace SprocMapperLibrary.MySql
             _connectionString = connectionString;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Performs synchronous version of stored procedure.
         /// </summary>
@@ -45,7 +46,7 @@ namespace SprocMapperLibrary.MySql
         /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, 
-            string cacheKey, Action saveCacheDel, CommandType commandType, bool valueOrStringType = false)
+            string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
 
@@ -114,7 +115,7 @@ namespace SprocMapperLibrary.MySql
 
         /// <inheritdoc />
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType commandType)
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType? commandType)
         {
             var userProvidedConnection = false;
             try
@@ -173,7 +174,7 @@ namespace SprocMapperLibrary.MySql
 
         /// <inheritdoc />
         protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType commandType)
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType? commandType)
         {
             var userProvidedConnection = false;
             try
@@ -230,6 +231,7 @@ namespace SprocMapperLibrary.MySql
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Performs asynchronous version of stored procedure.
         /// </summary>
@@ -247,7 +249,7 @@ namespace SprocMapperLibrary.MySql
         /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, 
-            string cacheKey, Action saveCacheDel, CommandType commandType, bool valueOrStringType = false)
+            string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
 
@@ -264,7 +266,7 @@ namespace SprocMapperLibrary.MySql
 
                 await OpenConnAsync(_mySqlConn);
 
-                List<TResult> result = new List<TResult>();
+                var result = new List<TResult>();
 
                 using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {
@@ -316,6 +318,7 @@ namespace SprocMapperLibrary.MySql
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Execute a MySQL stored procedure synchronously.
         /// </summary>
@@ -324,7 +327,7 @@ namespace SprocMapperLibrary.MySql
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <returns>Number of affected records.</returns>
-        public override int ExecuteNonQuery(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override int ExecuteNonQuery(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             try
             {
@@ -355,6 +358,7 @@ namespace SprocMapperLibrary.MySql
 
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Execute a stored procedure asynchronously.
         /// </summary>
@@ -363,7 +367,7 @@ namespace SprocMapperLibrary.MySql
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <returns>Number of affected records.</returns>
-        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             try
             {
@@ -394,8 +398,8 @@ namespace SprocMapperLibrary.MySql
 
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="storedProcedure"></param>
@@ -403,7 +407,7 @@ namespace SprocMapperLibrary.MySql
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public override T ExecuteScalar<T>(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override T ExecuteScalar<T>(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             try
             {
@@ -434,8 +438,8 @@ namespace SprocMapperLibrary.MySql
 
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="storedProcedure"></param>
@@ -443,7 +447,7 @@ namespace SprocMapperLibrary.MySql
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <returns>First column of the first row in the result set.</returns>
-        public override async Task<T> ExecuteScalarAsync<T>(string storedProcedure, CommandType commandType = CommandType.StoredProcedure, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override async Task<T> ExecuteScalarAsync<T>(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             try
             {

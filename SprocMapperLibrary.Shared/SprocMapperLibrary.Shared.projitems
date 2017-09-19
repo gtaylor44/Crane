@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseAccess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseInitialiser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseSproc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\INullType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocMapperAccess.cs" />

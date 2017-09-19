@@ -24,7 +24,11 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="cacheProvider"></param>
         public SqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
         {
-            _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
+            if (connectionString == null)
+                throw new ArgumentException(InvalidConnMsg);
+
+
+            _connectionString = connectionString;
             _credential = null;
             CacheProvider = cacheProvider;
         }

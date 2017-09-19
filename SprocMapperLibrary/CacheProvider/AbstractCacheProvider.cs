@@ -86,7 +86,11 @@ namespace SprocMapperLibrary.CacheProvider
         {
             if (policy == null)
                 throw new ArgumentNullException(nameof(policy));
-            policy.CacheKeyRegExp = regularExpression ?? throw new ArgumentNullException(nameof(regularExpression));
+
+            if (regularExpression == null)
+                throw new ArgumentNullException(nameof(regularExpression));
+
+            policy.CacheKeyRegExp = regularExpression;
 
             if (PolicyIsValid(policy))
                 CustomSprocCachePolicyList.Add(policy);

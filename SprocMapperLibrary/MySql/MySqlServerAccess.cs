@@ -20,7 +20,9 @@ namespace SprocMapperLibrary.MySql
         /// <param name="cacheProvider"></param>
         public MySqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
         {
-            _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
+            if (connectionString == null)
+                throw new ArgumentException(InvalidConnMsg);
+            _connectionString = connectionString;
             CacheProvider = cacheProvider;
         }
 

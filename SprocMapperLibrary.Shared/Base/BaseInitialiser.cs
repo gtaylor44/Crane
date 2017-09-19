@@ -57,9 +57,9 @@ namespace SprocMapperLibrary
         /// <param name="command"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="commandType"></param>
-        protected void SetCommandProps(DbCommand command, int? commandTimeout, CommandType commandType)
+        protected void SetCommandProps(DbCommand command, int? commandTimeout, CommandType? commandType)
         {
-            command.CommandType = commandType;
+            command.CommandType = commandType ?? CommandType.Text;
 
             if (commandTimeout.HasValue)
                 command.CommandTimeout = commandTimeout.Value;

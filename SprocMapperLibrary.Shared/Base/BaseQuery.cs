@@ -14,10 +14,10 @@ using System.Reflection;
 // ReSharper disable once CheckNamespace
 namespace SprocMapperLibrary
 {
+    /// <inheritdoc />
     /// <summary>
-    /// 
     /// </summary>
-    public abstract class BaseSproc : BaseInitialiser
+    public abstract class BaseQuery : BaseInitialiser
     {
         /// <summary>
         /// 
@@ -40,57 +40,15 @@ namespace SprocMapperLibrary
         private const char PartitionSplitOnChar = '|';
 
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
-        protected BaseSproc(AbstractCacheProvider cacheProvider) : base()
+        protected BaseQuery(AbstractCacheProvider cacheProvider) : base()
         {
             SprocObjectMapList = new List<ISprocObjectMap>();
             CustomColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
             CacheProvider = cacheProvider;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <returns></returns>
-        public abstract int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <returns></returns>
-        public abstract Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="commandType"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public abstract T ExecuteScalar<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public abstract Task<T> ExecuteScalarAsync<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
 
         /// <summary>
         /// 
@@ -113,7 +71,7 @@ namespace SprocMapperLibrary
         /// <param name="source"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        public BaseSproc CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination) where T : class
+        public BaseQuery CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination) where T : class
         {
             var propertyName = SprocMapper.GetPropertyName(source);
 
@@ -132,7 +90,7 @@ namespace SprocMapperLibrary
             var typeAccessor = TypeAccessor.Create(typeof(T));
 
             //Get all properties
-            MemberSet members = typeAccessor.GetMembers();
+            var members = typeAccessor.GetMembers();
 
             foreach (var member in members)
             {
@@ -217,7 +175,7 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
-        public BaseSproc AddSqlParameter(SqlParameter sqlParameter)
+        public BaseQuery AddSqlParameter(SqlParameter sqlParameter)
         {
             if (sqlParameter == null)
                 throw new NullReferenceException(nameof(sqlParameter));
@@ -232,7 +190,7 @@ namespace SprocMapperLibrary
         /// <param name="parameterName"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public BaseSproc AddSqlParameter(string parameterName, object value)
+        public BaseQuery AddSqlParameter(string parameterName, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
@@ -248,7 +206,7 @@ namespace SprocMapperLibrary
         /// <param name="value"></param>
         /// <param name="dbType"></param>
         /// <returns></returns>
-        public BaseSproc AddSqlParameter(string parameterName, SqlDbType dbType, object value)
+        public BaseQuery AddSqlParameter(string parameterName, SqlDbType dbType, object value)
         {
             if (parameterName == null)
                 throw new NullReferenceException(nameof(parameterName));
@@ -261,7 +219,7 @@ namespace SprocMapperLibrary
         /// Adds a list of SqlParameters to be passed into stored procedure.
         /// </summary>
         /// <returns></returns>
-        public BaseSproc AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
+        public BaseQuery AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)
         {
             if (sqlParameterCollection == null)
                 throw new NullReferenceException(nameof(sqlParameterCollection));

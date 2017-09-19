@@ -148,7 +148,7 @@ namespace SprocMapperLibrary
         }
 
         public static bool ValidateSelectColumns(ReadOnlyCollection<DbColumn> columnSchema, List<ISprocObjectMap> sprocObjectMapList,
-            int[] partitionOnOrdinal, string storedProcedure)
+            int[] partitionOnOrdinal)
         {
             List<string> absentColumnMessageList = new List<string>();
 
@@ -188,8 +188,8 @@ namespace SprocMapperLibrary
 
             string absentColumnsAsString = string.Join(",\n\n", absentColumnMessageList);
 
-            string message = sprocObjectMapList.Count == 1 ? $"The following columns from the select statement in '{storedProcedure}' have not been " +
-                                                             $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n\n{absentColumnsAsString}\n" : 
+            string message = sprocObjectMapList.Count == 1 ? $"The following columns in select statement could not be " +
+                                                             $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n{absentColumnsAsString}\n" : 
                                                              $"The following columns from select statement have not been mapped to target model. "+
                                                              $"The target model is determined by the 'partitionOn' parameter. This validation message is dependant on a sound partitionOn argument. \n\n{absentColumnsAsString}\n";
 

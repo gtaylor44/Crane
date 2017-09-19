@@ -34,7 +34,7 @@ namespace IntegrationTest
 
                 SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
 
-                inserted = dataAccess.Sproc()
+                inserted = dataAccess.Command()
                     .AddSqlParameter(idParam)
                     .AddSqlParameter("@City", customer.City)
                     .AddSqlParameter("@Country", customer.Country)
@@ -47,8 +47,8 @@ namespace IntegrationTest
 
                 if (id == default(int))
                     throw new InvalidOperationException("Id output not parsed");
-
-                dataAccess.Sproc()
+                
+                dataAccess.Command()
                     .AddSqlParameter("@CustomerId", id)
                     .ExecuteNonQuery("dbo.DeleteCustomer", unmanagedConn: conn);
 

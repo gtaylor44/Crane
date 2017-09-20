@@ -4,28 +4,33 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Dynamic;
+using System.Linq;
 using System.Threading.Tasks;
 using SprocMapperLibrary.CacheProvider;
 
 namespace SprocMapperLibrary.SqlServer
 {
+    /// <inheritdoc />
     /// <summary>
-    /// 
     /// </summary>
-    public class SqlServerSproc : BaseSproc
+    public class SqlServerQuery : BaseQuery
     {
         private SqlConnection _conn;
 
         private readonly string _connectionString;
+        private readonly SqlCredential _credential;
 
         /// <inheritdoc />
         /// <summary>
         /// </summary>
         /// <param name="connectionString"></param>
+        /// <param name="credential"></param>
         /// <param name="cacheProvider"></param>
-        public SqlServerSproc(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
+        public SqlServerQuery(string connectionString, SqlCredential credential,
+            AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
+            _credential = credential;
         }
 
         /// <inheritdoc />
@@ -39,7 +44,7 @@ namespace SprocMapperLibrary.SqlServer
         /// <param name="saveCacheDel"></param>
         /// <param name="commandType"></param>
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, 
+            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel,
             CommandType? commandType)
         {
             var userProvidedConnection = false;
@@ -49,7 +54,8 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -68,20 +74,17 @@ namespace SprocMapperLibrary.SqlServer
                         if (!reader.HasRows)
                             return new List<dynamic>();
 
-                        if (!reader.CanGetColumnSchema())
-                            throw new SprocMapperException("Could not get column schema for table");
+                        var schema = reader.GetSchemaTable();
 
-                        var columnSchema = reader.GetColumnSchema();
-
-                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(columnSchema);
+                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
 
                         while (reader.Read())
                         {
                             dynamic expando = new ExpandoObject();
 
-                            foreach (var col in dynamicColumnDic)                                                          
+                            foreach (var col in dynamicColumnDic)
                                 ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
-                            
+
                             getObjectDel(expando, result);
                         }
                     }
@@ -120,16 +123,17 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
 
                 else
                     _conn = userConn as SqlConnection;
 
                 await OpenConnAsync(_conn);
 
-                var result = new List<dynamic>();
+                List<dynamic> result = new List<dynamic>();
 
-                using (var cmd = new SqlCommand(command, _conn))
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
                     // Set common SqlCommand properties
                     SetCommandProps(cmd, commandTimeout, commandType);
@@ -139,12 +143,8 @@ namespace SprocMapperLibrary.SqlServer
                         if (!reader.HasRows)
                             return new List<dynamic>();
 
-                        if (!reader.CanGetColumnSchema())
-                            throw new SprocMapperException("Could not get column schema for table");
-
-                        var columnSchema = reader.GetColumnSchema();
-
-                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(columnSchema);
+                        var schema = reader.GetSchemaTable();
+                        var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
 
                         while (await reader.ReadAsync())
                         {
@@ -198,7 +198,8 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -206,7 +207,7 @@ namespace SprocMapperLibrary.SqlServer
                 OpenConn(_conn);
 
                 var result = new List<TResult>();
-                using (var cmd = new SqlCommand(command, _conn))
+                using (SqlCommand cmd = new SqlCommand(command, _conn))
                 {
                     // Set common SqlCommand properties
                     SetCommandProps(cmd, commandTimeout, commandType);
@@ -218,23 +219,22 @@ namespace SprocMapperLibrary.SqlServer
 
                         if (!valueOrStringType)
                         {
-                            if (!reader.CanGetColumnSchema())
-                                throw new SprocMapperException("Could not get column schema for table");
-
-                            var columnSchema = reader.GetColumnSchema();
+                            DataTable schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
                             int[] partitionOnOrdinal = null;
 
                             if (partitionOnArr != null)
                                 partitionOnOrdinal =
-                                    SprocMapper.GetOrdinalPartition(columnSchema, partitionOnArr, SprocObjectMapList.Count);
+                                    SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
-                            SprocMapper.SetOrdinal(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
                             if (validateSelectColumns)
-                                SprocMapper.ValidateSelectColumns(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                                SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    command);
 
-                            SprocMapper.ValidateSchema(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
 
                         while (reader.Read())
@@ -284,7 +284,8 @@ namespace SprocMapperLibrary.SqlServer
 
                 // Try open connection if not already open.
                 if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
+                    _conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
 
                 else
                     _conn = userConn as SqlConnection;
@@ -305,23 +306,22 @@ namespace SprocMapperLibrary.SqlServer
 
                         if (!valueOrStringType)
                         {
-                            if (!reader.CanGetColumnSchema())
-                                throw new SprocMapperException("Could not get column schema for table");
-
-                            var columnSchema = reader.GetColumnSchema();
+                            DataTable schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
                             int[] partitionOnOrdinal = null;
 
                             if (partitionOnArr != null)
                                 partitionOnOrdinal =
-                                    SprocMapper.GetOrdinalPartition(columnSchema, partitionOnArr, SprocObjectMapList.Count);
+                                    SprocMapper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
-                            SprocMapper.SetOrdinal(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
                             if (validateSelectColumns)
-                                SprocMapper.ValidateSelectColumns(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                                SprocMapper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    command);
 
-                            SprocMapper.ValidateSchema(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            SprocMapper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
 
                         while (await reader.ReadAsync())
@@ -342,161 +342,6 @@ namespace SprocMapperLibrary.SqlServer
                 if (!userProvidedConnection)
                     _conn.Dispose();
             }
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Execute a MSSql stored procedure synchronously.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="userConn"></param>
-        /// <returns>Number of affected records.</returns>
-        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
-        {
-            try
-            {
-                int affectedRecords;
-
-                if (userConn == null)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
-
-                OpenConn(_conn);
-
-                using (SqlCommand cmd = new SqlCommand(command, _conn))
-                {
-                    SetCommandProps(cmd, commandTimeout, commandType);
-                    affectedRecords = cmd.ExecuteNonQuery();
-                }
-
-                return affectedRecords;
-            }
-            finally
-            {
-                if (userConn == null)
-                    _conn.Dispose();
-            }
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Execute a stored procedure asynchronously.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="userConn"></param>
-        /// <returns>Number of affected records.</returns>
-        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
-        {
-            try
-            {
-                int affectedRecords;
-
-                if (userConn == null)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
-
-                await OpenConnAsync(_conn);
-
-                using (SqlCommand cmd = new SqlCommand(command, _conn))
-                {
-                    SetCommandProps(cmd, commandTimeout, commandType);
-                    affectedRecords = await cmd.ExecuteNonQueryAsync();
-                }
-
-                return affectedRecords;
-            }
-            finally
-            {
-                if (userConn == null)
-                    _conn.Dispose();
-            }
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="command"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="userConn"></param>
-        /// <returns>First column of the first row in the result set.</returns>
-        public override T ExecuteScalar<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
-        {
-            try
-            {
-                T obj;
-
-                if (userConn == null)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
-
-                OpenConn(_conn);
-
-                using (SqlCommand cmd = new SqlCommand(command, _conn))
-                {
-                    SetCommandProps(cmd, commandTimeout, commandType);
-                    obj = (T)cmd.ExecuteScalar();
-                }
-
-                return obj;
-            }
-
-            finally
-            {
-                if (userConn == null)
-                    _conn.Dispose();
-            }
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="command"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="userConn"></param>
-        /// <returns>First column of the first row in the result set.</returns>
-        public override async Task<T> ExecuteScalarAsync<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
-        {
-            try
-            {
-                T obj;
-
-                if (userConn == null)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
-
-                await OpenConnAsync(_conn);
-
-                using (SqlCommand cmd = new SqlCommand(command, _conn))
-                {
-                    SetCommandProps(cmd, commandTimeout, commandType);
-                    obj = (T)await cmd.ExecuteScalarAsync();
-                }
-
-                return obj;
-            }
-
-            finally
-            {
-                if (userConn == null)
-                    _conn.Dispose();
-            }
-
         }
     }
 }

@@ -26,7 +26,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var productList = dataAccess.Sproc().ExecuteReader("dbo.GetProducts")
+            var productList = dataAccess.Query().ExecuteReader("dbo.GetProducts")
                 .ToList()
                 .ConvertAll(x => new Product()
             {
@@ -45,7 +45,7 @@ namespace IntegrationTest
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             List<Product> productList = new List<Product>();
-            dataAccess.Sproc()
+            dataAccess.Query()
                 .ExecuteReader("dbo.GetProducts", (x) =>
                 {
                     productList.Add(new Product()
@@ -65,7 +65,7 @@ namespace IntegrationTest
 
             Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
-            dataAccess.Sproc()
+            dataAccess.Query()
                 .ExecuteReader<Customer, Order>("dbo.GetAllCustomersAndOrders", (c, o) =>
                 {
                     Customer customer;
@@ -100,11 +100,11 @@ namespace IntegrationTest
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);
 
 
-            var products = dataAccess.Sproc()
+            var products = dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                 .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "GetProducts");
 
-            var products2 = dataAccess.Sproc()
+            var products2 = dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                 .ExecuteReader<Product>("dbo.GetProducts", cacheKey: "GetProducts");
 
@@ -116,7 +116,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var products = dataAccess.Sproc()
+            var products = dataAccess.Query()
                 .AddSqlParameter("@SupplierId", 1)
                 .ExecuteReader<Product>("SELECT * FROM dbo.Product WHERE SupplierId = @SupplierId", commandType: CommandType.Text);
 
@@ -130,7 +130,7 @@ namespace IntegrationTest
 
             List<Product> productList = new List<Product>();
 
-            dataAccess.Sproc()
+            dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                 .ExecuteReader<Product>("dbo.GetProducts", (product) =>
                 {
@@ -150,7 +150,7 @@ namespace IntegrationTest
 
             Customer cust = null;
 
-            dataAccess.Sproc()
+            dataAccess.Query()
                 .AddSqlParameter("@FirstName", "Thomas")
                 .AddSqlParameter("@LastName", "Hardy")
                 .CustomColumnMapping<Order>(x => x.Id, "OrderId")
@@ -182,7 +182,7 @@ namespace IntegrationTest
             Product product = null;
 
 
-            product = dataAccess.Sproc()
+            product = dataAccess.Query()
                 .AddSqlParameter("@Id", productId)
                 .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
                 {
@@ -210,7 +210,7 @@ namespace IntegrationTest
 
             Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-            dataAccess.Sproc()
+            dataAccess.Query()
             .AddSqlParameter("@OrderId", orderId)
             .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")
             .ExecuteReader<Order, OrderItem, Product>("dbo.GetOrder", (o, oi, p) =>
@@ -236,7 +236,8 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var suppliers = dataAccess.Sproc().ExecuteReader<Supplier>("dbo.GetSuppliers");
+            var suppliers = dataAccess.Query()
+                .ExecuteReader<Supplier>("dbo.GetSuppliers");
             Assert.IsTrue(suppliers.Any());
         }
 
@@ -246,7 +247,7 @@ namespace IntegrationTest
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
 
-            var customer = dataAccess.Sproc()
+            var customer = dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
                 .ExecuteReader<Customer>("dbo.GetCustomer", commandType: CommandType.StoredProcedure, validateSelectColumns: true)
                 .FirstOrDefault();
@@ -264,7 +265,7 @@ namespace IntegrationTest
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
 
-            var supplier = dataAccess.Sproc()
+            var supplier = dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
                 .ExecuteReader<Supplier>("dbo.GetSupplierByName", commandType: CommandType.StoredProcedure)
                 .FirstOrDefault();
@@ -279,7 +280,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            dataAccess.Sproc()           
+            dataAccess.Query()           
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                 .ExecuteReader<Product>("dbo.GetProducts");
         }
@@ -290,7 +291,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", cacheKey: "test");
+            dataAccess.Query().ExecuteReader<Product>("dbo.GetProducts", cacheKey: "test");
         }
 
         [TestMethod]
@@ -338,7 +339,7 @@ namespace IntegrationTest
                     .MatchTargetOn(x => x.IntTest)
                     .Commit(conn);
 
-                var result = dataAccess.Sproc()
+                var result = dataAccess.Query()
                     .ExecuteReader<TestDataType>("dbo.GetTestDataTypes", unmanagedConn: conn)
                     .SingleOrDefault();
 

@@ -61,10 +61,12 @@
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
     <Compile Include="CacheProvider\SprocCachePolicy.cs" />
     <Compile Include="GenericExtensions.cs" />
+    <Compile Include="MySql\MySqlUserCommand.cs" />
     <Compile Include="MySql\MySqlServerAccess.cs" />
+    <Compile Include="MySql\MySqlUserQuery.cs" />
     <Compile Include="SqlServer\SqlServerAccess.cs" />
-    <Compile Include="SqlServer\SqlServerSproc.cs" />
-    <Compile Include="MySql\MySqlSproc.cs" />
+    <Compile Include="SqlServer\SqlServerCommand.cs" />
+    <Compile Include="SqlServer\SqlServerQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SprocMapper.cs" />
   </ItemGroup>

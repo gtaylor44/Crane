@@ -24,7 +24,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var products = await dataAccess.Sproc()
+            var products = await dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
                 .ExecuteReaderAsync<Product>("dbo.GetProducts");
 
@@ -41,7 +41,7 @@ namespace IntegrationTest
             Customer cust = null;
 
 
-            await dataAccess.Sproc()
+            await dataAccess.Query()
                 .AddSqlParameter("@FirstName", "Thomas")
                 .AddSqlParameter("@LastName", "Hardy")
                 .CustomColumnMapping<Order>(x => x.Id, "OrderId")
@@ -72,7 +72,7 @@ namespace IntegrationTest
             Product product = null;
 
 
-            product = (await dataAccess.Sproc()
+            product = (await dataAccess.Query()
                 .AddSqlParameter("@Id", productId)
                 .ExecuteReaderAsync<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
                 {
@@ -98,7 +98,7 @@ namespace IntegrationTest
 
             Dictionary<int, Order> orderDic = new Dictionary<int, Order>();
 
-            await dataAccess.Sproc()
+            await dataAccess.Query()
             .AddSqlParameter("@OrderId", orderId)
             .CustomColumnMapping<Product>(x => x.UnitPrice, "Price")
             .ExecuteReaderAsync<Order, OrderItem, Product>("dbo.GetOrder", (o, oi, p) =>
@@ -124,7 +124,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var suppliers = await dataAccess.Sproc().ExecuteReaderAsync<Supplier>("dbo.GetSuppliers");
+            var suppliers = await dataAccess.Query().ExecuteReaderAsync<Supplier>("dbo.GetSuppliers");
 
             Assert.IsTrue(suppliers.Any());
 
@@ -135,7 +135,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var customer = (await dataAccess.Sproc()
+            var customer = (await dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
                 .ExecuteReaderAsync<Customer>("dbo.GetCustomer", commandType: CommandType.StoredProcedure))
                 .FirstOrDefault();
@@ -152,7 +152,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            var supplier = (await dataAccess.Sproc()
+            var supplier = (await dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
                 .ExecuteReaderAsync<Supplier>("dbo.GetSupplierByName", commandType: CommandType.StoredProcedure))
                 .FirstOrDefault();
@@ -185,7 +185,7 @@ namespace IntegrationTest
                     conn.Open();
                     SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
 
-                    inserted = await dataAccess.Sproc()
+                    inserted = await dataAccess.Command()
                         .AddSqlParameter(idParam)
                         .AddSqlParameter("@City", customer.City)
                         .AddSqlParameter("@Country", customer.Country)
@@ -199,7 +199,7 @@ namespace IntegrationTest
                     if (id == default(int))
                         throw new InvalidOperationException("Id output not parsed");
 
-                    await dataAccess.Sproc()
+                    await dataAccess.Command()
                         .AddSqlParameter("@CustomerId", id)
                         .ExecuteNonQueryAsync("dbo.DeleteCustomer", unmanagedConn: conn, commandType: CommandType.StoredProcedure);
                 }
@@ -216,7 +216,7 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            await dataAccess.Sproc()
+            await dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
                 .ExecuteReaderAsync<Product>("dbo.GetProducts");
 
@@ -228,7 +228,8 @@ namespace IntegrationTest
         {
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            await dataAccess.Sproc().ExecuteReaderAsync<Product>("dbo.GetProducts", cacheKey: "test");
+            await dataAccess.Query()
+                .ExecuteReaderAsync<Product>("dbo.GetProducts", cacheKey: "test");
         }
 
     }

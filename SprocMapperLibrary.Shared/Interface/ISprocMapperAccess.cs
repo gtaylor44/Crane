@@ -10,11 +10,6 @@ namespace SprocMapperLibrary.Interface
         /// <summary>
         /// 
         /// </summary>
-        BaseSproc Sproc();
-
-        /// <summary>
-        /// 
-        /// </summary>
         BaseCommand Command();
 
         /// <summary>

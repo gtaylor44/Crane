@@ -17,8 +17,8 @@ namespace SprocMapperLibrary.SqlServer
         private readonly SqlCredential _credential;
 
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="cacheProvider"></param>
@@ -33,8 +33,8 @@ namespace SprocMapperLibrary.SqlServer
             CacheProvider = cacheProvider;
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="credential"></param>
@@ -49,24 +49,16 @@ namespace SprocMapperLibrary.SqlServer
             CacheProvider = cacheProvider;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        public BaseSproc Sproc()
-        {
-            return new SqlServerSproc(_connectionString, _credential, CacheProvider);
-        }
-
+        /// <inheritdoc />
         public BaseCommand Command()
         {
-            throw new NotImplementedException();
+            return new SqlServerCommand(_connectionString);
         }
 
+        /// <inheritdoc />
         public BaseQuery Query()
         {
-            throw new NotImplementedException();
+            return new SqlServerQuery(_connectionString, _credential, CacheProvider);
         }
     }
 }

@@ -26,15 +26,6 @@ namespace SprocMapperLibrary.SqlServer
             CacheProvider = cacheProvider;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public BaseSproc Sproc()
-        {
-            return new SqlServerSproc(_connectionString, CacheProvider);
-        }
-
         public BaseCommand Command()
         {
             return new SqlServerCommand(_connectionString);
@@ -44,7 +35,5 @@ namespace SprocMapperLibrary.SqlServer
         {
             return new SqlServerQuery(_connectionString, CacheProvider);
         }
-
-
     }
 }

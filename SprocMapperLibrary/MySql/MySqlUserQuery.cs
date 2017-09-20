@@ -13,7 +13,7 @@ namespace SprocMapperLibrary.MySql
     /// <inheritdoc />
     /// <summary>
     /// </summary>
-    public class MySqlSproc : BaseSproc
+    public class MySqlUserQuery : BaseQuery
     {
         private MySqlConnection _mySqlConn;
         private readonly string _connectionString;
@@ -23,7 +23,7 @@ namespace SprocMapperLibrary.MySql
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="cacheProvider"></param>
-        public MySqlSproc(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
+        public MySqlUserQuery(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
         }
@@ -44,8 +44,10 @@ namespace SprocMapperLibrary.MySql
         /// <param name="commandType"></param>
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
-        protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, 
+        protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(
+            Action<DbDataReader, List<TResult>> getObjectDel,
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns,
+            DbConnection unmanagedConn,
             string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
@@ -55,9 +57,9 @@ namespace SprocMapperLibrary.MySql
                 userProvidedConnection = unmanagedConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)                
+                if (!userProvidedConnection)
                     _mySqlConn = new MySqlConnection(_connectionString);
-                    
+
                 else
                     _mySqlConn = unmanagedConn as MySqlConnection;
 
@@ -115,7 +117,8 @@ namespace SprocMapperLibrary.MySql
 
         /// <inheritdoc />
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType? commandType)
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel,
+            CommandType? commandType)
         {
             var userProvidedConnection = false;
             try
@@ -152,7 +155,7 @@ namespace SprocMapperLibrary.MySql
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<String, object>) expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }
@@ -173,8 +176,10 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
-            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType? commandType)
+        protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(
+            Action<dynamic, List<dynamic>> getObjectDel,
+            string storedProcedure, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel,
+            CommandType? commandType)
         {
             var userProvidedConnection = false;
             try
@@ -211,7 +216,7 @@ namespace SprocMapperLibrary.MySql
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<String, object>) expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }
@@ -247,8 +252,10 @@ namespace SprocMapperLibrary.MySql
         /// <param name="commandType"></param>
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
-        protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection unmanagedConn, 
+        protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
+            Action<DbDataReader, List<TResult>> getObjectDel,
+            string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns,
+            DbConnection unmanagedConn,
             string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
@@ -258,9 +265,9 @@ namespace SprocMapperLibrary.MySql
                 userProvidedConnection = unmanagedConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)                
+                if (!userProvidedConnection)
                     _mySqlConn = new MySqlConnection(_connectionString);
-                                                       
+
                 else
                     _mySqlConn = unmanagedConn as MySqlConnection;
 
@@ -276,7 +283,7 @@ namespace SprocMapperLibrary.MySql
                     using (var reader = await command.ExecuteReaderAsync())
                     {
                         if (!reader.HasRows)
-                            return (List<TResult>)Activator.CreateInstance(typeof(List<TResult>));
+                            return (List<TResult>) Activator.CreateInstance(typeof(List<TResult>));
 
                         if (!valueOrStringType)
                         {
@@ -316,167 +323,6 @@ namespace SprocMapperLibrary.MySql
                 if (!userProvidedConnection)
                     _mySqlConn.Dispose();
             }
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Execute a MySQL stored procedure synchronously.
-        /// </summary>
-        /// <param name="storedProcedure"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <returns>Number of affected records.</returns>
-        public override int ExecuteNonQuery(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
-        {
-            try
-            {
-                int affectedRecords;
-
-                // Try open connection if not already open.
-                if (unmanagedConn == null)                
-                    _mySqlConn = new MySqlConnection(_connectionString);
-                                   
-                else                
-                    _mySqlConn = unmanagedConn as MySqlConnection;
-                
-                OpenConn(_mySqlConn);
-
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
-                {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    affectedRecords = command.ExecuteNonQuery();
-                }
-
-                return affectedRecords;
-            }
-            finally
-            {
-                if (unmanagedConn == null)
-                    _mySqlConn.Dispose();
-            }
-
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Execute a stored procedure asynchronously.
-        /// </summary>
-        /// <param name="storedProcedure"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <returns>Number of affected records.</returns>
-        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
-        {
-            try
-            {
-                int affectedRecords;
-
-                // Try open connection if not already open.
-                if (unmanagedConn == null)             
-                    _mySqlConn = new MySqlConnection(_connectionString);
-                                                       
-                else                
-                    _mySqlConn = unmanagedConn as MySqlConnection;
-                
-                await OpenConnAsync(_mySqlConn);
-
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
-                {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    affectedRecords = await command.ExecuteNonQueryAsync();
-                }
-
-                return affectedRecords;
-            }
-            finally
-            {
-                if (unmanagedConn == null)
-                     _mySqlConn.Dispose();
-            }
-
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="storedProcedure"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <returns>First column of the first row in the result set.</returns>
-        public override T ExecuteScalar<T>(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
-        {
-            try
-            {
-                T obj;
-
-                // Try open connection if not already open.
-                if (unmanagedConn == null)                
-                    _mySqlConn = new MySqlConnection(_connectionString);
-                                    
-                else                
-                    _mySqlConn = unmanagedConn as MySqlConnection;
-                
-                OpenConn(_mySqlConn);
-
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
-                {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    obj = (T) command.ExecuteScalar();
-                }
-
-                return obj;
-            }
-            finally
-            {
-                if (unmanagedConn == null)
-                    _mySqlConn.Dispose();
-            }
-
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="storedProcedure"></param>
-        /// <param name="commandType"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <returns>First column of the first row in the result set.</returns>
-        public override async Task<T> ExecuteScalarAsync<T>(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
-        {
-            try
-            {
-                T obj;
-
-                // Try open connection if not already open.
-                if (unmanagedConn == null)               
-                    _mySqlConn = new MySqlConnection(_connectionString);
-                                                 
-                else                
-                    _mySqlConn = unmanagedConn as MySqlConnection;
-                
-                await OpenConnAsync(_mySqlConn);
-
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
-                {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    obj = (T) await command.ExecuteScalarAsync();
-                }
-
-                return obj;
-            }
-
-            finally
-            {
-                if (unmanagedConn == null)
-                    _mySqlConn.Dispose();
-            }
-
         }
     }
 }

@@ -6,15 +6,14 @@ using SprocMapperLibrary.Interface;
 namespace SprocMapperLibrary.MySql
 {
     /// <summary>
-    /// 
     /// </summary>
     public class MySqlServerAccess : BaseAccess, ISprocMapperAccess
     {
         private readonly string _connectionString;
         private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="cacheProvider"></param>
@@ -22,28 +21,29 @@ namespace SprocMapperLibrary.MySql
         {
             if (connectionString == null)
                 throw new ArgumentException(InvalidConnMsg);
+
             _connectionString = connectionString;
             CacheProvider = cacheProvider;
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        public BaseSproc Sproc()
-        {
-            return new MySqlSproc(_connectionString, CacheProvider);
-        }
-
+        /// <exception cref="T:System.NotImplementedException"></exception>
         public BaseCommand Command()
         {
-            throw new NotImplementedException();
+            return new MySqlUserCommand(_connectionString);
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="T:System.NotImplementedException"></exception>
         public BaseQuery Query()
         {
-            throw new NotImplementedException();
+            return new MySqlUserQuery(_connectionString, CacheProvider);
         }
     }
 }

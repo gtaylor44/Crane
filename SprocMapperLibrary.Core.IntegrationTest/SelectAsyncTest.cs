@@ -55,7 +55,7 @@ namespace IntegrationTest
                     if (o.Id != default(int))
                         cust.CustomerOrders.Add(o);
 
-                }, "Id|OrderId");
+                }, "Id|OrderId", commandType: CommandType.StoredProcedure);
 
 
             Assert.AreEqual(13, cust.CustomerOrders.Count);
@@ -77,7 +77,7 @@ namespace IntegrationTest
                 {
                     p.Supplier = s;
 
-                }, "ProductName|Id")).FirstOrDefault();
+                }, "ProductName|Id", commandType: CommandType.StoredProcedure)).FirstOrDefault();
 
 
             Assert.AreEqual("Tarte au sucre", product?.ProductName);
@@ -112,7 +112,7 @@ namespace IntegrationTest
                 order = orderDic[o.Id];
                 oi.Product = p;
                 order.OrderItemList.Add(oi);
-            }, "Id|unitprice|productname");
+            }, "Id|unitprice|productname", commandType: CommandType.StoredProcedure);
 
 
             Assert.IsNotNull(order);
@@ -138,7 +138,7 @@ namespace IntegrationTest
 
             var customer = (await dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
-                .ExecuteReaderAsync<Customer>("dbo.GetCustomer"))
+                .ExecuteReaderAsync<Customer>("dbo.GetCustomer", commandType: CommandType.StoredProcedure))
                 .FirstOrDefault();
 
             Assert.AreEqual("Hanna", customer?.FirstName);
@@ -155,7 +155,7 @@ namespace IntegrationTest
 
             var supplier = (await dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                .ExecuteReaderAsync<Supplier>("dbo.GetSupplierByName"))
+                .ExecuteReaderAsync<Supplier>("dbo.GetSupplierByName", commandType: CommandType.StoredProcedure))
                 .FirstOrDefault();
 
             Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);
@@ -192,7 +192,7 @@ namespace IntegrationTest
                     .AddSqlParameter("@FirstName", customer.FirstName)
                     .AddSqlParameter("@LastName", customer.LastName)
                     .AddSqlParameter("@Phone", customer.Phone)
-                    .ExecuteNonQueryAsync("dbo.SaveCustomer", unmanagedConn: conn);
+                    .ExecuteNonQueryAsync("dbo.SaveCustomer", unmanagedConn: conn, commandType: CommandType.StoredProcedure);
 
                 int id = idParam.GetValueOrDefault<int>();
 
@@ -201,7 +201,7 @@ namespace IntegrationTest
 
                 await dataAccess.Command()
                     .AddSqlParameter("@CustomerId", id)
-                    .ExecuteNonQueryAsync("dbo.DeleteCustomer", unmanagedConn: conn);
+                    .ExecuteNonQueryAsync("dbo.DeleteCustomer", unmanagedConn: conn, commandType: CommandType.StoredProcedure);
             }
 
             Assert.AreEqual(1, inserted);

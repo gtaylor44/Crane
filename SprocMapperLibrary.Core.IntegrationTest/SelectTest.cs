@@ -161,7 +161,7 @@ namespace IntegrationTest
                     if (o.Id != default(int))
                         cust.CustomerOrders.Add(o);
 
-                }, partitionOn: "Id|OrderId");
+                }, partitionOn: "Id|OrderId", commandType: CommandType.StoredProcedure);
 
 
             Assert.AreEqual(13, cust.CustomerOrders.Count);
@@ -184,7 +184,7 @@ namespace IntegrationTest
                 {
                     p.Supplier = s;
 
-                }, partitionOn: "ProductName|Id").FirstOrDefault();
+                }, partitionOn: "ProductName|Id", commandType: CommandType.StoredProcedure).FirstOrDefault();
 
 
             Assert.AreEqual("Tarte au sucre", product?.ProductName);
@@ -220,7 +220,7 @@ namespace IntegrationTest
                     order = orderDic[o.Id];
                     oi.Product = p;
                     order.OrderItemList.Add(oi);
-                }, partitionOn: "Id|unitprice|productname");
+                }, partitionOn: "Id|unitprice|productname", commandType: CommandType.StoredProcedure);
 
 
             Assert.IsNotNull(order);
@@ -243,7 +243,7 @@ namespace IntegrationTest
 
             var customer = dataAccess.Sproc()
                 .AddSqlParameter("@CustomerId", 6)
-                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
+                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true, commandType: CommandType.StoredProcedure)
                 .FirstOrDefault();
 
             Assert.AreEqual("Hanna", customer?.FirstName);
@@ -261,7 +261,7 @@ namespace IntegrationTest
 
             var supplier = dataAccess.Sproc()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                .ExecuteReader<Supplier>("dbo.GetSupplierByName")
+                .ExecuteReader<Supplier>("dbo.GetSupplierByName", commandType: CommandType.StoredProcedure)
                 .FirstOrDefault();
 
             Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);

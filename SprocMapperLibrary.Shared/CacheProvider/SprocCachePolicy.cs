@@ -20,11 +20,11 @@ namespace SprocMapperLibrary.CacheProvider
         /// <summary>
         /// Set an absolute expiration time
         /// </summary>
-        public TimeSpan AbsoluteExpiration { get; set; }
+        public TimeSpan? AbsoluteExpiration { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public TimeSpan SlidingExpiration { get; set; }
+        public TimeSpan? SlidingExpiration { get; set; }
     }
 }

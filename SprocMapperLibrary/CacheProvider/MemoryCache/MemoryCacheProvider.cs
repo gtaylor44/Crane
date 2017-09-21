@@ -32,13 +32,18 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         {
             var cacheStrategy = GetCachingStrategy(key);
 
-            var cachePolicy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = cacheStrategy.InfiniteExpiration
-                    ? ObjectCache.InfiniteAbsoluteExpiration : GetDateTimeOffsetFromTimespan(cacheStrategy.AbsoluteExpiration),
+            var cachePolicy = new CacheItemPolicy();
 
-                SlidingExpiration = cacheStrategy.SlidingExpiration       
-            };
+            if (cacheStrategy.AbsoluteExpiration.HasValue)
+            {
+                cachePolicy.AbsoluteExpiration = cacheStrategy.InfiniteExpiration
+                    ? ObjectCache.InfiniteAbsoluteExpiration : GetDateTimeOffsetFromTimespan(cacheStrategy.AbsoluteExpiration.Value);
+            }
+
+            if (cacheStrategy.SlidingExpiration.HasValue)
+            {
+                cachePolicy.SlidingExpiration = cacheStrategy.SlidingExpiration.Value;
+            }
 
             lock (Padlock)
             {

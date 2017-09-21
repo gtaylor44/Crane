@@ -8,6 +8,7 @@ using SprocMapperLibrary.Interface;
 using SprocMapperLibrary.SqlServer;
 using SprocMapperLibrary.TestCommon.Model;
 using SprocMapperLibrary.TestCommon;
+using System;
 
 namespace IntegrationTest
 {
@@ -92,7 +93,7 @@ namespace IntegrationTest
 
             cacheProvider.AddPolicy("GetProducts", new SprocCachePolicy()
             {
-                InfiniteExpiration = true
+                SlidingExpiration = TimeSpan.FromSeconds(15)
             });
 
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);

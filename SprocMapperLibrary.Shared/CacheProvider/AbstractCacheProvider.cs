@@ -77,17 +77,17 @@ namespace SprocMapperLibrary.CacheProvider
                 throw new ArgumentNullException(nameof(policy));
             }
 
-            if (policy.AbsoluteExpiration != TimeSpan.Zero && policy.SlidingExpiration != TimeSpan.Zero)
+            if (policy.AbsoluteExpiration.HasValue && policy.SlidingExpiration.HasValue)
             {
                 throw new InvalidOperationException($"Cache Policy is invalid. AbsoluteExpiration and SlidingExpiration can't both be set. To resolve this issue, set one or the other.");
             }
 
-            if (policy.SlidingExpiration != TimeSpan.Zero && policy.InfiniteExpiration)
+            if (policy.SlidingExpiration.HasValue && policy.InfiniteExpiration)
             {
                 throw new InvalidOperationException($"Cache Policy is invalid. SlidingExpiration can't be set if InfiniteExpiration is set to true. Set InfiniteExpiration to false if you want to use SlidingExpiration.");
             }
 
-            if (policy.InfiniteExpiration && policy.AbsoluteExpiration != TimeSpan.Zero)
+            if (policy.InfiniteExpiration && policy.AbsoluteExpiration.HasValue)
             {
                 throw new InvalidOperationException($"Cache Policy is invalid. Can't set expiration to infinite if {nameof(policy.AbsoluteExpiration)} is set.");
             }

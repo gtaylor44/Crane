@@ -173,6 +173,28 @@ namespace SprocMapperLibrary
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="command"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="unmanagedConn"></param>
+        /// <param name="commandType"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public abstract T ExecuteScalar<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="unmanagedConn"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public abstract Task<T> ExecuteScalarAsync<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
         public BaseQuery AddSqlParameter(SqlParameter sqlParameter)

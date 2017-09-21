@@ -17,7 +17,7 @@ namespace IntegrationTest
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-            Customer customer = new Customer()
+            var customer = new Customer()
             {
                 City = "Auckland",
                 Country = "New Zealand",
@@ -26,7 +26,7 @@ namespace IntegrationTest
                 Phone = "021222222"
             };
 
-            int inserted = 0;
+            var inserted = 0;
 
 
             using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())

@@ -8,12 +8,12 @@ namespace SprocMapperLibrary.Interface
     public interface ISprocMapperAccess
     {
         /// <summary>
-        /// 
+        /// Contains methods for executing database commands.
         /// </summary>
         BaseCommand Command();
 
         /// <summary>
-        /// 
+        /// Contains methods for performing select query on a database.
         /// </summary>
         BaseQuery Query();
 

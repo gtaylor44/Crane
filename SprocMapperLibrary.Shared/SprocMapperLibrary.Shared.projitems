@@ -13,7 +13,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseInitialiser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseQuery.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\BaseSproc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCacheProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\SprocCachePolicy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GenericExtensions.cs" />

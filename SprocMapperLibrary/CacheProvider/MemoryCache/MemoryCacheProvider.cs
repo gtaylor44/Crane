@@ -1,22 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Caching;
-using System.Text.RegularExpressions;
 
 namespace SprocMapperLibrary.CacheProvider.MemoryCache
-{  
-    /// <summary>
-    /// 
-    /// </summary>
+{
+    /// <inheritdoc />
     public class MemoryCacheProvider : AbstractCacheProvider
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public MemoryCacheProvider() : base(){}
-        
-        /// <summary>
-        /// Returns true and initialises output param items if exists in cache, otherwise returns false and default collection. 
-        /// </summary>
+        /// <inheritdoc />
         public override bool TryGet<T>(string key, out IEnumerable<T> items)
         {
             lock (Padlock)
@@ -37,12 +27,10 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
             }
         }
 
-        /// <summary>
-        /// Adds an IEnumerable to cache with given key. 
-        /// </summary>
+        /// <inheritdoc />
         public override void Add<T>(string key, IEnumerable<T> items)
         {
-            SprocCachePolicy cacheStrategy = GetCachingStrategy(key);
+            var cacheStrategy = GetCachingStrategy(key);
 
             var cachePolicy = new CacheItemPolicy
             {
@@ -56,9 +44,7 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
             }
         }
 
-        /// <summary>
-        /// Remove an item in the cache at a specified key.
-        /// </summary>
+        /// <inheritdoc />
         public override void Remove(string key)
         {
             lock (Padlock)
@@ -68,23 +54,6 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
         }
 
         /// <inheritdoc />
-        public override void RemoveMatchingKeys(string regex)
-        {
-            lock (Padlock)
-            {
-                foreach (var element in MemoryCacheSingleton.Instance)
-                {
-                    if (Regex.IsMatch(element.Key, regex))
-                    {
-                        MemoryCacheSingleton.Instance.Remove(element.Key);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Removes all keys from cache.
-        /// </summary>
         public override void ResetCache()
         {
             lock (Padlock)

@@ -14,6 +14,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseSproc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCacheProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\SprocCachePolicy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GenericExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\INullType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocMapperAccess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocObjectMap.cs" />

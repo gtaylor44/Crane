@@ -4,9 +4,8 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
     /// <summary>
     /// 
     /// </summary>
-    public sealed class MemoryCacheSingleton
+    public static class MemoryCacheSingleton
     {
-        private MemoryCacheSingleton() { }
         /// <summary>
         /// 
         /// </summary>

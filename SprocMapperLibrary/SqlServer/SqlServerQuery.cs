@@ -67,7 +67,7 @@ namespace SprocMapperLibrary.SqlServer
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<string, object>)expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }

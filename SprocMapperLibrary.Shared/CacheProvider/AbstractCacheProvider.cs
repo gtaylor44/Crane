@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 
 namespace SprocMapperLibrary.CacheProvider
@@ -57,11 +55,6 @@ namespace SprocMapperLibrary.CacheProvider
         public abstract void Remove(string key);
 
         /// <summary>
-        /// Clears all cached lists matching the specified regular expression.
-        /// </summary>
-        public abstract void RemoveMatchingKeys(string regex);
-
-        /// <summary>
         /// Removes all keys from cache.
         /// </summary>
         public abstract void ResetCache();
@@ -86,11 +79,7 @@ namespace SprocMapperLibrary.CacheProvider
         {
             if (policy == null)
                 throw new ArgumentNullException(nameof(policy));
-
-            if (regularExpression == null)
-                throw new ArgumentNullException(nameof(regularExpression));
-
-            policy.CacheKeyRegExp = regularExpression;
+            policy.CacheKeyRegExp = regularExpression ?? throw new ArgumentNullException(nameof(regularExpression));
 
             if (PolicyIsValid(policy))
                 CustomSprocCachePolicyList.Add(policy);

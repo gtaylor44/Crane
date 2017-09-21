@@ -56,11 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CacheProvider\AbstractCacheProvider.cs" />
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheProvider.cs" />
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
-    <Compile Include="CacheProvider\SprocCachePolicy.cs" />
-    <Compile Include="GenericExtensions.cs" />
     <Compile Include="MySql\MySqlUserCommand.cs" />
     <Compile Include="MySql\MySqlServerAccess.cs" />
     <Compile Include="MySql\MySqlUserQuery.cs" />

@@ -13,10 +13,6 @@ namespace SprocMapperLibrary.MySql
         private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="cacheProvider"></param>
         public MySqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
         {
             if (connectionString == null)
@@ -27,20 +23,12 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="T:System.NotImplementedException"></exception>
         public BaseCommand Command()
         {
             return new MySqlUserCommand(_connectionString);
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="T:System.NotImplementedException"></exception>
         public BaseQuery Query()
         {
             return new MySqlUserQuery(_connectionString, CacheProvider);

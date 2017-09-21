@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Linq.Expressions;
@@ -88,7 +87,7 @@ namespace SprocMapperLibrary
         /// <summary>
         /// Gets the ordinal as a start index for each column in partitionOn string. 
         /// </summary>
-        /// <param name="rows"></param>
+        /// <param name="columnSchema"></param>
         /// <param name="partitionOnArr"></param>
         /// <param name="mapCount"></param>
         /// <returns></returns>
@@ -334,7 +333,7 @@ namespace SprocMapperLibrary
             mapObject.TypeAccessor = TypeAccessor.Create(typeof(TObj));
 
             //Get all properties
-            MemberSet members = mapObject.TypeAccessor.GetMembers();
+            var members = mapObject.TypeAccessor.GetMembers();
 
             foreach (var member in members)
             {
@@ -351,11 +350,11 @@ namespace SprocMapperLibrary
 
         public static Dictionary<int, string> GetColumnsForDynamicQuery(ReadOnlyCollection<DbColumn> columnSchema)
         {            
-            Dictionary<int, string> dynamicColumnDic = new Dictionary<int, string>();
+            var dynamicColumnDic = new Dictionary<int, string>();
 
             foreach(var item in columnSchema)
             {
-                string strippedColumnName = item.ColumnName.Replace(" ", string.Empty);
+                var strippedColumnName = item.ColumnName.Replace(" ", string.Empty);
 
                 if (strippedColumnName == null)
                     throw new SprocMapperException("There was a probelm retrieving column.");
@@ -381,8 +380,8 @@ namespace SprocMapperLibrary
         /// <returns></returns>
         public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)
         {
-            T targetObject = (T)sprocObjectMap.TypeAccessor.CreateNew();
-            int defaultOrNullCounter = 0;
+            var targetObject = (T)sprocObjectMap.TypeAccessor.CreateNew();
+            var defaultOrNullCounter = 0;
 
             foreach (var column in sprocObjectMap.Columns)
             {
@@ -476,10 +475,7 @@ namespace SprocMapperLibrary
                 type == typeof(string) ||
                 type == typeof(byte[]) ||
                 type == typeof(char[]) ||
-                type == typeof(SqlXml)
-                //type == typeof(SqlGeography) ||
-                //type == typeof(SqlGeometry)
-                )
+                type == typeof(SqlXml))
                 return true;
 
             return false;

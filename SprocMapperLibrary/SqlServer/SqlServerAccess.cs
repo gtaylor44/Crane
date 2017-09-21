@@ -18,15 +18,10 @@ namespace SprocMapperLibrary.SqlServer
 
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="cacheProvider"></param>
         public SqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
         {
             if (connectionString == null)
                 throw new ArgumentException(InvalidConnMsg);
-
 
             _connectionString = connectionString;
             _credential = null;
@@ -34,11 +29,6 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="credential"></param>
-        /// <param name="cacheProvider"></param>
         public SqlServerAccess(string connectionString, SqlCredential credential, AbstractCacheProvider cacheProvider = null)
         {
             if (connectionString == null || credential == null)

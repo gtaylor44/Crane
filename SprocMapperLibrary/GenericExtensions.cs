@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 namespace SprocMapperLibrary
 {
     /// <summary>
-    /// 
+    /// Contains convenience extensions
     /// </summary>
     public static class GenericExtensions
     {

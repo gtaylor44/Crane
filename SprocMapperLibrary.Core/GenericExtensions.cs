@@ -5,7 +5,7 @@ using System.Reflection;
 namespace SprocMapperLibrary
 {
     /// <summary>
-    /// 
+    /// Contains convenience extensions
     /// </summary>
     public static class GenericExtensions
     {

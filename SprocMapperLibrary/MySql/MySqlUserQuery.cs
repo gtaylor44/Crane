@@ -11,39 +11,18 @@ using SprocMapperLibrary.CacheProvider;
 namespace SprocMapperLibrary.MySql
 {
     /// <inheritdoc />
-    /// <summary>
-    /// </summary>
     public class MySqlUserQuery : BaseQuery
     {
         private MySqlConnection _mySqlConn;
         private readonly string _connectionString;
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="cacheProvider"></param>
         public MySqlUserQuery(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// Performs synchronous version of stored procedure.
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="getObjectDel"></param>
-        /// <param name="storedProcedure">The name of your stored procedure (with schema name if applicable).</param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="partitionOnArr"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="saveCacheDel"></param>
-        /// <param name="commandType"></param>
-        /// <param name="valueOrStringType"></param>
-        /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns,
@@ -134,9 +113,9 @@ namespace SprocMapperLibrary.MySql
 
                 OpenConn(_mySqlConn);
 
-                List<dynamic> result = new List<dynamic>();
+                var result = new List<dynamic>();
 
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                using (var command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {
                     // Set common SqlCommand properties
                     SetCommandProps(command, commandTimeout, commandType);
@@ -195,9 +174,9 @@ namespace SprocMapperLibrary.MySql
 
                 await OpenConnAsync(_mySqlConn);
 
-                List<dynamic> result = new List<dynamic>();
+                var result = new List<dynamic>();
 
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                using (var command = new MySqlCommand(storedProcedure, _mySqlConn))
                 {
                     // Set common SqlCommand properties
                     SetCommandProps(command, commandTimeout, commandType);
@@ -207,7 +186,7 @@ namespace SprocMapperLibrary.MySql
                         if (!reader.HasRows)
                             return new List<dynamic>();
 
-                        DataTable schema = reader.GetSchemaTable();
+                        var schema = reader.GetSchemaTable();
 
                         var dynamicColumnDic = SprocMapper.GetColumnsForDynamicQuery(schema);
 
@@ -237,21 +216,6 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// Performs asynchronous version of stored procedure.
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="getObjectDel"></param>
-        /// <param name="storedProcedure"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="partitionOnArr"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="saveCacheDel"></param>
-        /// <param name="commandType"></param>
-        /// <param name="valueOrStringType"></param>
-        /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string storedProcedure, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns,
@@ -287,7 +251,7 @@ namespace SprocMapperLibrary.MySql
 
                         if (!valueOrStringType)
                         {
-                            DataTable schema = reader.GetSchemaTable();
+                            var schema = reader.GetSchemaTable();
                             var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
                             int[] partitionOnOrdinal = null;

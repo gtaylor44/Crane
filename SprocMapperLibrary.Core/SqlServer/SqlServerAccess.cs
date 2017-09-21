@@ -14,23 +14,20 @@ namespace SprocMapperLibrary.SqlServer
 
         private readonly string _connectionString;
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="cacheProvider"></param>
+        /// <inheritdoc />
         public SqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
         {
             _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
             CacheProvider = cacheProvider;
         }
 
+        /// <inheritdoc />
         public BaseCommand Command()
         {
             return new SqlServerCommand(_connectionString);
         }
 
+        /// <inheritdoc />
         public BaseQuery Query()
         {
             return new SqlServerQuery(_connectionString, CacheProvider);

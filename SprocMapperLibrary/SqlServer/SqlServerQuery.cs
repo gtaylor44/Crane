@@ -11,8 +11,6 @@ using SprocMapperLibrary.CacheProvider;
 namespace SprocMapperLibrary.SqlServer
 {
     /// <inheritdoc />
-    /// <summary>
-    /// </summary>
     public class SqlServerQuery : BaseQuery
     {
         private SqlConnection _conn;
@@ -21,11 +19,6 @@ namespace SprocMapperLibrary.SqlServer
         private readonly SqlCredential _credential;
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="credential"></param>
-        /// <param name="cacheProvider"></param>
         public SqlServerQuery(string connectionString, SqlCredential credential,
             AbstractCacheProvider cacheProvider) : base(cacheProvider)
         {
@@ -34,15 +27,6 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <param name="getObjectDel"></param>
-        /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="userConn"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="saveCacheDel"></param>
-        /// <param name="commandType"></param>
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
             string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel,
             CommandType? commandType)
@@ -104,15 +88,6 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// </summary>
-        /// <param name="getObjectDel"></param>
-        /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="userConn"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="saveCacheDel"></param>
-        /// <param name="commandType"></param>
         protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
             string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel, CommandType? commandType)
         {
@@ -131,9 +106,9 @@ namespace SprocMapperLibrary.SqlServer
 
                 await OpenConnAsync(_conn);
 
-                List<dynamic> result = new List<dynamic>();
+                var result = new List<dynamic>();
 
-                using (SqlCommand cmd = new SqlCommand(command, _conn))
+                using (var cmd = new SqlCommand(command, _conn))
                 {
                     // Set common SqlCommand properties
                     SetCommandProps(cmd, commandTimeout, commandType);
@@ -151,7 +126,7 @@ namespace SprocMapperLibrary.SqlServer
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<string, object>)expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }
@@ -172,21 +147,6 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// Performs synchronous version of stored procedure.
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="getObjectDel"></param>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="partitionOnArr"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="userConn"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="saveCacheDel"></param>
-        /// <param name="commandType"></param>
-        /// <param name="valueOrStringType"></param>
-        /// <returns></returns>
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
             string command, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
             string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
@@ -219,7 +179,7 @@ namespace SprocMapperLibrary.SqlServer
 
                         if (!valueOrStringType)
                         {
-                            DataTable schema = reader.GetSchemaTable();
+                            var schema = reader.GetSchemaTable();
                             var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
                             int[] partitionOnOrdinal = null;
@@ -258,21 +218,6 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// Performs asynchronous version of stored procedure.
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="getObjectDel"></param>
-        /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="partitionOnArr"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="userConn"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="saveCacheDel"></param>
-        /// <param name="commandType"></param>
-        /// <param name="valueOrStringType"></param>
-        /// <returns></returns>
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
             string command, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
             string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false)
@@ -306,7 +251,7 @@ namespace SprocMapperLibrary.SqlServer
 
                         if (!valueOrStringType)
                         {
-                            DataTable schema = reader.GetSchemaTable();
+                            var schema = reader.GetSchemaTable();
                             var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
                             int[] partitionOnOrdinal = null;

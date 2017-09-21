@@ -35,7 +35,9 @@ namespace SprocMapperLibrary.CacheProvider.MemoryCache
             var cachePolicy = new CacheItemPolicy
             {
                 AbsoluteExpiration = cacheStrategy.InfiniteExpiration
-                    ? ObjectCache.InfiniteAbsoluteExpiration : GetDateTimeOffsetFromTimespan(cacheStrategy.AbsoluteExpiration)
+                    ? ObjectCache.InfiniteAbsoluteExpiration : GetDateTimeOffsetFromTimespan(cacheStrategy.AbsoluteExpiration),
+
+                SlidingExpiration = cacheStrategy.SlidingExpiration       
             };
 
             lock (Padlock)

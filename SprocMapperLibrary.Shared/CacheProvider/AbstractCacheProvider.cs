@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SprocMapperLibrary.Shared.Interface;
 
 namespace SprocMapperLibrary.CacheProvider
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public abstract class AbstractCacheProvider
+    /// <inheritdoc />
+    public abstract class AbstractCacheProvider : ICacheProvider
     {
         /// <summary>
         /// 
@@ -33,38 +32,24 @@ namespace SprocMapperLibrary.CacheProvider
             CustomSprocCachePolicyList = new List<SprocCachePolicy>();
             GlobalSprocPolicy = null;
         }
-        /// <summary>
-        /// When this method returns, contains the items associated with the specified key, 
-        /// if the key is found; otherwise, the default value for the type of the value parameter. 
-        /// This parameter is passed uninitialized.
-        /// </summary>
-        /// <returns></returns>
+
+        /// <inheritdoc />
         public abstract bool TryGet<T>(string key, out IEnumerable<T> items);
 
-        /// <summary>
-        /// Adds a list of cacheable records.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="items"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <inheritdoc />
         public abstract void Add<T>(string key, IEnumerable<T> items);
 
-        /// <summary>
-        /// Clears a single cached list at the specified key.
-        /// </summary>
+        /// <inheritdoc />
         public abstract void Remove(string key);
 
-        /// <summary>
-        /// Removes all keys from cache.
-        /// </summary>
+        /// <inheritdoc />
         public abstract void ResetCache();
-
 
         /// <summary>
         /// Set a custom policy on all cached items.
         /// </summary>
         /// <param name="policy">The custom policy.</param>
-        public void SetGlobalPolicy(SprocCachePolicy policy)
+        public void AddGlobalPolicy(SprocCachePolicy policy)
         {
             if (PolicyIsValid(policy))
                 GlobalSprocPolicy = policy;
@@ -92,9 +77,19 @@ namespace SprocMapperLibrary.CacheProvider
                 throw new ArgumentNullException(nameof(policy));
             }
 
+            if (policy.AbsoluteExpiration != TimeSpan.Zero && policy.SlidingExpiration != TimeSpan.Zero)
+            {
+                throw new InvalidOperationException($"Cache Policy is invalid. AbsoluteExpiration and SlidingExpiration can't both be set. To resolve this issue, set one or the other.");
+            }
+
+            if (policy.SlidingExpiration != TimeSpan.Zero && policy.InfiniteExpiration)
+            {
+                throw new InvalidOperationException($"Cache Policy is invalid. SlidingExpiration can't be set if InfiniteExpiration is set to true. Set InfiniteExpiration to false if you want to use SlidingExpiration.");
+            }
+
             if (policy.InfiniteExpiration && policy.AbsoluteExpiration != TimeSpan.Zero)
             {
-                throw new InvalidOperationException($"Can't set expiration to infinite if {nameof(policy.AbsoluteExpiration)} is set.");
+                throw new InvalidOperationException($"Cache Policy is invalid. Can't set expiration to infinite if {nameof(policy.AbsoluteExpiration)} is set.");
             }
 
             return true;
@@ -144,7 +139,7 @@ namespace SprocMapperLibrary.CacheProvider
             return GetDefaultPolicy();
         }
 
-        private SprocCachePolicy GetDefaultPolicy()
+        private static SprocCachePolicy GetDefaultPolicy()
         {
             return new SprocCachePolicy()
             {

@@ -1,4 +1,5 @@
 ﻿using SprocMapperLibrary.CacheProvider;
+using SprocMapperLibrary.Shared.Interface;
 
 namespace SprocMapperLibrary.Interface
 {
@@ -18,10 +19,10 @@ namespace SprocMapperLibrary.Interface
         BaseQuery Query();
 
         /// <summary>
-        /// 
+        /// Register a cache provider that extends AbstractCacheProvider. 
         /// </summary>
         /// <param name="cacheProvider"></param>
-        void RegisterCacheProvider(AbstractCacheProvider cacheProvider);
+        void RegisterCacheProvider(ICacheProvider cacheProvider);
 
         /// <summary>
         /// 

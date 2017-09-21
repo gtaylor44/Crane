@@ -1,5 +1,6 @@
 ﻿using System;
 using SprocMapperLibrary.CacheProvider;
+using SprocMapperLibrary.Shared.Interface;
 
 namespace SprocMapperLibrary.Base
 {
@@ -28,12 +29,12 @@ namespace SprocMapperLibrary.Base
         /// 
         /// </summary>
         /// <param name="cacheProvider"></param>
-        public void RegisterCacheProvider(AbstractCacheProvider cacheProvider)
+        public void RegisterCacheProvider(ICacheProvider cacheProvider)
         {
             if (CacheProvider != null)
                 throw new InvalidOperationException(CacheAlreadyRegisteredMsg);
 
-            CacheProvider = cacheProvider;
+            CacheProvider = cacheProvider as AbstractCacheProvider;
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace SprocMapperLibrary.Base
         }
 
         /// <summary>
-        /// Resets all cached items. Anything that is utilising cache will get a new copy next time sproc is called. 
+        /// Resets all cached items. Anything that is utilising cache will get a new copy next time query is executed. 
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
         public void ResetCache()

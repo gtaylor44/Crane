@@ -95,6 +95,8 @@ namespace IntegrationTest
             cacheProvider.AddPolicy("GetProducts", new SprocCachePolicy()
             {
                 InfiniteExpiration = true
+                
+                
             });
 
             ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);

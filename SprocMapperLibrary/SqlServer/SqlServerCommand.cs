@@ -23,6 +23,8 @@ namespace SprocMapperLibrary.SqlServer
         {
             try
             {
+                command = GetCleanSqlCommand(command);
+
                 int affectedRecords;
 
                 if (userConn == null)
@@ -53,6 +55,8 @@ namespace SprocMapperLibrary.SqlServer
         {
             try
             {
+                command = GetCleanSqlCommand(command);
+
                 int affectedRecords;
 
                 if (userConn == null)

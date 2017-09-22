@@ -69,6 +69,16 @@ namespace SprocMapperLibrary
                 command.Parameters.AddRange(ParamList.ToArray());
         }
 
+        public string GetCleanSqlCommand(string sqlCommand)
+        {
+            if (sqlCommand == null)
+                throw new SprocMapperException("SQL command can't be null");
+
+            sqlCommand = sqlCommand.Trim();
+
+            return sqlCommand;
+        }
+
         /// <summary>
         /// Determines if SQL CommandType is Text or StoredProcedure
         /// </summary>

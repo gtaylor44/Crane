@@ -33,6 +33,8 @@ namespace SprocMapperLibrary.MySql
 
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = unmanagedConn != null;
 
                 // Try open connection if not already open.
@@ -101,6 +103,8 @@ namespace SprocMapperLibrary.MySql
             var userProvidedConnection = false;
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -161,6 +165,8 @@ namespace SprocMapperLibrary.MySql
             var userProvidedConnection = false;
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -224,6 +230,8 @@ namespace SprocMapperLibrary.MySql
 
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = unmanagedConn != null;
 
                 // Try open connection if not already open.
@@ -292,6 +300,8 @@ namespace SprocMapperLibrary.MySql
         {
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 T obj;
 
                 // Try open connection if not already open.
@@ -324,6 +334,8 @@ namespace SprocMapperLibrary.MySql
         {
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 T obj;
 
                 // Try open connection if not already open.

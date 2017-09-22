@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Dynamic;
@@ -24,11 +23,13 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
+            string query, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
         {
             var userProvidedConnection = false;
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -42,10 +43,10 @@ namespace SprocMapperLibrary.SqlServer
 
                 var result = new List<dynamic>();
 
-                using (var cmd = new SqlCommand(command, _conn))
+                using (var cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, commandTimeout, query);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -86,11 +87,13 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
-            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
+            string query, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
         {
             var userProvidedConnection = false;
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -104,10 +107,10 @@ namespace SprocMapperLibrary.SqlServer
 
                 var result = new List<dynamic>();
 
-                using (var cmd = new SqlCommand(command, _conn))
+                using (var cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, commandTimeout, query);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
@@ -148,12 +151,14 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string command, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
+            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
             string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -166,10 +171,10 @@ namespace SprocMapperLibrary.SqlServer
                 OpenConn(_conn);
 
                 var result = new List<TResult>();
-                using (var cmd = new SqlCommand(command, _conn))
+                using (var cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, commandTimeout, query);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -219,12 +224,14 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string command, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
+            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
             string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
@@ -238,10 +245,10 @@ namespace SprocMapperLibrary.SqlServer
 
                 var result = new List<TResult>();
 
-                using (var cmd = new SqlCommand(command, _conn))
+                using (var cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, commandTimeout, query);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
@@ -290,10 +297,12 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        public override T ExecuteScalar<T>(string command, int? commandTimeout = null, DbConnection userConn = null)
+        public override T ExecuteScalar<T>(string query, int? commandTimeout = null, DbConnection userConn = null)
         {
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 T obj;
 
                 if (userConn == null)
@@ -304,9 +313,9 @@ namespace SprocMapperLibrary.SqlServer
 
                 OpenConn(_conn);
 
-                using (SqlCommand cmd = new SqlCommand(command, _conn))
+                using (SqlCommand cmd = new SqlCommand(query, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, commandTimeout, query);
                     obj = (T)cmd.ExecuteScalar();
                 }
 
@@ -321,10 +330,12 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        public override async Task<T> ExecuteScalarAsync<T>(string command, int? commandTimeout = null, DbConnection userConn = null)
+        public override async Task<T> ExecuteScalarAsync<T>(string query, int? commandTimeout = null, DbConnection userConn = null)
         {
             try
             {
+                query = GetCleanSqlCommand(query);
+
                 T obj;
 
                 if (userConn == null)
@@ -335,9 +346,9 @@ namespace SprocMapperLibrary.SqlServer
 
                 await OpenConnAsync(_conn);
 
-                using (SqlCommand cmd = new SqlCommand(command, _conn))
+                using (SqlCommand cmd = new SqlCommand(query, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, commandTimeout, query);
                     obj = (T)await cmd.ExecuteScalarAsync();
                 }
 

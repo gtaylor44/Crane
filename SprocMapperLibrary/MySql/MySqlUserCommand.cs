@@ -24,6 +24,8 @@ namespace SprocMapperLibrary.MySql
             {
                 int affectedRecords;
 
+                command = GetCleanSqlCommand(command);
+
                 // Try open connection if not already open.
                 if (unmanagedConn == null)                
                     _mySqlConn = new MySqlConnection(_connectionString);
@@ -55,6 +57,8 @@ namespace SprocMapperLibrary.MySql
             try
             {
                 int affectedRecords;
+
+                command = GetCleanSqlCommand(command);
 
                 // Try open connection if not already open.
                 if (unmanagedConn == null)             

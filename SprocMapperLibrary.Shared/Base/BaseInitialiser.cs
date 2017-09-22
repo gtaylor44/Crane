@@ -75,10 +75,13 @@ namespace SprocMapperLibrary
         /// /// <param name="sqlCommand"></param>
         public bool IsStoredProcedure(string sqlCommand)
         {
-            if (sqlCommand.StartsWith("EXEC", StringComparison.OrdinalIgnoreCase))          
+            if (sqlCommand.StartsWith("EXEC(", StringComparison.OrdinalIgnoreCase))          
                 return false;
 
-            if (sqlCommand.StartsWith("SP", StringComparison.OrdinalIgnoreCase))
+            if (sqlCommand.StartsWith("EXECUTE(", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (sqlCommand.StartsWith("SP_", StringComparison.OrdinalIgnoreCase))
                 return false;
 
             if (!sqlCommand.Contains(" "))           

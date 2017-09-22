@@ -55,17 +55,33 @@ namespace SprocMapperLibrary
         /// 
         /// </summary>
         /// <param name="command"></param>
+        /// <param name="sqlCommand"></param>
         /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        protected void SetCommandProps(DbCommand command, int? commandTimeout, CommandType? commandType)
+        protected void SetCommandProps(DbCommand command, int? commandTimeout, string sqlCommand)
         {
-            command.CommandType = commandType ?? CommandType.Text;
+            command.CommandType = IsStoredProcedure(sqlCommand) ? CommandType.StoredProcedure : CommandType.Text;
 
             if (commandTimeout.HasValue)
                 command.CommandTimeout = commandTimeout.Value;
 
             if (ParamList != null && ParamList.Any())
                 command.Parameters.AddRange(ParamList.ToArray());
+        }
+
+        /// <summary>
+        /// Determines if SQL CommandType is Text or StoredProcedure
+        /// </summary>
+        /// /// <param name="sqlCommand"></param>
+        public bool IsStoredProcedure(string sqlCommand)
+        {
+            if (sqlCommand.Contains("EXEC"))          
+                return false;
+            
+
+            if (!sqlCommand.Contains(" "))           
+                return true;
+            
+            return false;
         }
     }
 }

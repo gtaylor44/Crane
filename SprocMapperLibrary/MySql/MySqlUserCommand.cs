@@ -18,7 +18,7 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        public override int ExecuteNonQuery(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             try
             {
@@ -33,10 +33,10 @@ namespace SprocMapperLibrary.MySql
                 
                 OpenConn(_mySqlConn);
 
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                using (MySqlCommand cmd = new MySqlCommand(command, _mySqlConn))
                 {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    affectedRecords = command.ExecuteNonQuery();
+                    SetCommandProps(cmd, commandTimeout, command);
+                    affectedRecords = cmd.ExecuteNonQuery();
                 }
 
                 return affectedRecords;
@@ -50,7 +50,7 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        public override async Task<int> ExecuteNonQueryAsync(string storedProcedure, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             try
             {
@@ -65,10 +65,10 @@ namespace SprocMapperLibrary.MySql
                 
                 await OpenConnAsync(_mySqlConn);
 
-                using (MySqlCommand command = new MySqlCommand(storedProcedure, _mySqlConn))
+                using (MySqlCommand cmd = new MySqlCommand(command, _mySqlConn))
                 {
-                    SetCommandProps(command, commandTimeout, commandType);
-                    affectedRecords = await command.ExecuteNonQueryAsync();
+                    SetCommandProps(cmd, commandTimeout, command);
+                    affectedRecords = await cmd.ExecuteNonQueryAsync();
                 }
 
                 return affectedRecords;

@@ -120,12 +120,11 @@ namespace SprocMapperLibrary
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
         /// <param name="valueOrStringType"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string command, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false);
+            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
 
         /// <summary>
         /// 
@@ -136,9 +135,8 @@ namespace SprocMapperLibrary
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDe"></param>
-        /// <param name="commandType"></param>
         protected abstract IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe, CommandType? commandType);
+            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe);
 
         /// <summary>
         /// 
@@ -149,9 +147,8 @@ namespace SprocMapperLibrary
         /// <param name="userConn"></param>
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDe"></param>
-        /// <param name="commandType"></param>
         protected abstract Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
-            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe, CommandType? commandType);
+            string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe);
 
         /// <summary>
         /// Performs asynchronous version of stored procedure.
@@ -166,12 +163,11 @@ namespace SprocMapperLibrary
         /// <param name="cacheKey"></param>
         /// <param name="saveCacheDel"></param>
         /// <param name="valueOrStringType"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string command, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, CommandType? commandType, bool valueOrStringType = false);
+            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
 
         /// <summary>
         /// 
@@ -179,21 +175,19 @@ namespace SprocMapperLibrary
         /// <param name="command"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
-        /// <param name="commandType"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public abstract T ExecuteScalar<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
+        public abstract T ExecuteScalar<T>(string command, int? commandTimeout = null, DbConnection unmanagedConn = null);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public abstract Task<T> ExecuteScalarAsync<T>(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
+        public abstract Task<T> ExecuteScalarAsync<T>(string command, int? commandTimeout = null, DbConnection unmanagedConn = null);
 
         /// <summary>
         /// 
@@ -258,10 +252,9 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="command"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
-        public IEnumerable<dynamic> ExecuteReader(string command, string cacheKey = null, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public IEnumerable<dynamic> ExecuteReader(string command, string cacheKey = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -282,7 +275,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -293,9 +286,8 @@ namespace SprocMapperLibrary
         /// <param name="cacheKey"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
-        /// <param name="commandType"></param>
         public IEnumerable<dynamic> ExecuteReader(string command, Action<dynamic> callBack, string cacheKey = null, 
-            CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -326,7 +318,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -338,9 +330,8 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
-        public IEnumerable<TResult> ExecuteReader<TResult>(string command, string cacheKey = null, CommandType? commandType = null,
+        public IEnumerable<TResult> ExecuteReader<TResult>(string command, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
@@ -366,7 +357,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(row);
                     }
 
-                }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType) as dynamic;
+                }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
             }
 
             if (type.GetTypeInfo().IsValueType || type == typeof(string))
@@ -381,7 +372,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(obj1);
                     }
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType, valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -396,7 +387,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(obj1);
                 }
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -409,9 +400,8 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
-        public IEnumerable<TResult> ExecuteReader<TResult>(string command, Action<TResult> callBack, string cacheKey = null, CommandType? commandType = null,
+        public IEnumerable<TResult> ExecuteReader<TResult>(string command, Action<TResult> callBack, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
@@ -447,7 +437,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(row);
                     }
 
-                }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType) as dynamic;
+                }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
             } 
 
             if (type.GetTypeInfo().IsValueType || type == typeof(string))
@@ -464,7 +454,7 @@ namespace SprocMapperLibrary
 
                     callBack.Invoke(obj1);
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType, valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -481,7 +471,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1);
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -496,10 +486,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1>(string command, Action<TResult, TJoin1> callBack,
-            string partitionOn, string cacheKey = null, CommandType? commandType = null,
+            string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, 
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
@@ -544,7 +533,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -560,10 +549,8 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2>(string command, Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -611,7 +598,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -628,11 +615,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3>(string command, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, 
             string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -682,7 +667,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -700,10 +685,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string command, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, 
-            string partitionOn, string cacheKey = null, CommandType? commandType = null,
+            string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -757,7 +741,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -776,11 +760,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -837,7 +819,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -857,11 +839,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -920,7 +900,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -941,11 +921,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -1009,7 +987,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1031,11 +1009,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string command,
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -1102,7 +1078,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1112,9 +1088,8 @@ namespace SprocMapperLibrary
         /// <param name="cacheKey"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
-        /// <param name="commandType"></param>
         public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, string cacheKey = null, 
-            CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -1135,7 +1110,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1146,9 +1121,8 @@ namespace SprocMapperLibrary
         /// <param name="cacheKey"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
-        /// <param name="commandType"></param>
         public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, Action<dynamic> callBack, string cacheKey = null, 
-            CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -1179,7 +1153,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1190,11 +1164,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
@@ -1219,7 +1191,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(obj1);
                     }
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType, valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1234,7 +1206,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(obj1);
                 }
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1246,11 +1218,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, Action<TResult> callBack, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
         {
             ValidateCacheKey(cacheKey);
@@ -1286,7 +1256,7 @@ namespace SprocMapperLibrary
 
                     callBack.Invoke(obj1);
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType, valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings); 
@@ -1303,7 +1273,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1);
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1318,11 +1288,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1>(string command, Action<TResult, TJoin1> callBack,
-            string partitionOn, string cacheKey = null, CommandType? commandType = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault,
+            string partitionOn, string cacheKey = null, bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -1367,7 +1335,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1383,11 +1351,10 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2>(string command,
             Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null, 
-            CommandType? commandType = null, bool validateSelectColumns = ValidateSelectColumnsDefault,
+            bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -1435,7 +1402,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1452,11 +1419,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
@@ -1508,7 +1473,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1526,11 +1491,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
@@ -1586,7 +1549,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1605,11 +1568,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
@@ -1667,7 +1628,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1687,11 +1648,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
@@ -1752,7 +1711,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1773,11 +1732,9 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
-            CommandType? commandType = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
             int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
@@ -1842,7 +1799,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1864,13 +1821,11 @@ namespace SprocMapperLibrary
         /// <param name="commandTimeout"></param>
         /// <param name="unmanagedConn"></param>
         /// <param name="cacheKey"></param>
-        /// <param name="commandType"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync
             <TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string command,
                 Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack,
                 string partitionOn, string cacheKey = null,
-                CommandType? commandType = null,
                 bool validateSelectColumns = ValidateSelectColumnsDefault,
                 int? commandTimeout = null, DbConnection unmanagedConn = null)
             where TResult : class, new()
@@ -1938,7 +1893,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), commandType);
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)

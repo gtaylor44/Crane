@@ -6,13 +6,14 @@ using System.Linq;
 using SprocMapperLibrary;
 using SprocMapperLibrary.TestCommon;
 using SprocMapperLibrary.TestCommon.Model;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace UnitTest
 {
     [TestClass]
     public class OrdinalTest
     {
-
         [TestMethod]
         public void TestOrdinalForId()
         {

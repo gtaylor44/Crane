@@ -56,7 +56,7 @@ namespace IntegrationTest
                     if (o.Id != default(int))
                         cust.CustomerOrders.Add(o);
 
-                }, "Id|OrderId", commandType: CommandType.StoredProcedure);
+                }, "Id|OrderId");
 
 
             Assert.AreEqual(13, cust.CustomerOrders.Count);
@@ -78,7 +78,7 @@ namespace IntegrationTest
                 {
                     p.Supplier = s;
 
-                }, "ProductName|Id", commandType: CommandType.StoredProcedure)).FirstOrDefault();
+                }, "ProductName|Id")).FirstOrDefault();
 
 
             Assert.AreEqual("Tarte au sucre", product?.ProductName);
@@ -113,7 +113,7 @@ namespace IntegrationTest
                 order = orderDic[o.Id];
                 oi.Product = p;
                 order.OrderItemList.Add(oi);
-            }, "Id|unitprice|productname", commandType: CommandType.StoredProcedure);
+            }, "Id|unitprice|productname");
 
 
             Assert.IsNotNull(order);
@@ -137,7 +137,7 @@ namespace IntegrationTest
 
             var customer = (await dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
-                .ExecuteReaderAsync<Customer>("dbo.GetCustomer", commandType: CommandType.StoredProcedure))
+                .ExecuteReaderAsync<Customer>("dbo.GetCustomer"))
                 .FirstOrDefault();
 
             Assert.AreEqual("Hanna", customer?.FirstName);
@@ -154,7 +154,7 @@ namespace IntegrationTest
 
             var supplier = (await dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                .ExecuteReaderAsync<Supplier>("dbo.GetSupplierByName", commandType: CommandType.StoredProcedure))
+                .ExecuteReaderAsync<Supplier>("dbo.GetSupplierByName"))
                 .FirstOrDefault();
 
             Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);

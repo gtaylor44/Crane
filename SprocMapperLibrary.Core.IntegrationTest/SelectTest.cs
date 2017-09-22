@@ -117,7 +117,7 @@ namespace IntegrationTest
 
             var products = dataAccess.Query()
                 .AddSqlParameter("@SupplierId", 1)
-                .ExecuteReader<Product>("SELECT * FROM dbo.Product WHERE SupplierId = @SupplierId", commandType: CommandType.Text);
+                .ExecuteReader<Product>("SELECT * FROM dbo.Product WHERE SupplierId = @SupplierId");
 
             Assert.IsTrue(products.Count() == 3);
         }
@@ -164,7 +164,7 @@ namespace IntegrationTest
                     if (o.Id != default(int))
                         cust.CustomerOrders.Add(o);
 
-                }, partitionOn: "Id|OrderId", commandType: CommandType.StoredProcedure);
+                }, partitionOn: "Id|OrderId");
 
 
             Assert.AreEqual(13, cust.CustomerOrders.Count);
@@ -187,7 +187,7 @@ namespace IntegrationTest
                 {
                     p.Supplier = s;
 
-                }, partitionOn: "ProductName|Id", commandType: CommandType.StoredProcedure).FirstOrDefault();
+                }, partitionOn: "ProductName|Id").FirstOrDefault();
 
 
             Assert.AreEqual("Tarte au sucre", product?.ProductName);
@@ -223,7 +223,7 @@ namespace IntegrationTest
                     order = orderDic[o.Id];
                     oi.Product = p;
                     order.OrderItemList.Add(oi);
-                }, partitionOn: "Id|unitprice|productname", commandType: CommandType.StoredProcedure);
+                }, partitionOn: "Id|unitprice|productname");
 
 
             Assert.IsNotNull(order);
@@ -246,7 +246,7 @@ namespace IntegrationTest
 
             var customer = dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
-                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true, commandType: CommandType.StoredProcedure)
+                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
                 .FirstOrDefault();
 
             Assert.AreEqual("Hanna", customer?.FirstName);
@@ -264,7 +264,7 @@ namespace IntegrationTest
 
             var supplier = dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
-                .ExecuteReader<Supplier>("dbo.GetSupplierByName", commandType: CommandType.StoredProcedure)
+                .ExecuteReader<Supplier>("dbo.GetSupplierByName")
                 .FirstOrDefault();
 
             Assert.AreEqual("Cheryl Saylor", supplier?.ContactName);

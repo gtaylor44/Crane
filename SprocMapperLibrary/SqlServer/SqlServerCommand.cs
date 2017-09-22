@@ -35,7 +35,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 using (var cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, commandType);
+                    SetCommandProps(cmd, commandTimeout, command);
                     affectedRecords = cmd.ExecuteNonQuery();
                 }
 
@@ -65,7 +65,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 using (var cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, commandType);
+                    SetCommandProps(cmd, commandTimeout, command);
                     affectedRecords = await cmd.ExecuteNonQueryAsync();
                 }
 

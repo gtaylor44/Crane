@@ -15,7 +15,7 @@ namespace SprocMapperLibrary
     public abstract class BaseCommand : BaseInitialiser
     {
         /// <summary>
-        /// 
+        /// Interface for executing a command.
         /// </summary>
         /// <param name="command"></param>
         /// <param name="commandType"></param>
@@ -25,7 +25,7 @@ namespace SprocMapperLibrary
         public abstract int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
 
         /// <summary>
-        /// 
+        /// Executes a command asynchronously.
         /// </summary>
         /// <param name="command"></param>
         /// <param name="commandType"></param>
@@ -35,7 +35,7 @@ namespace SprocMapperLibrary
         public abstract Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
 
         /// <summary>
-        /// 
+        /// Add an sql parameter to the command.
         /// </summary>
         /// <param name="sqlParameter"></param>
         /// <returns></returns>
@@ -49,7 +49,7 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// 
+        /// Add an sql parameter to the command.
         /// </summary>
         /// <param name="parameterName"></param>
         /// <param name="value"></param>
@@ -64,7 +64,7 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// 
+        /// Add an sql parameter to the command.
         /// </summary>
         /// <param name="parameterName"></param>
         /// <param name="value"></param>
@@ -80,7 +80,7 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// Adds a list of SqlParameters to be passed into stored procedure.
+        /// Add a list of parameters to the command.
         /// </summary>
         /// <returns></returns>
         public BaseCommand AddSqlParameterCollection(IEnumerable<SqlParameter> sqlParameterCollection)

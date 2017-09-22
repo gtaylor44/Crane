@@ -42,6 +42,7 @@ namespace SprocMapperLibrary
 
         /// <inheritdoc />
         /// <summary>
+        /// Interface for executing a query.
         /// </summary>
         protected BaseQuery(AbstractCacheProvider cacheProvider) : base()
         {
@@ -51,7 +52,7 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// 
+        /// Validates that cache provider is instantiated.
         /// </summary>
         protected void ValidateCacheKey(string cacheKey)
         {
@@ -63,12 +64,14 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// If a property name does not match the corresponding column in select statement, 
-        /// you can create a custom mapping. This is helpful in situations where you want to use 
-        /// column aliasing in your stored procedure without losing mapping abilities.
+        /// If a property name does not match the corresponding column in select statement 
+        /// (due to aliasing or unmatching columns between table and model representation), 
+        /// create a custom mapping. 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
+        /// <param name="source">
+        /// Lambda style property selector (e.g. x => x.PropertyName)
+        /// </param>
         /// <param name="destination"></param>
         /// <returns></returns>
         public BaseQuery CustomColumnMapping<T>(Expression<Func<T, object>> source, string destination) where T : class
@@ -105,11 +108,11 @@ namespace SprocMapperLibrary
         }
 
         /// <summary>
-        /// Performs synchronous version of stored procedure.
+        /// Perform a query and map to model.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">The command can either be plain SQL or reference to a stored procedure.</param>
         /// <param name="commandTimeout"></param>
         /// <param name="partitionOnArr"></param>
         /// <param name="validateSelectColumns"></param>

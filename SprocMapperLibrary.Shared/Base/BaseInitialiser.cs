@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -74,9 +75,11 @@ namespace SprocMapperLibrary
         /// /// <param name="sqlCommand"></param>
         public bool IsStoredProcedure(string sqlCommand)
         {
-            if (sqlCommand.Contains("EXEC"))          
+            if (sqlCommand.StartsWith("EXEC", StringComparison.OrdinalIgnoreCase))          
                 return false;
-            
+
+            if (sqlCommand.StartsWith("SP", StringComparison.OrdinalIgnoreCase))
+                return false;
 
             if (!sqlCommand.Contains(" "))           
                 return true;

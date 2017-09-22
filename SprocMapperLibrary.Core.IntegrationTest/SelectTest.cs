@@ -15,7 +15,6 @@ namespace IntegrationTest
     [TestClass]
     public class SelectTest
     {
-
         // Returns all products with Id and Product Name only
         // Id has an alias of 'Product Id'
         [TestMethod]

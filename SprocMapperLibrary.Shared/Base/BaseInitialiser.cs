@@ -85,6 +85,8 @@ namespace SprocMapperLibrary
         /// /// <param name="sqlCommand"></param>
         public bool IsStoredProcedure(string sqlCommand)
         {
+            // Note: sqlCommand has already been trimmed in a prior process
+
             if (sqlCommand.StartsWith("EXEC(", StringComparison.OrdinalIgnoreCase))          
                 return false;
 

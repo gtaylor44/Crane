@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SprocMapperLibrary.CacheProvider;
 using System.Data.Common;
 using System.Data;
 using System.Data.SqlClient;
@@ -15,14 +14,14 @@ namespace SprocMapperLibrary
     public abstract class BaseCommand : BaseInitialiser
     {
         /// <summary>
-        /// Interface for executing a command.
+        /// Executes a command.
         /// </summary>
         /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="dbConnection"></param>
         /// <returns></returns>
-        public abstract int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
+        public abstract int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection dbConnection = null);
 
         /// <summary>
         /// Executes a command asynchronously.
@@ -30,9 +29,9 @@ namespace SprocMapperLibrary
         /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="dbConnection"></param>
         /// <returns></returns>
-        public abstract Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null);
+        public abstract Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection dbConnection = null);
 
         /// <summary>
         /// Add an sql parameter to the command.

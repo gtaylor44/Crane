@@ -44,7 +44,7 @@ namespace IntegrationTest
                         .AddSqlParameter("@FirstName", customer.FirstName)
                         .AddSqlParameter("@LastName", customer.LastName)
                         .AddSqlParameter("@Phone", customer.Phone)
-                        .ExecuteNonQuery("dbo.SaveCustomer", unmanagedConn: conn, commandType: CommandType.StoredProcedure);
+                        .ExecuteNonQuery("dbo.SaveCustomer", dbConnection: conn, commandType: CommandType.StoredProcedure);
 
                     int id = idParam.GetValueOrDefault<int>();
 
@@ -53,7 +53,7 @@ namespace IntegrationTest
 
                     dataAccess.Command()
                         .AddSqlParameter("@CustomerId", id)
-                        .ExecuteNonQuery("dbo.DeleteCustomer", unmanagedConn: conn, commandType: CommandType.StoredProcedure);
+                        .ExecuteNonQuery("dbo.DeleteCustomer", dbConnection: conn, commandType: CommandType.StoredProcedure);
 
                 }
 

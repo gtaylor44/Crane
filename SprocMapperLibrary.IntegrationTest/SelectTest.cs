@@ -342,7 +342,7 @@ namespace IntegrationTest
                     .Commit(conn);
 
                 var result = dataAccess.Query()
-                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes", unmanagedConn: conn)
+                    .ExecuteReader<TestDataType>("dbo.GetTestDataTypes", dbConnection: conn)
                     .SingleOrDefault();
 
                 Assert.AreEqual(1, result?.IntTest);

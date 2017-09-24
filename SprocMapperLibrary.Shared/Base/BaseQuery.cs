@@ -112,28 +112,28 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
-        /// <param name="command">The command can either be plain SQL or reference to a stored procedure.</param>
-        /// <param name="commandTimeout"></param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
         /// <param name="partitionOnArr"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <param name="saveCacheDel"></param>
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected abstract IEnumerable<TResult> ExecuteReaderImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string command, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
+            bool validateSelectColumns, DbConnection dbConnection, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="getObjectDel"></param>
         /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
         /// <param name="userConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <param name="saveCacheDe"></param>
         protected abstract IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
             string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe);
@@ -143,9 +143,9 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="getObjectDel"></param>
         /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
         /// <param name="userConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <param name="saveCacheDe"></param>
         protected abstract Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
             string command, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDe);
@@ -156,38 +156,38 @@ namespace SprocMapperLibrary
         /// <typeparam name="TResult"></typeparam>
         /// <param name="getObjectDel"></param>
         /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
         /// <param name="partitionOnArr"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <param name="saveCacheDel"></param>
         /// <param name="valueOrStringType"></param>
         /// <returns></returns>
         protected abstract Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(
             Action<DbDataReader, List<TResult>> getObjectDel,
             string command, int? commandTimeout, string[] partitionOnArr,
-            bool validateSelectColumns, DbConnection unmanagedConn, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
+            bool validateSelectColumns, DbConnection dbConnection, string cacheKey, Action saveCacheDel, bool valueOrStringType = false);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public abstract T ExecuteScalar<T>(string command, int? commandTimeout = null, DbConnection unmanagedConn = null);
+        public abstract T ExecuteScalar<T>(string command, int? commandTimeout = null, DbConnection dbConnection = null);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public abstract Task<T> ExecuteScalarAsync<T>(string command, int? commandTimeout = null, DbConnection unmanagedConn = null);
+        public abstract Task<T> ExecuteScalarAsync<T>(string command, int? commandTimeout = null, DbConnection dbConnection = null);
 
         /// <summary>
         /// 
@@ -251,10 +251,10 @@ namespace SprocMapperLibrary
         /// 
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        public IEnumerable<dynamic> ExecuteReader(string command, string cacheKey = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        public IEnumerable<dynamic> ExecuteReader(string command, string cacheKey = null, int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -275,7 +275,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -283,11 +283,11 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="command"></param>
         /// <param name="callBack"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
         public IEnumerable<dynamic> ExecuteReader(string command, Action<dynamic> callBack, string cacheKey = null, 
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -318,21 +318,21 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
         /// Perform a select statement against a single type.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="command">Text based command or name of stored procedure..</param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string command, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -357,7 +357,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(row);
                     }
 
-                }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
+                }, command, commandTimeout, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
             }
 
             if (type.GetTypeInfo().IsValueType || type == typeof(string))
@@ -372,7 +372,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(obj1);
                     }
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -387,22 +387,22 @@ namespace SprocMapperLibrary
                     cacheList.Add(obj1);
                 }
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
         /// Perform a select statement against a single type.
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string command, Action<TResult> callBack, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -437,7 +437,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(row);
                     }
 
-                }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
+                }, command, commandTimeout, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
             } 
 
             if (type.GetTypeInfo().IsValueType || type == typeof(string))
@@ -454,7 +454,7 @@ namespace SprocMapperLibrary
 
                     callBack.Invoke(obj1);
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -471,7 +471,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1);
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -479,18 +479,18 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <typeparam name="TJoin1"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1>(string command, Action<TResult, TJoin1> callBack,
             string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault, 
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
         {
@@ -533,7 +533,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -542,16 +542,16 @@ namespace SprocMapperLibrary
         /// <typeparam name="TResult"></typeparam>
         /// <typeparam name="TJoin1"></typeparam>
         /// <typeparam name="TJoin2"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2>(string command, Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -598,7 +598,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -608,17 +608,17 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin1"></typeparam>
         /// <typeparam name="TJoin2"></typeparam>
         /// <typeparam name="TJoin3"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3>(string command, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, 
             string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -667,7 +667,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -678,17 +678,17 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin2"></typeparam>
         /// <typeparam name="TJoin3"></typeparam>
         /// <typeparam name="TJoin4"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string command, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, 
             string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -741,7 +741,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -753,17 +753,17 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin3"></typeparam>
         /// <typeparam name="TJoin4"></typeparam>
         /// <typeparam name="TJoin5"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -819,7 +819,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -832,17 +832,17 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin4"></typeparam>
         /// <typeparam name="TJoin5"></typeparam>
         /// <typeparam name="TJoin6"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -900,7 +900,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -914,17 +914,17 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin5"></typeparam>
         /// <typeparam name="TJoin6"></typeparam>
         /// <typeparam name="TJoin7"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -987,7 +987,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1002,17 +1002,17 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin6"></typeparam>
         /// <typeparam name="TJoin7"></typeparam>
         /// <typeparam name="TJoin8"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string command,
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1078,18 +1078,18 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
         public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, string cacheKey = null, 
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -1110,7 +1110,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1118,11 +1118,11 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="command"></param>
         /// <param name="callBack"></param>
-        /// <param name="cacheKey"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
         public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, Action<dynamic> callBack, string cacheKey = null, 
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<dynamic> cachedResult;
@@ -1153,21 +1153,21 @@ namespace SprocMapperLibrary
                     cacheList.Add(row);
                 }
 
-            }, command, commandTimeout, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
         /// Perform a select statement against a single type.
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -1191,7 +1191,7 @@ namespace SprocMapperLibrary
                         cacheList.Add(obj1);
                     }
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1206,7 +1206,7 @@ namespace SprocMapperLibrary
                     cacheList.Add(obj1);
                 }
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1214,14 +1214,14 @@ namespace SprocMapperLibrary
         /// </summary>
         /// <param name="command"></param>
         /// <param name="callBack"></param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, Action<TResult> callBack, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection unmanagedConn = null)
+            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -1256,7 +1256,7 @@ namespace SprocMapperLibrary
 
                     callBack.Invoke(obj1);
 
-                }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings); 
@@ -1273,7 +1273,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1);
 
-            }, command, commandTimeout, null, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1284,14 +1284,14 @@ namespace SprocMapperLibrary
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1>(string command, Action<TResult, TJoin1> callBack,
             string partitionOn, string cacheKey = null, bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
         {
@@ -1335,7 +1335,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1344,18 +1344,18 @@ namespace SprocMapperLibrary
         /// <typeparam name="TResult"></typeparam>
         /// <typeparam name="TJoin1"></typeparam>
         /// <typeparam name="TJoin2"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2>(string command,
             Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null, 
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1402,7 +1402,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1412,18 +1412,18 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin1"></typeparam>
         /// <typeparam name="TJoin2"></typeparam>
         /// <typeparam name="TJoin3"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1473,7 +1473,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1484,18 +1484,18 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin2"></typeparam>
         /// <typeparam name="TJoin3"></typeparam>
         /// <typeparam name="TJoin4"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1549,7 +1549,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1561,18 +1561,18 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin3"></typeparam>
         /// <typeparam name="TJoin4"></typeparam>
         /// <typeparam name="TJoin5"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1628,7 +1628,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1641,18 +1641,18 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin4"></typeparam>
         /// <typeparam name="TJoin5"></typeparam>
         /// <typeparam name="TJoin6"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1711,7 +1711,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1725,18 +1725,18 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin5"></typeparam>
         /// <typeparam name="TJoin6"></typeparam>
         /// <typeparam name="TJoin7"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string command, 
             Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
             bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection unmanagedConn = null)
+            int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1799,7 +1799,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1814,20 +1814,20 @@ namespace SprocMapperLibrary
         /// <typeparam name="TJoin6"></typeparam>
         /// <typeparam name="TJoin7"></typeparam>
         /// <typeparam name="TJoin8"></typeparam>
-        /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
+        /// <param name="command">Text based command or name of stored procedure.</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
-        /// <param name="cacheKey"></param>
+        /// <param name="validateSelectColumns">If set to true, Crane will validate that ALL columns in query are mapped to target model.</param>
+        /// <param name="commandTimeout"><optional> Set the commandTimeout for query.</param>
+        /// <param name="dbConnection"><optional> If set, Crane will use the given DbConnection and the scope of connection will be unmanaged meaning you will need to clean up resources yourself.</param>
+        /// <param name="cacheKey"><optional> Define a key that uniquely identifies this query for caching stragies.</param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync
             <TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string command,
                 Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack,
                 string partitionOn, string cacheKey = null,
                 bool validateSelectColumns = ValidateSelectColumnsDefault,
-                int? commandTimeout = null, DbConnection unmanagedConn = null)
+                int? commandTimeout = null, DbConnection dbConnection = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1893,7 +1893,7 @@ namespace SprocMapperLibrary
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, unmanagedConn, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)

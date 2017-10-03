@@ -19,7 +19,8 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
+        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null,
+            DbConnection userConn = null, DbTransaction transaction = null)
         {
             try
             {
@@ -37,7 +38,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 using (var cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, transaction, commandTimeout, command);
                     affectedRecords = cmd.ExecuteNonQuery();
                 }
 
@@ -51,7 +52,8 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection userConn = null)
+        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, 
+            int? commandTimeout = null, DbConnection userConn = null, DbTransaction transaction = null)
         {
             try
             {
@@ -69,7 +71,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 using (var cmd = new SqlCommand(command, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, transaction, commandTimeout, command);
                     affectedRecords = await cmd.ExecuteNonQueryAsync();
                 }
 

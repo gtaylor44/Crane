@@ -58,9 +58,13 @@ namespace SprocMapperLibrary
         /// <param name="command"></param>
         /// <param name="sqlCommand"></param>
         /// <param name="commandTimeout"></param>
-        protected void SetCommandProps(DbCommand command, int? commandTimeout, string sqlCommand)
+        /// <param name="transaction"></param>
+        protected void SetCommandProps(DbCommand command, DbTransaction transaction, int? commandTimeout, string sqlCommand)
         {
             command.CommandType = IsStoredProcedure(sqlCommand) ? CommandType.StoredProcedure : CommandType.Text;
+
+            if (transaction != null)
+                command.Transaction = transaction;
 
             if (commandTimeout.HasValue)
                 command.CommandTimeout = commandTimeout.Value;
@@ -68,7 +72,11 @@ namespace SprocMapperLibrary
             if (ParamList != null && ParamList.Any())
                 command.Parameters.AddRange(ParamList.ToArray());
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sqlCommand"></param>
+        /// <returns></returns>
         public string GetCleanSqlCommand(string sqlCommand)
         {
             if (sqlCommand == null)

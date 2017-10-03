@@ -28,7 +28,7 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string query, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
+            string query, int? commandTimeout, DbConnection userConn, DbTransaction transaction, string cacheKey, Action saveCacheDel)
         {
             var userProvidedConnection = false;
             try
@@ -52,7 +52,7 @@ namespace SprocMapperLibrary.SqlServer
                 using (var cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, query);
+                    SetCommandProps(cmd, transaction, commandTimeout, query);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -90,7 +90,7 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override async Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
-            string query, int? commandTimeout, DbConnection userConn, string cacheKey, Action saveCacheDel)
+            string query, int? commandTimeout, DbConnection userConn, DbTransaction transaction, string cacheKey, Action saveCacheDel)
         {
             var userProvidedConnection = false;
             try
@@ -114,7 +114,7 @@ namespace SprocMapperLibrary.SqlServer
                 using (var cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, query);
+                    SetCommandProps(cmd, transaction, commandTimeout, query);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
@@ -151,7 +151,7 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
+            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, DbTransaction transaction,
             string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
@@ -175,7 +175,7 @@ namespace SprocMapperLibrary.SqlServer
                 using (SqlCommand cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, query);
+                    SetCommandProps(cmd, transaction, commandTimeout, query);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -224,7 +224,7 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         protected override async Task<IEnumerable<TResult>> ExecuteReaderAsyncImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn,
+            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, DbTransaction transaction,
             string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
@@ -249,7 +249,7 @@ namespace SprocMapperLibrary.SqlServer
                 using (var cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, commandTimeout, query);
+                    SetCommandProps(cmd, transaction, commandTimeout, query);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
@@ -297,7 +297,7 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        public override T ExecuteScalar<T>(string query, int? commandTimeout = null, DbConnection userConn = null)
+        public override T ExecuteScalar<T>(string query, int? commandTimeout = null, DbConnection userConn = null, DbTransaction transaction = null)
         {
             try
             {
@@ -315,7 +315,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 using (var cmd = new SqlCommand(query, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, query);
+                    SetCommandProps(cmd, transaction, commandTimeout, query);
                     obj = (T)cmd.ExecuteScalar();
                 }
 
@@ -330,7 +330,7 @@ namespace SprocMapperLibrary.SqlServer
         }
 
         /// <inheritdoc />
-        public override async Task<T> ExecuteScalarAsync<T>(string query, int? commandTimeout = null, DbConnection userConn = null)
+        public override async Task<T> ExecuteScalarAsync<T>(string query, int? commandTimeout = null, DbConnection userConn = null, DbTransaction transaction = null)
         {
             try
             {
@@ -348,7 +348,7 @@ namespace SprocMapperLibrary.SqlServer
 
                 using (var cmd = new SqlCommand(query, _conn))
                 {
-                    SetCommandProps(cmd, commandTimeout, query);
+                    SetCommandProps(cmd, transaction, commandTimeout, query);
                     obj = (T)await cmd.ExecuteScalarAsync();
                 }
 

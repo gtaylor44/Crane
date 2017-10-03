@@ -18,7 +18,8 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, 
+            DbConnection unmanagedConn = null, DbTransaction transaction = null)
         {
             try
             {
@@ -37,7 +38,7 @@ namespace SprocMapperLibrary.MySql
 
                 using (MySqlCommand cmd = new MySqlCommand(command, _mySqlConn))
                 {
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, transaction, commandTimeout, command);
                     affectedRecords = cmd.ExecuteNonQuery();
                 }
 
@@ -52,7 +53,8 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, DbConnection unmanagedConn = null)
+        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, 
+            DbConnection unmanagedConn = null, DbTransaction transaction = null)
         {
             try
             {
@@ -71,7 +73,7 @@ namespace SprocMapperLibrary.MySql
 
                 using (MySqlCommand cmd = new MySqlCommand(command, _mySqlConn))
                 {
-                    SetCommandProps(cmd, commandTimeout, command);
+                    SetCommandProps(cmd, transaction, commandTimeout, command);
                     affectedRecords = await cmd.ExecuteNonQueryAsync();
                 }
 

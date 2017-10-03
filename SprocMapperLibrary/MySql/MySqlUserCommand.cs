@@ -18,7 +18,7 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, 
+        public override int ExecuteNonQuery(string command, int? commandTimeout = null, 
             DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             try
@@ -53,7 +53,7 @@ namespace SprocMapperLibrary.MySql
         }
 
         /// <inheritdoc />
-        public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, 
+        public override async Task<int> ExecuteNonQueryAsync(string command, int? commandTimeout = null, 
             DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             try

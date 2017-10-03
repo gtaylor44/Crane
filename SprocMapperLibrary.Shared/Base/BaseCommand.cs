@@ -20,11 +20,11 @@ namespace SprocMapperLibrary
         /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="dbConnection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public abstract int ExecuteNonQuery(string command, CommandType? commandType = null, 
-            int? commandTimeout = null, DbConnection unmanagedConn = null, DbTransaction transaction = null);
+            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null);
 
         /// <summary>
         /// Executes a command asynchronously.
@@ -32,11 +32,11 @@ namespace SprocMapperLibrary
         /// <param name="command"></param>
         /// <param name="commandType"></param>
         /// <param name="commandTimeout"></param>
-        /// <param name="unmanagedConn"></param>
+        /// <param name="dbConnection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public abstract Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, 
-            int? commandTimeout = null, DbConnection unmanagedConn = null, DbTransaction transaction = null);
+            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null);
 
         /// <summary>
         /// Add an sql parameter to the command.

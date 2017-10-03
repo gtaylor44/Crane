@@ -19,7 +19,7 @@ namespace SprocMapperLibrary.MySql
 
         /// <inheritdoc />
         public override int ExecuteNonQuery(string command, CommandType? commandType = null, int? commandTimeout = null, 
-            DbConnection unmanagedConn = null, DbTransaction transaction = null)
+            DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             try
             {
@@ -28,11 +28,11 @@ namespace SprocMapperLibrary.MySql
                 command = GetCleanSqlCommand(command);
 
                 // Try open connection if not already open.
-                if (unmanagedConn == null)                
+                if (dbConnection == null)                
                     _mySqlConn = new MySqlConnection(_connectionString);
                                    
                 else                
-                    _mySqlConn = unmanagedConn as MySqlConnection;
+                    _mySqlConn = dbConnection as MySqlConnection;
                 
                 OpenConn(_mySqlConn);
 
@@ -46,7 +46,7 @@ namespace SprocMapperLibrary.MySql
             }
             finally
             {
-                if (unmanagedConn == null)
+                if (dbConnection == null)
                     _mySqlConn.Dispose();
             }
 
@@ -54,7 +54,7 @@ namespace SprocMapperLibrary.MySql
 
         /// <inheritdoc />
         public override async Task<int> ExecuteNonQueryAsync(string command, CommandType? commandType = null, int? commandTimeout = null, 
-            DbConnection unmanagedConn = null, DbTransaction transaction = null)
+            DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             try
             {
@@ -63,11 +63,11 @@ namespace SprocMapperLibrary.MySql
                 command = GetCleanSqlCommand(command);
 
                 // Try open connection if not already open.
-                if (unmanagedConn == null)             
+                if (dbConnection == null)             
                     _mySqlConn = new MySqlConnection(_connectionString);
                                                        
                 else                
-                    _mySqlConn = unmanagedConn as MySqlConnection;
+                    _mySqlConn = dbConnection as MySqlConnection;
                 
                 await OpenConnAsync(_mySqlConn);
 
@@ -81,7 +81,7 @@ namespace SprocMapperLibrary.MySql
             }
             finally
             {
-                if (unmanagedConn == null)
+                if (dbConnection == null)
                      _mySqlConn.Dispose();
             }
 

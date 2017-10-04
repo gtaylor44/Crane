@@ -24,7 +24,7 @@ namespace IntegrationTest
 
             var productList = dataAccess
                 .Query()
-                .ExecuteReader(" dbo.GetProducts")
+                .ExecuteReader(" dbo.GetProducts", CommandType.)
                 .ToList()
                 .ConvertAll(x => new Product()
             {

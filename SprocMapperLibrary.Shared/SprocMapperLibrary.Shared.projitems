@@ -30,5 +30,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\TwoJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SprocMapperException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SprocObjectMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\CraneCommandType.cs" />
   </ItemGroup>
 </Project>

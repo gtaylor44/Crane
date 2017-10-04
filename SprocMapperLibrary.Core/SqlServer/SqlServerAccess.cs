@@ -1,6 +1,7 @@
 ﻿using System;
 using SprocMapperLibrary.Base;
 using SprocMapperLibrary.CacheProvider;
+using SprocMapperLibrary.Core.SqlServer;
 using SprocMapperLibrary.Interface;
 
 namespace SprocMapperLibrary.SqlServer

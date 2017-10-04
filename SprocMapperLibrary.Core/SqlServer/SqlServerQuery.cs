@@ -6,7 +6,7 @@ using System.Dynamic;
 using System.Threading.Tasks;
 using SprocMapperLibrary.CacheProvider;
 
-namespace SprocMapperLibrary.SqlServer
+namespace SprocMapperLibrary.Core.SqlServer
 {
     /// <inheritdoc />
     public class SqlServerQuery : BaseQuery

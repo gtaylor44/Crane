@@ -58,9 +58,11 @@
   <ItemGroup>
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheProvider.cs" />
     <Compile Include="CacheProvider\MemoryCache\MemoryCacheSingleton.cs" />
+    <Compile Include="MySql\Extensions.cs" />
     <Compile Include="MySql\MySqlUserCommand.cs" />
     <Compile Include="MySql\MySqlServerAccess.cs" />
     <Compile Include="MySql\MySqlUserQuery.cs" />
+    <Compile Include="SqlServer\Extensions.cs" />
     <Compile Include="SqlServer\SqlServerAccess.cs" />
     <Compile Include="SqlServer\SqlServerCommand.cs" />
     <Compile Include="SqlServer\SqlServerQuery.cs" />

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("SprocMapperLibrary.UnitTests")]
 [assembly: InternalsVisibleTo("SprocMapperLibrary.IntegrationTests")]
-namespace SprocMapperLibrary
+namespace Crane
 {
     internal class CraneException : Exception
     {

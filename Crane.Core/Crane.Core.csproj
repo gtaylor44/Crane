@@ -4,8 +4,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <VersionPrefix>1.0</VersionPrefix>
-    <AssemblyTitle>SprocMapperLibrary.Core</AssemblyTitle>
-    <Description>Sprocmapper Library</Description>
+    <AssemblyTitle>Crane.Core</AssemblyTitle>
+    <Description>Crane Library</Description>
     <Copyright>Copyright © Greg Taylor 2017</Copyright>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
@@ -18,10 +18,5 @@
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Runtime.Caching">
-      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Caching.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace SprocMapperLibrary
+namespace Crane
 {
     /// <summary>
     /// Marker interface for overloaded ExecuteReader methods to encourage code reuse

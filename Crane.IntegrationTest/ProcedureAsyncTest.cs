@@ -3,11 +3,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Transactions;
+using Crane;
+using Crane.SqlServer;
+using Crane.TestCommon.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SprocMapperLibrary;
-using SprocMapperLibrary.SqlServer;
-using SprocMapperLibrary.TestCommon.Model;
-using SprocMapperLibrary.TestCommon;
+using Crane.TestCommon;
 
 namespace IntegrationTest
 {

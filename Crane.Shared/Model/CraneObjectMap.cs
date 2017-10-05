@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FastMember;
 
-namespace SprocMapperLibrary
+namespace Crane
 {
     internal class CraneObjectMap<T> : ICraneObjectMap
     {

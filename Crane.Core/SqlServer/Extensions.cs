@@ -1,7 +1,7 @@
-﻿using SprocMapperLibrary.SqlServer;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
+using Crane.SqlServer;
 
-namespace SprocMapperLibrary.Core.SqlServer
+namespace Crane.Core.SqlServer
 {
     /// <summary>
     /// 

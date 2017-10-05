@@ -5,12 +5,12 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using Crane;
+using Crane.Interface;
+using Crane.SqlServer;
+using Crane.TestCommon;
+using Crane.TestCommon.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SprocMapperLibrary;
-using SprocMapperLibrary.Interface;
-using SprocMapperLibrary.SqlServer;
-using SprocMapperLibrary.TestCommon;
-using SprocMapperLibrary.TestCommon.Model;
 
 namespace IntegrationTest
 {

@@ -1,4 +1,4 @@
-﻿namespace SprocMapperLibrary.Model
+﻿namespace Crane.Model
 {
     /// <summary>
     /// 

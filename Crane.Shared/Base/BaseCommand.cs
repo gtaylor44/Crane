@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SprocMapperLibrary.CacheProvider;
 using System.Data.Common;
 using System.Data;
 using System.Data.SqlClient;
 
 // ReSharper disable once CheckNamespace
-namespace SprocMapperLibrary
+namespace Crane
 {
     /// <inheritdoc />
     /// <summary>

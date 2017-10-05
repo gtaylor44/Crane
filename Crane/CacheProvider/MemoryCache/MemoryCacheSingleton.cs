@@ -1,4 +1,4 @@
-﻿namespace SprocMapperLibrary.CacheProvider.MemoryCache
+﻿namespace Crane.CacheProvider.MemoryCache
 {
     /// <summary>
     /// 

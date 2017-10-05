@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
-namespace SprocMapperLibrary.MySql
+namespace Crane.MySql
 {
     /// <inheritdoc />
     public class MySqlUserCommand : BaseCommand

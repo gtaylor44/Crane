@@ -5,10 +5,10 @@ using System.Data.Common;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using Crane.CacheProvider;
 using MySql.Data.MySqlClient;
-using SprocMapperLibrary.CacheProvider;
 
-namespace SprocMapperLibrary.MySql
+namespace Crane.MySql
 {
     /// <inheritdoc />
     public class MySqlUserQuery : BaseQuery

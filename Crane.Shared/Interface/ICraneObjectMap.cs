@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using FastMember;
 
 // ReSharper disable once CheckNamespace
-namespace SprocMapperLibrary
+namespace Crane
 {
     /// <summary>
     /// 

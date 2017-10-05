@@ -1,4 +1,4 @@
-﻿namespace SprocMapperLibrary.TestCommon.Model
+﻿namespace Crane.TestCommon.Model
 {
     public class OrderItem
     {

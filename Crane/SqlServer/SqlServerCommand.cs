@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
-namespace SprocMapperLibrary.SqlServer
+namespace Crane.SqlServer
 {
     /// <inheritdoc />
     public class SqlServerCommand : BaseCommand

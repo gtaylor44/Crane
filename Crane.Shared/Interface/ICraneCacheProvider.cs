@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SprocMapperLibrary.Shared.Interface
+namespace Crane.Shared.Interface
 {
     /// <summary>
     /// 

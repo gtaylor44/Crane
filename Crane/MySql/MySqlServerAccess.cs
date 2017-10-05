@@ -1,9 +1,9 @@
 ﻿using System;
-using SprocMapperLibrary.Base;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.Interface;
+using Crane.Base;
+using Crane.CacheProvider;
+using Crane.Interface;
 
-namespace SprocMapperLibrary.MySql
+namespace Crane.MySql
 {
     /// <summary>
     /// </summary>

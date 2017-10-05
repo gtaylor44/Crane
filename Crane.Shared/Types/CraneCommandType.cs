@@ -1,4 +1,4 @@
-﻿namespace SprocMapperLibrary.Shared.Types
+﻿namespace Crane.Shared.Types
 {
     /// <summary>
     /// 

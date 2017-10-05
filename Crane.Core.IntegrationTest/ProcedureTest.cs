@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using Crane;
+using Crane.SqlServer;
+using Crane.TestCommon;
+using Crane.TestCommon.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SprocMapperLibrary;
-using SprocMapperLibrary.SqlServer;
-using SprocMapperLibrary.TestCommon;
-using SprocMapperLibrary.TestCommon.Model;
 
 namespace IntegrationTest
 {

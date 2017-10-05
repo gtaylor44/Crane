@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Crane.Shared.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SprocMapperLibrary.Shared.Interface;
 
-namespace SprocMapperLibrary.CacheProvider
+namespace Crane.CacheProvider
 {
     /// <inheritdoc />
     public abstract class AbstractCraneCacheProvider : ICraneCacheProvider

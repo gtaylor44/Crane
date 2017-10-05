@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 // ReSharper disable once CheckNamespace
-namespace SprocMapperLibrary
+namespace Crane
 {
     /// <summary>
     /// 

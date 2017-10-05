@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 
-namespace SprocMapperLibrary.SqlServer
+namespace Crane.SqlServer
 {
     /// <summary>
     /// 

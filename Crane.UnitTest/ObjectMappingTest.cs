@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Crane;
+using Crane.TestCommon;
+using Crane.TestCommon.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using SprocMapperLibrary;
-using SprocMapperLibrary.TestCommon;
-using SprocMapperLibrary.TestCommon.Model;
 
 namespace UnitTest
 {

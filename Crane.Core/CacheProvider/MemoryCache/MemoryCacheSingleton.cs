@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-namespace SprocMapperLibrary.CacheProvider.MemoryCache
+namespace Crane.CacheProvider.MemoryCache
 {
     /// <summary>
     /// 

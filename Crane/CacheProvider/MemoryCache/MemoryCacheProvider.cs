@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Caching;
 
-namespace SprocMapperLibrary.CacheProvider.MemoryCache
+namespace Crane.CacheProvider.MemoryCache
 {
     /// <inheritdoc />
     public class MemoryCacheProvider : AbstractCraneCacheProvider

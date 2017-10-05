@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SprocMapperLibrary.TestCommon
+namespace Crane.TestCommon
 {
     public sealed class MyExpectedException : ExpectedExceptionBaseAttribute
     {

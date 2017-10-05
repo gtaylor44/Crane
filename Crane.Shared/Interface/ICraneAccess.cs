@@ -1,7 +1,7 @@
-﻿using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.Shared.Interface;
+﻿
+using Crane.Shared.Interface;
 
-namespace SprocMapperLibrary.Interface
+namespace Crane.Interface
 {
     /// <summary>
     /// 

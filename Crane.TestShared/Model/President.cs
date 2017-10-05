@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SprocMapperLibrary.TestCommon.Model
+namespace Crane.TestCommon.Model
 {
     public class President
     {

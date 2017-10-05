@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data.SqlClient;
-using SprocMapperLibrary.Base;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.Interface;
+using Crane.Base;
+using Crane.CacheProvider;
+using Crane.Interface;
 
-namespace SprocMapperLibrary.SqlServer
+namespace Crane.SqlServer
 {
     /// <summary>
     /// 

@@ -11,7 +11,7 @@ using Microsoft.SqlServer.Types;
 
 [assembly: InternalsVisibleTo("UnitTest")]
 [assembly: InternalsVisibleTo("IntegrationTest")]
-namespace SprocMapperLibrary
+namespace Crane
 {
     internal static class CraneHelper
     {

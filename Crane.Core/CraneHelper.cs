@@ -13,7 +13,7 @@ using System.Data.Common;
 
 [assembly: InternalsVisibleTo("UnitTest")]
 [assembly: InternalsVisibleTo("IntegrationTest")]
-namespace SprocMapperLibrary
+namespace Crane
 {
     internal static class CraneHelper
     {

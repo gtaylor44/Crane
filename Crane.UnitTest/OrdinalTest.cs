@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using SprocMapperLibrary;
-using SprocMapperLibrary.TestCommon;
-using SprocMapperLibrary.TestCommon.Model;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+using Crane;
+using Crane.TestCommon;
+using Crane.TestCommon.Model;
 
 namespace UnitTest
 {

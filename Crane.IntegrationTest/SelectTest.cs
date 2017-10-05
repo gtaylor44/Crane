@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using Crane;
+using Crane.CacheProvider.MemoryCache;
+using Crane.Interface;
+using Crane.SqlServer;
+using Crane.TestCommon;
+using Crane.TestCommon.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SprocMapperLibrary;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.CacheProvider.MemoryCache;
-using SprocMapperLibrary.Interface;
-using SprocMapperLibrary.SqlServer;
-using SprocMapperLibrary.TestCommon;
-using SprocMapperLibrary.TestCommon.Model;
 using SqlBulkTools;
+using Crane.CacheProvider;
 
 namespace IntegrationTest
 {

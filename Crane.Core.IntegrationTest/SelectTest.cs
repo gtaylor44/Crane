@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.CacheProvider.MemoryCache;
-using SprocMapperLibrary.Interface;
-using SprocMapperLibrary.SqlServer;
-using SprocMapperLibrary.TestCommon.Model;
-using SprocMapperLibrary.TestCommon;
 using System;
+using Crane.CacheProvider.MemoryCache;
+using Crane.Interface;
+using Crane.SqlServer;
+using Crane.TestCommon;
+using Crane.TestCommon.Model;
+using Crane.CacheProvider;
 
 namespace IntegrationTest
 {

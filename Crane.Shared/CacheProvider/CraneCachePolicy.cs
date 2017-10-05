@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SprocMapperLibrary.CacheProvider
+namespace Crane.CacheProvider
 {
     /// <summary>
     /// 

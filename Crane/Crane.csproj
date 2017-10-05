@@ -8,8 +8,8 @@
     <ProjectGuid>{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SprocMapperLibrary</RootNamespace>
-    <AssemblyName>SprocMapperLibrary</AssemblyName>
+    <RootNamespace>Crane</RootNamespace>
+    <AssemblyName>Crane</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -23,7 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug\SprocMapperLibrary.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Crane.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -72,6 +72,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Crane.Core\Crane.Core.csproj">
+      <Project>{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}</Project>
+      <Name>Crane.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

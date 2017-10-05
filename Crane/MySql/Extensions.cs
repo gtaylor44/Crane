@@ -1,6 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 
-namespace SprocMapperLibrary.MySql
+namespace Crane.MySql
 {
     /// <summary>
     /// 

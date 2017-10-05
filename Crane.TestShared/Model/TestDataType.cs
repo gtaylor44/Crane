@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SprocMapperLibrary.TestCommon.Model
+namespace Crane.TestCommon.Model
 {
     public class TestDataType
     {

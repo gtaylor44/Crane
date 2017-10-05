@@ -1,8 +1,8 @@
 ﻿using System;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.Shared.Interface;
+using Crane.CacheProvider;
+using Crane.Shared.Interface;
 
-namespace SprocMapperLibrary.Base
+namespace Crane.Base
 {
     /// <summary>
     /// Contains common behaviours that access object should have. 

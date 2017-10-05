@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SprocMapperLibrary.CacheProvider.MemoryCache
+namespace Crane.CacheProvider.MemoryCache
 {  
     /// <inheritdoc />
     public class MemoryCacheProvider : AbstractCraneCacheProvider

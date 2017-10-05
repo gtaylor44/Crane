@@ -4,15 +4,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FastMember;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.Model;
 using System.Data.Common;
 using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
+using Crane.CacheProvider;
+using Crane.Model;
 
 // ReSharper disable once CheckNamespace
-namespace SprocMapperLibrary
+namespace Crane
 {
     /// <inheritdoc />
     /// <summary>

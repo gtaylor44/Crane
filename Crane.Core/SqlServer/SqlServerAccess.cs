@@ -1,13 +1,12 @@
 ﻿using System;
-using SprocMapperLibrary.Base;
-using SprocMapperLibrary.CacheProvider;
-using SprocMapperLibrary.Core.SqlServer;
-using SprocMapperLibrary.Interface;
+using Crane.Base;
+using Crane.CacheProvider;
+using Crane.Core.SqlServer;
+using Crane.Interface;
 
-namespace SprocMapperLibrary.SqlServer
+namespace Crane.SqlServer
 {
     /// <summary>
-    /// 
     /// </summary>
     public class SqlServerAccess : BaseAccess, ICraneAccess
     {

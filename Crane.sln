@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crane.UnitTest", "Crane.UnitTest\Crane.UnitTest.csproj", "{F18E9219-B104-4B23-A0CC-520653D40A43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crane.IntegrationTest", "Crane.IntegrationTest\Crane.IntegrationTest.csproj", "{ADB34AAB-E2A3-4B55-87E6-EE3481982758}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crane", "Crane\Crane.csproj", "{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Crane.Shared", "Crane.Shared\Crane.Shared.shproj", "{ADB65E5B-BD5D-4BD5-8262-DDFCCFF937F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crane.Core", "Crane.Core\Crane.Core.csproj", "{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crane.Core.IntegrationTest", "Crane.Core.IntegrationTest\Crane.Core.IntegrationTest.csproj", "{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Crane.TestShared", "Crane.TestShared\Crane.TestShared.shproj", "{07F5D8EA-4321-4A9F-BA96-71B34BD9B04A}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Crane.TestShared\Crane.TestShared.projitems*{07f5d8ea-4321-4a9f-ba96-71b34bd9b04a}*SharedItemsImports = 13
+		Crane.Shared\Crane.Shared.projitems*{ac717bc4-c2f1-40ba-afb2-0ade649a33a5}*SharedItemsImports = 4
+		Crane.Shared\Crane.Shared.projitems*{adb65e5b-bd5d-4bd5-8262-ddfccff937f8}*SharedItemsImports = 13
+		Crane.TestShared\Crane.TestShared.projitems*{f18e9219-b104-4b23-a0cc-520653d40a43}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F18E9219-B104-4B23-A0CC-520653D40A43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADB34AAB-E2A3-4B55-87E6-EE3481982758}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADB34AAB-E2A3-4B55-87E6-EE3481982758}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADB34AAB-E2A3-4B55-87E6-EE3481982758}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADB34AAB-E2A3-4B55-87E6-EE3481982758}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC717BC4-C2F1-40BA-AFB2-0ADE649A33A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E77C32A-F955-4F53-BEFA-7F604A2ACF4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C33DE1-FACB-4CDE-A676-CD9C2F15E180}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BABC4160-41F6-4EE6-8686-62975E6575F8}
+	EndGlobalSection
+EndGlobal

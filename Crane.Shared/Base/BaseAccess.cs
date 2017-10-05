@@ -15,7 +15,7 @@ namespace SprocMapperLibrary.Base
         /// <summary>
         /// 
         /// </summary>
-        protected AbstractCacheProvider CacheProvider;
+        protected AbstractCraneCacheProvider CacheProvider;
 
         /// <summary>
         /// 
@@ -29,12 +29,12 @@ namespace SprocMapperLibrary.Base
         /// 
         /// </summary>
         /// <param name="cacheProvider"></param>
-        public void RegisterCacheProvider(ICacheProvider cacheProvider)
+        public void RegisterCacheProvider(ICraneCacheProvider cacheProvider)
         {
             if (CacheProvider != null)
                 throw new InvalidOperationException(CacheAlreadyRegisteredMsg);
 
-            CacheProvider = cacheProvider as AbstractCacheProvider;
+            CacheProvider = cacheProvider as AbstractCraneCacheProvider;
         }
 
         /// <summary>

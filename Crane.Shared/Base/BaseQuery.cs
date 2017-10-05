@@ -22,7 +22,7 @@ namespace SprocMapperLibrary
         /// <summary>
         /// 
         /// </summary>
-        internal readonly List<ISprocObjectMap> SprocObjectMapList;
+        internal readonly List<ICraneObjectMap> SprocObjectMapList;
         /// <summary>
         /// 
         /// </summary>
@@ -35,7 +35,7 @@ namespace SprocMapperLibrary
         /// <summary>
         /// 
         /// </summary>
-        protected readonly AbstractCacheProvider CacheProvider;
+        protected readonly AbstractCraneCacheProvider CacheProvider;
 
         private const char PartitionSplitOnChar = '|';
 
@@ -44,9 +44,9 @@ namespace SprocMapperLibrary
         /// <summary>
         /// Interface for executing a query.
         /// </summary>
-        protected BaseQuery(AbstractCacheProvider cacheProvider) : base()
+        protected BaseQuery(AbstractCraneCacheProvider cacheProvider) : base()
         {
-            SprocObjectMapList = new List<ISprocObjectMap>();
+            SprocObjectMapList = new List<ICraneObjectMap>();
             CustomColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
             CacheProvider = cacheProvider;
         }
@@ -392,7 +392,7 @@ namespace SprocMapperLibrary
                 }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
-            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
@@ -476,7 +476,7 @@ namespace SprocMapperLibrary
                 }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
-            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             return ExecuteReaderImpl<TResult>((reader, res) =>
             {
@@ -530,7 +530,7 @@ namespace SprocMapperLibrary
                 return oneJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -593,7 +593,7 @@ namespace SprocMapperLibrary
                 return twoJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -662,7 +662,7 @@ namespace SprocMapperLibrary
                 return threeJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -734,7 +734,7 @@ namespace SprocMapperLibrary
                 return fourJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -812,7 +812,7 @@ namespace SprocMapperLibrary
 
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -892,7 +892,7 @@ namespace SprocMapperLibrary
                 return sixJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -976,7 +976,7 @@ namespace SprocMapperLibrary
                 return sevenJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1225,7 +1225,7 @@ namespace SprocMapperLibrary
                 }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
-            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -1291,7 +1291,7 @@ namespace SprocMapperLibrary
                 }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
-            MapObject<TResult, INullType, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings); 
+            MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings); 
 
             return await ExecuteReaderAsyncImpl<TResult>((reader, res) =>
             {
@@ -1344,7 +1344,7 @@ namespace SprocMapperLibrary
                 return oneJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, INullType, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1410,7 +1410,7 @@ namespace SprocMapperLibrary
                 return twoJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, INullType, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1480,7 +1480,7 @@ namespace SprocMapperLibrary
                 return threeJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, INullType, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1554,7 +1554,7 @@ namespace SprocMapperLibrary
                 return fourJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, INullType, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1633,7 +1633,7 @@ namespace SprocMapperLibrary
                 return fiveJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, INullType, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1715,7 +1715,7 @@ namespace SprocMapperLibrary
                 return sixJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, INullType, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1801,7 +1801,7 @@ namespace SprocMapperLibrary
                 return sevenJoins.Select(x => x.Result);
             }
 
-            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, INullType>(SprocObjectMapList, CustomColumnMappings);
+            MapObject<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
 
             CraneHelper.ValidatePartitionOn(partitionOn);
             var partitionOnArr = partitionOn.Split(PartitionSplitOnChar);
@@ -1936,59 +1936,59 @@ namespace SprocMapperLibrary
             }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
-        private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
+        private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ICraneObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
         {
             HashSet<Type> tempHashSet = new HashSet<Type>();
 
-            if (typeof(T) != typeof(INullType))
+            if (typeof(T) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T));
                 CraneHelper.MapObject<T>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T1) != typeof(INullType))
+            if (typeof(T1) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T1));
                 CraneHelper.MapObject<T1>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T2) != typeof(INullType))
+            if (typeof(T2) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T2));
                 CraneHelper.MapObject<T2>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T3) != typeof(INullType))
+            if (typeof(T3) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T3));
                 CraneHelper.MapObject<T3>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T4) != typeof(INullType))
+            if (typeof(T4) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T4));
                 CraneHelper.MapObject<T4>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T5) != typeof(INullType))
+            if (typeof(T5) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T5));
                 CraneHelper.MapObject<T5>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T6) != typeof(INullType))
+            if (typeof(T6) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T6));
                 CraneHelper.MapObject<T6>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T7) != typeof(INullType))
+            if (typeof(T7) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T7));
                 CraneHelper.MapObject<T7>(sprocObjectMapList, customColumnMappings);
             }
 
-            if (typeof(T8) != typeof(INullType))
+            if (typeof(T8) != typeof(ICraneNullType))
             {
                 ValidateType(tempHashSet, typeof(T8));
                 CraneHelper.MapObject<T8>(sprocObjectMapList, customColumnMappings);

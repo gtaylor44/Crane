@@ -24,7 +24,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProductsDynamic()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var productList = dataAccess.Query().ExecuteReader("dbo.GetProducts")
                 .ToList()
@@ -42,7 +42,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProductsDynamicWithCallback()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             List<Product> productList = new List<Product>();
             dataAccess.Query()
@@ -61,7 +61,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetAllCustomersAndOrders()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
@@ -92,14 +92,14 @@ namespace IntegrationTest
         {
             var cacheProvider = new MemoryCacheProvider();
 
-            cacheProvider.AddPolicy("GetProducts", new SprocCachePolicy()
+            cacheProvider.AddPolicy("GetProducts", new CraneCachePolicy()
             {
                 InfiniteExpiration = true
                 
                 
             });
 
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);
 
 
             var products = dataAccess.Query()
@@ -116,7 +116,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProductsTextQuery()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var products = dataAccess.Query()
                 .AddSqlParameter("@SupplierId", 1)
@@ -128,7 +128,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProducts_WithCallback()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             List<Product> productList = new List<Product>();
 
@@ -148,7 +148,7 @@ namespace IntegrationTest
         [TestMethod]
         public void SelectSingleCustomerAndOrders()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             Customer cust = null;
 
@@ -178,7 +178,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetProductAndSupplier()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             int productId = 62;
             Product product = null;
@@ -203,7 +203,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetOrderAndProducts()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             int orderId = 20;
 
@@ -236,7 +236,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetSuppliers()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var suppliers = dataAccess.Query()
                 .ExecuteReader<Supplier>("dbo.GetSuppliers");
@@ -246,7 +246,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetCustomer()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
 
             var customer = dataAccess.Query()
@@ -264,7 +264,7 @@ namespace IntegrationTest
         [TestMethod]
         public void GetSupplierByName()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
 
             var supplier = dataAccess.Query()
@@ -280,7 +280,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(CraneException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
         public void CustomColumnName_MustBeUniqueToClass()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             dataAccess.Query()           
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
@@ -291,7 +291,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(CraneException), "A cache key has been provided without a cache provider. Use the method 'RegisterCacheProvider' to register a cache provider.")]
         public void CacheKeyNotProvided_ThrowsException()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             dataAccess.Query().ExecuteReader<Product>("dbo.GetProducts", cacheKey: "test");
         }
@@ -299,7 +299,7 @@ namespace IntegrationTest
         [TestMethod]
         public void SaveGetDataTypes()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             BulkOperations bulk = new BulkOperations();
 

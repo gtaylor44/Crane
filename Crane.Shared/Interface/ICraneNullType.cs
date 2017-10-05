@@ -4,7 +4,7 @@ namespace SprocMapperLibrary
     /// <summary>
     /// Marker interface for overloaded ExecuteReader methods to encourage code reuse
     /// </summary>
-    internal interface INullType
+    internal interface ICraneNullType
     {
     }
 }

@@ -7,7 +7,7 @@ using SprocMapperLibrary.Shared.Interface;
 namespace SprocMapperLibrary.CacheProvider
 {
     /// <inheritdoc />
-    public abstract class AbstractCacheProvider : ICacheProvider
+    public abstract class AbstractCraneCacheProvider : ICraneCacheProvider
     {
         /// <summary>
         /// 
@@ -17,19 +17,19 @@ namespace SprocMapperLibrary.CacheProvider
         /// <summary>
         /// 
         /// </summary>
-        protected SprocCachePolicy GlobalSprocPolicy;
+        protected CraneCachePolicy GlobalSprocPolicy;
 
         /// <summary>
         /// 
         /// </summary>
-        protected readonly List<SprocCachePolicy> CustomSprocCachePolicyList;
+        protected readonly List<CraneCachePolicy> CustomSprocCachePolicyList;
 
         /// <summary>
         /// 
         /// </summary>
-        protected AbstractCacheProvider()
+        protected AbstractCraneCacheProvider()
         {
-            CustomSprocCachePolicyList = new List<SprocCachePolicy>();
+            CustomSprocCachePolicyList = new List<CraneCachePolicy>();
             GlobalSprocPolicy = null;
         }
 
@@ -49,7 +49,7 @@ namespace SprocMapperLibrary.CacheProvider
         /// Set a custom policy on all cached items.
         /// </summary>
         /// <param name="policy">The custom policy.</param>
-        public void AddGlobalPolicy(SprocCachePolicy policy)
+        public void AddGlobalPolicy(CraneCachePolicy policy)
         {
             if (PolicyIsValid(policy))
                 GlobalSprocPolicy = policy;
@@ -60,7 +60,7 @@ namespace SprocMapperLibrary.CacheProvider
         /// </summary>
         /// <param name="regularExpression">The regular express pattern to match.</param>
         /// <param name="policy">The custom policy.</param>
-        public void AddPolicy(string regularExpression, SprocCachePolicy policy)
+        public void AddPolicy(string regularExpression, CraneCachePolicy policy)
         {
             if (policy == null)
                 throw new ArgumentNullException(nameof(policy));
@@ -70,7 +70,7 @@ namespace SprocMapperLibrary.CacheProvider
                 CustomSprocCachePolicyList.Add(policy);
         }
 
-        private bool PolicyIsValid(SprocCachePolicy policy)
+        private bool PolicyIsValid(CraneCachePolicy policy)
         {
             if (policy == null)
             {
@@ -115,7 +115,7 @@ namespace SprocMapperLibrary.CacheProvider
         /// 
         /// </summary>
         /// <returns></returns>
-        protected SprocCachePolicy GetCachingStrategy(string key)
+        protected CraneCachePolicy GetCachingStrategy(string key)
         {
             // If specific policy exists, use it and break from loop. 
             if (CustomSprocCachePolicyList != null && CustomSprocCachePolicyList.Any())
@@ -139,9 +139,9 @@ namespace SprocMapperLibrary.CacheProvider
             return GetDefaultPolicy();
         }
 
-        private static SprocCachePolicy GetDefaultPolicy()
+        private static CraneCachePolicy GetDefaultPolicy()
         {
-            return new SprocCachePolicy()
+            return new CraneCachePolicy()
             {
                 InfiniteExpiration = true
             };

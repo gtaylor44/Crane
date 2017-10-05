@@ -5,7 +5,7 @@ namespace SprocMapperLibrary.CacheProvider
     /// <summary>
     /// 
     /// </summary>
-    public class SprocCachePolicy
+    public class CraneCachePolicy
     {
         /// <summary>
         /// Apply the policy only to the keys in a given regular expression.

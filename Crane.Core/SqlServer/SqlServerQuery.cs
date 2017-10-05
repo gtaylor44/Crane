@@ -16,7 +16,7 @@ namespace SprocMapperLibrary.Core.SqlServer
         private readonly string _connectionString;
 
         /// <inheritdoc />
-        public SqlServerQuery(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
+        public SqlServerQuery(string connectionString, AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
         }

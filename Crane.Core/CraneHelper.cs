@@ -17,7 +17,7 @@ namespace SprocMapperLibrary
 {
     internal static class CraneHelper
     {
-        public static void SetOrdinal(ReadOnlyCollection<DbColumn> columnSchema, List<ISprocObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
+        public static void SetOrdinal(ReadOnlyCollection<DbColumn> columnSchema, List<ICraneObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
             int currMap = 0;
 
@@ -146,14 +146,14 @@ namespace SprocMapperLibrary
                 throw new CraneException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'OrderId|ProductId'");
         }
 
-        public static bool ValidateSelectColumns(ReadOnlyCollection<DbColumn> columnSchema, List<ISprocObjectMap> sprocObjectMapList,
+        public static bool ValidateSelectColumns(ReadOnlyCollection<DbColumn> columnSchema, List<ICraneObjectMap> sprocObjectMapList,
             int[] partitionOnOrdinal)
         {
             List<string> absentColumnMessageList = new List<string>();
 
             if (sprocObjectMapList.Count == 1)
             {
-                ISprocObjectMap objectMap = sprocObjectMapList.ElementAt(0);
+                ICraneObjectMap objectMap = sprocObjectMapList.ElementAt(0);
                 foreach (var col in columnSchema)
                 {
                     string currColumn = col.ColumnName;
@@ -198,14 +198,14 @@ namespace SprocMapperLibrary
             return true;
         }
 
-        public static string GetActualColumn(string columnName, ISprocObjectMap objectMap) 
+        public static string GetActualColumn(string columnName, ICraneObjectMap objectMap) 
         {
             return objectMap.CustomColumnMappings.ContainsKey(columnName)
                 ? objectMap.CustomColumnMappings[columnName]
                 : columnName;
         }
 
-        public static bool ValidateCustomColumnMappings(List<ISprocObjectMap> sprocObjectMapList)
+        public static bool ValidateCustomColumnMappings(List<ICraneObjectMap> sprocObjectMapList)
         {
             foreach (var map in sprocObjectMapList)
             {
@@ -225,12 +225,12 @@ namespace SprocMapperLibrary
             return true;
         }
 
-        public static void ValidateSchema(ReadOnlyCollection<DbColumn> columnSchema, List<ISprocObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
+        public static void ValidateSchema(ReadOnlyCollection<DbColumn> columnSchema, List<ICraneObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
 
             if (sprocObjectMapList.Count == 1)
             {
-                ISprocObjectMap map = sprocObjectMapList.ElementAt(0);
+                ICraneObjectMap map = sprocObjectMapList.ElementAt(0);
                 foreach (var col in columnSchema)
                 {
                     map.Columns.ToList().ForEach(x =>
@@ -291,7 +291,7 @@ namespace SprocMapperLibrary
             }
         }
 
-        public static void ValidateColumn(ISprocObjectMap map, string schemaColumn, DbColumn column)
+        public static void ValidateColumn(ICraneObjectMap map, string schemaColumn, DbColumn column)
         {
             Member member;
 
@@ -310,9 +310,9 @@ namespace SprocMapperLibrary
             }
         }
 
-        public static void MapObject<T>(List<ISprocObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
+        public static void MapObject<T>(List<ICraneObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
         {
-            SprocObjectMap<T> objectMap = new SprocObjectMap<T>();
+            CraneObjectMap<T> objectMap = new CraneObjectMap<T>();
 
             objectMap.Columns = GetAllValueTypeAndStringColumns(objectMap);
 
@@ -326,7 +326,7 @@ namespace SprocMapperLibrary
             sprocObjectMapList.Add(objectMap);
         }
 
-        public static HashSet<string> GetAllValueTypeAndStringColumns<TObj>(SprocObjectMap<TObj> mapObject)
+        public static HashSet<string> GetAllValueTypeAndStringColumns<TObj>(CraneObjectMap<TObj> mapObject)
         {
             HashSet<string> columns = new HashSet<string>();
 
@@ -378,7 +378,7 @@ namespace SprocMapperLibrary
         /// <param name="sprocObjectMap"></param>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static T GetObject<T>(ISprocObjectMap sprocObjectMap, IDataReader reader)
+        public static T GetObject<T>(ICraneObjectMap sprocObjectMap, IDataReader reader)
         {
             var targetObject = (T)sprocObjectMap.TypeAccessor.CreateNew();
             var defaultOrNullCounter = 0;

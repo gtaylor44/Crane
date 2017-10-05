@@ -4,9 +4,9 @@ using FastMember;
 
 namespace SprocMapperLibrary
 {
-    internal class SprocObjectMap<T> : ISprocObjectMap
+    internal class CraneObjectMap<T> : ICraneObjectMap
     {
-        internal SprocObjectMap()
+        internal CraneObjectMap()
         {
             MemberInfoCache = new Dictionary<string, Member>();
             CustomColumnMappings = new Dictionary<string, string>();

@@ -20,7 +20,7 @@ namespace SprocMapperLibrary.SqlServer
 
         /// <inheritdoc />
         public SqlServerQuery(string connectionString, SqlCredential credential,
-            AbstractCacheProvider cacheProvider) : base(cacheProvider)
+            AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
             _credential = credential;

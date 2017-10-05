@@ -22,7 +22,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetProducts()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var products = await dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
@@ -37,7 +37,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task SelectSingleCustomerAndOrders()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             Customer cust = null;
 
 
@@ -67,7 +67,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetProductAndSupplier()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             int productId = 62;
             Product product = null;
 
@@ -90,7 +90,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetOrderAndProducts()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             int orderId = 20;
 
             Order order = null;
@@ -122,7 +122,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetSuppliers()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var suppliers = await dataAccess.Query().ExecuteReaderAsync<Supplier>("dbo.GetSuppliers");
 
@@ -133,7 +133,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetCustomer()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var customer = (await dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
@@ -150,7 +150,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetSupplierByName()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var supplier = (await dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
@@ -164,7 +164,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task InsertCustomerThenDelete()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             Customer customer = new Customer()
             {
@@ -214,7 +214,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(CraneException), "Custom column mapping must map to a unique property. A property with the name 'ProductName' already exists.")]
         public async Task CustomColumnName_MustBeUniqueToClass()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             await dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Package, "ProductName")
@@ -226,7 +226,7 @@ namespace IntegrationTest
         [MyExpectedException(typeof(CraneException), "A cache key has been provided without a cache provider. Use the method 'RegisterCacheProvider' to register a cache provider.")]
         public async Task CacheKeyNotProvided_ThrowsException()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             await dataAccess.Query()
                 .ExecuteReaderAsync<Product>("dbo.GetProducts", cacheKey: "test");

@@ -21,7 +21,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetProducts()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var products = await dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
@@ -36,7 +36,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task SelectSingleCustomerAndOrders()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             Customer cust = null;
 
 
@@ -66,7 +66,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetProductAndSupplier()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             int productId = 62;
             Product product = null;
 
@@ -89,7 +89,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetOrderAndProducts()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
             int orderId = 20;
 
             Order order = null;
@@ -121,7 +121,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetSuppliers()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var suppliers = await dataAccess
                 .Query()
@@ -134,7 +134,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetCustomer()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var customer = (await dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
@@ -151,7 +151,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task GetSupplierByName()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             var supplier = (await dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")
@@ -165,7 +165,7 @@ namespace IntegrationTest
         [TestMethod]
         public async Task InsertCustomerThenDelete()
         {
-            ISprocMapperAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
             Customer customer = new Customer()
             {

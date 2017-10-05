@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SprocMapperLibrary.Shared.Interface
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface ICacheProvider
+    public interface ICraneCacheProvider
     {
         /// <summary>
         /// When this method returns, contains the items associated with the specified key, 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace SprocMapperLibrary.CacheProvider.MemoryCache
 {  
     /// <inheritdoc />
-    public class MemoryCacheProvider : AbstractCacheProvider
+    public class MemoryCacheProvider : AbstractCraneCacheProvider
     {     
         /// <inheritdoc />
         public override bool TryGet<T>(string key, out IEnumerable<T> items)

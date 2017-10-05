@@ -9,14 +9,14 @@ namespace SprocMapperLibrary.SqlServer
     /// <summary>
     /// 
     /// </summary>
-    public class SqlServerAccess : BaseAccess, ISprocMapperAccess
+    public class SqlServerAccess : BaseAccess, ICraneAccess
     {
         private const string InvalidConnMsg = "Please ensure that valid Sql Server Credentials have been passed in.";
 
         private readonly string _connectionString;
 
         /// <inheritdoc />
-        public SqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
+        public SqlServerAccess(string connectionString, AbstractCraneCacheProvider cacheProvider = null)
         {
             _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
             CacheProvider = cacheProvider;

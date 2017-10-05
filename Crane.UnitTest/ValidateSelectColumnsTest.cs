@@ -17,7 +17,7 @@ namespace UnitTest
         {
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentSchema()?.Rows.Cast<DataRow>().ToList();
-            List<ISprocObjectMap> list = new List<ISprocObjectMap>();
+            List<ICraneObjectMap> list = new List<ICraneObjectMap>();
             CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
 
             list.ElementAt(0).ColumnOrdinalDic = GetValidPresidentOrdinalDic();
@@ -37,7 +37,7 @@ namespace UnitTest
         {
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentSchema()?.Rows.Cast<DataRow>().ToList();
-            List<ISprocObjectMap> list = new List<ISprocObjectMap>();
+            List<ICraneObjectMap> list = new List<ICraneObjectMap>();
             CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
 
             list.ElementAt(0).ColumnOrdinalDic = GetValidPresidentOrdinalDic();
@@ -55,7 +55,7 @@ namespace UnitTest
         {
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentAndAssistantSchema()?.Rows.Cast<DataRow>().ToList();
-            List<ISprocObjectMap> list = new List<ISprocObjectMap>();
+            List<ICraneObjectMap> list = new List<ICraneObjectMap>();
             CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
 
             CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>());
@@ -75,7 +75,7 @@ namespace UnitTest
         {
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentAndAssistantSchema()?.Rows.Cast<DataRow>().ToList();
-            List<ISprocObjectMap> list = new List<ISprocObjectMap>();
+            List<ICraneObjectMap> list = new List<ICraneObjectMap>();
             CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
 
             CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>());
@@ -97,7 +97,7 @@ namespace UnitTest
         {
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentAndAssistantSchema()?.Rows.Cast<DataRow>().ToList();
-            List<ISprocObjectMap> list = new List<ISprocObjectMap>();
+            List<ICraneObjectMap> list = new List<ICraneObjectMap>();
             CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
 
             CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>());

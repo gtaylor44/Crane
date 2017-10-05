@@ -13,13 +13,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseInitialiser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseQuery.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCacheProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\SprocCachePolicy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCraneCacheProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\CraneCachePolicy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GenericExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interface\ICacheProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interface\INullType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocMapperAccess.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interface\ISprocObjectMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneCacheProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneNullType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneObjectMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\EightJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\FiveJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\FourJoin.cs" />
@@ -29,7 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\ThreeJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TwoJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CraneException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Model\SprocObjectMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\CraneObjectMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\CraneCommandType.cs" />
   </ItemGroup>
 </Project>

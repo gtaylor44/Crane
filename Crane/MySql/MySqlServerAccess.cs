@@ -7,13 +7,13 @@ namespace SprocMapperLibrary.MySql
 {
     /// <summary>
     /// </summary>
-    public class MySqlServerAccess : BaseAccess, ISprocMapperAccess
+    public class MySqlServerAccess : BaseAccess, ICraneAccess
     {
         private readonly string _connectionString;
         private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
 
         /// <inheritdoc />
-        public MySqlServerAccess(string connectionString, AbstractCacheProvider cacheProvider = null)
+        public MySqlServerAccess(string connectionString, AbstractCraneCacheProvider cacheProvider = null)
         {
             if (connectionString == null)
                 throw new ArgumentException(InvalidConnMsg);

@@ -8,7 +8,7 @@ namespace SprocMapperLibrary
     /// <summary>
     /// 
     /// </summary>
-    internal interface ISprocObjectMap
+    internal interface ICraneObjectMap
     {
         /// <summary>
         /// 

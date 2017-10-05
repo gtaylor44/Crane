@@ -6,7 +6,7 @@ namespace SprocMapperLibrary.Interface
     /// <summary>
     /// 
     /// </summary>
-    public interface ISprocMapperAccess
+    public interface ICraneAccess
     {
         /// <summary>
         /// Contains methods for executing database commands.
@@ -22,7 +22,7 @@ namespace SprocMapperLibrary.Interface
         /// Register a cache provider that extends AbstractCacheProvider. 
         /// </summary>
         /// <param name="cacheProvider"></param>
-        void RegisterCacheProvider(ICacheProvider cacheProvider);
+        void RegisterCacheProvider(ICraneCacheProvider cacheProvider);
 
         /// <summary>
         /// 

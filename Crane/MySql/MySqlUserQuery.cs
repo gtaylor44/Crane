@@ -17,7 +17,7 @@ namespace SprocMapperLibrary.MySql
         private readonly string _connectionString;
 
         /// <inheritdoc />
-        public MySqlUserQuery(string connectionString, AbstractCacheProvider cacheProvider) : base(cacheProvider)
+        public MySqlUserQuery(string connectionString, AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
         }

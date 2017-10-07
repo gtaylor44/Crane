@@ -2,6 +2,7 @@
 using Crane.Base;
 using Crane.CacheProvider;
 using Crane.Interface;
+using Crane.Shared;
 
 namespace Crane.MySql
 {

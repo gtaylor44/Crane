@@ -128,7 +128,7 @@ namespace Crane
             if (currPartition != partitionOnArr.Length)
             {
                 string matchedStr = string.Join(", ", matched);
-                throw new CraneException($"Please check that partitionOn arguments are all valid column names. SprocMapper was only able to match the following arguments: {matchedStr}. Expecting a total of {mapCount} valid arguments.");
+                throw new CraneException($"Please check that partitionOn arguments are all valid column names. Crane was only able to match the following arguments: {matchedStr}. Expecting a total of {mapCount} valid arguments.");
             }
 
             return result.ToArray();

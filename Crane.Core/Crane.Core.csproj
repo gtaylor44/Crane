@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\Crane.Shared\Crane.Shared.projitems" Label="Shared" />
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <VersionPrefix>1.0</VersionPrefix>
@@ -9,7 +8,7 @@
     <Copyright>Copyright © Greg Taylor 2017</Copyright>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
-  <!--<Import Project="..\Crane.Shared\Crane.Shared.projitems" Label="Shared" />-->
+  <Import Project="..\Crane.Shared\Crane.Shared.projitems" Label="Shared" />
   <ItemGroup>
     <PackageReference Include="FastMember" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.2" />

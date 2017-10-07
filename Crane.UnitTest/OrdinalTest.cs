@@ -80,7 +80,7 @@ namespace UnitTest
         }
 
         [TestMethod]
-        [MyExpectedException(typeof(CraneException), "Please check that partitionOn arguments are all valid column names. SprocMapper was only able to match the following arguments: Id. Expecting a total of 2 valid arguments.")]
+        [MyExpectedException(typeof(CraneException), "Please check that partitionOn arguments are all valid column names. Crane was only able to match the following arguments: Id. Expecting a total of 2 valid arguments.")]
         public void GetOrdinalPartition_ThrowsException_WhenCantFindAllPartitionArguments()
         {
             string[] partitionOnArr = "Id|MiddleName".Split('|');

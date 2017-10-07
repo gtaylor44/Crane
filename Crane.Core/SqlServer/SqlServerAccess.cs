@@ -3,6 +3,7 @@ using Crane.Base;
 using Crane.CacheProvider;
 using Crane.Core.SqlServer;
 using Crane.Interface;
+using Crane.Shared;
 
 namespace Crane.SqlServer
 {

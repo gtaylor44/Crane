@@ -1,4 +1,5 @@
 ﻿
+using Crane.Shared;
 using Crane.Shared.Interface;
 
 namespace Crane.Interface

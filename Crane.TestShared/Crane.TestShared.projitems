@@ -6,7 +6,7 @@
     <SharedGUID>07f5d8ea-4321-4a9f-ba96-71b34bd9b04a</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>SprocMapperLibrary.TestShared</Import_RootNamespace>
+    <Import_RootNamespace>Crane.TestShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Model\Customer.cs" />

@@ -5,8 +5,7 @@ using System.Data.Common;
 using System.Data;
 using System.Data.SqlClient;
 
-// ReSharper disable once CheckNamespace
-namespace Crane
+namespace Crane.Shared
 {
     /// <inheritdoc />
     /// <summary>

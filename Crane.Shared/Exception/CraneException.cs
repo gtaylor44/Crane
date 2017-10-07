@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("SprocMapperLibrary.UnitTests")]
-[assembly: InternalsVisibleTo("SprocMapperLibrary.IntegrationTests")]
+[assembly: InternalsVisibleTo("Crane.UnitTests")]
+[assembly: InternalsVisibleTo("Crane.IntegrationTests")]
 namespace Crane
 {
     internal class CraneException : Exception

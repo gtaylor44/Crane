@@ -2,6 +2,8 @@
 using System.Data.Common;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using Crane;
+using Crane.Shared;
 
 namespace Crane.MySql
 {

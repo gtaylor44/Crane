@@ -16,7 +16,7 @@ namespace IntegrationTest
         public void InsertCustomerThenDelete()
         {
             SqlServerAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
-
+             
             var customer = new Customer()
             {
                 City = "Auckland",

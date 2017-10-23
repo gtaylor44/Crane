@@ -29,7 +29,7 @@ namespace IntegrationTest
             var inserted = 0;
 
 
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+            using (SqlConnection conn = new SqlConnection(SqlConnectionFactory.SqlConnectionString))
             {
 
                 SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };
@@ -47,7 +47,7 @@ namespace IntegrationTest
 
                 if (id == default(int))
                     throw new InvalidOperationException("Id output not parsed");
-                
+
                 dataAccess.Command()
                     .AddSqlParameter("@CustomerId", id)
                     .ExecuteNonQuery("dbo.DeleteCustomer", dbConnection: conn);

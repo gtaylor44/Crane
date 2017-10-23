@@ -331,7 +331,7 @@ namespace IntegrationTest
                 ImageTest = new byte[] { 3, 3, 32, 4 }
             };
 
-            using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+            using (SqlConnection conn = new SqlConnection(SqlConnectionFactory.SqlConnectionString))
             {
                 bulk.Setup<TestDataType>()
                     .ForObject(dataTypeTest)

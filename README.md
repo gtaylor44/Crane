@@ -1,35 +1,32 @@
-<img src="http://gregnz.com/images/SprocMapper/logo.png" alt="SprocMapper logo"> 
+<img src="http://gregnz.com/images/SprocMapper/logo.png" alt="Crane logo"> 
 
-SprocMapper is an easy to use object-relational mapper specifically designed for stored procedures. Write less lines of code and be more productive.
+Crane is an ORM for people who know how to write SQL. 
 
-Key Features:
- * Support: SQL Server and MySql
- * Specificially designed for working with stored procedures.
- * Caching
- * Drastically Speed up the time it takes to map a stored procedure in the application layer. Minimise the risk of common mistakes that occur when mapping manually. 
- * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues. 
- * Validate that all columns in select statement are mapped to a corresponding model property (this can optionally be disabled). 
+Some key Features:
+ * Support: SQL Server, task based async pattern, .NET >= 4.5.0 and .NET Standard >= 1.3
+ * Cache queries in memory or a custom provider of your choice. 
+ * Minimise the risk of common mistakes that occur when mapping manually. Be alerted when a column included in select statement does not have a corrosponding model property. 
+ * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues.  
  
 # Getting started
 ```c#
+// Basic instantiation 
+
 // Sql Server
-private readonly ISprocMapperAccess _sqlAccess = new SqlServerAccess("your connection string");
+private readonly ICraneAccess _sqlAccess = new SqlServerAccess("your connection string");
 
-// MYSQL Server
-private readonly ISprocMapperAccess _mySqlAccess = new MySqlServerAccess("your connection string");
-
-// Use your favourite DI framework...
+// Or use your favourite DI framework...
 
 // .NET Core
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddTransient<ISprocMapperAccess>(x => new SqlServerAccess("your connection string", new MemoryCacheProvider()));
+    services.AddTransient<ICraneAccess>(x => new SqlServerAccess("your connection string", new MemoryCacheProvider()));
     services.AddMvc();
 }
 
 // Autofac
 var builder = new ContainerBuilder();
-builder.Register<ISprocMapperAccess>(x => new SqlServerAccess("your connection string", new MemoryCacheProvider())).InstancePerDependency();
+builder.Register<ICraneAccess>(x => new SqlServerAccess("your connection string", new MemoryCacheProvider())).InstancePerDependency();
 
 Container = builder.Build();
 
@@ -52,7 +49,7 @@ END
 
 ```c#
 // Returns IEnumerable of type Product.
-var products = _sqlAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts");
+var products = _sqlAccess.Query().ExecuteReader<Product>("dbo.GetProducts");
 ```
 -----------------------------
 Easily add parameters. The below example gets all products with a supplier id of 2.
@@ -73,7 +70,7 @@ END
 
 ```c#
  
-var products = _sqlAccess.Sproc()
+var products = _sqlAccess.Query()
     .AddSqlParameter("@SupplierId", 2)
     .ExecuteReader<Product>("dbo.GetProducts");
 
@@ -93,7 +90,7 @@ END
 ```
 
 ```c#
-    var products = _sqlAccess.Sproc()
+    var products = _sqlAccess.Query()
     .CustomColumnMapping<Product>(x => x.Id, "Product Id")
     .CustomColumnMapping<Product>(x => x.ProductName, "Product Name")
     .ExecuteReader<Product>("dbo.GetProducts");
@@ -101,20 +98,15 @@ END
 -----------------------------
 ## Caching
 
-SprocMapper supports caching for tuning application performance. Here's how to register a cache provider:
+Crane supports caching for tuning application performance. 
+
+Currently only MemoryCacheProvider (which uses MemoryCache by .NET) is supported. You can easily implement your own cache provider (e.g. Redis) by implementing the 
+ICraneCacheProvider interface. Once a cache provider is registered, you can supply 'cacheKey' as a named parameter to ExecuteReader queries. 
 
 ```c#
-_sqlAccess.RegisterCacheProvider(new MemoryCacheProvider());
-```
-
-Currently only MemoryCacheProvider (which uses MemoryCache by .NET) is provided. You can easily implement your own cache provider (e.g. Redis) by implementing 
-AbstractCacheProvider. If you do implement your own cache provider, I would appreciate if you could also create a pull request 
-so others can benefit from your work. 
-
-Once a cache provider is registered, you can supply 'cacheKey' as a named parameter to ExecuteReader commands. 
-
-```c#
-dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", cacheKey: "customer_x_products");
+dataAccess
+		.Query()
+		.ExecuteReader<Product>("dbo.GetProducts", cacheKey: "customer_x_products");
 ```
 
 If you want to force refresh the cache so a fresh copy is retrieved next call, you can use the RemoveFromCache method.
@@ -149,14 +141,14 @@ _sqlAccess.RegisterCacheProvider(cacheProvider);
 
 -----------------------------
 ## Reusing an existing DbConnection
-SprocMapper by default will manage the connection for you. If however you're in a TransactionScope and want to reuse an existing DbConnection and 
-not have SprocMapper open and close the connection for you, you can supply the named parameter 'unmanagedConn'.
+Crane by default will manage the connection for you. If however you're in a TransactionScope and want to reuse an existing DbConnection and 
+not have Crane open and close the connection for you, you can supply the named parameter 'unmanagedConn'.
 
 ```c#
-dataAccess.Sproc().ExecuteReader<Product>("dbo.GetProducts", unmanagedConn: conn);
+dataAccess.Query().ExecuteReader<Product>("dbo.GetProducts", unmanagedConn: conn);
 ```
 
-Note: 95% of the time you don't need this. Let SprocMapper handle the connection for you for most cases. 
+Note: 95% of the time you don't need this. Let Crane handle the connection for you for most cases. 
 
 -----------------------------
 ## Table Joins
@@ -165,7 +157,7 @@ Join up to eight other related entities. When mapping a join you must supply the
 Please observe the below procedure carefully and pay special attention to the columns 'ProductName' and 'Id'.
 These are the two arguments for the partitionOn parameter. partitionOn arguments are separated by a pipe '|'. The callback parameter 
 is a delegate and is invoked for every row that is processed. This is your chance to do any mappings for your TResult reference type. 
-Because SprocMapper reads row by row, some relationships may require an intermediate dictionary. 
+Because Crane reads row by row, some relationships may require an intermediate dictionary. 
 
 The below example retrieves a single product with an Id of 62 and its associated supplier. It's a 1:1 relationship. 
 
@@ -189,7 +181,7 @@ END
 ```c#
 Product product = null;
  
-product = _sqlAccess.Sproc()
+product = _sqlAccess.Query()
     .AddSqlParameter("@Id", 62)
     .ExecuteReader<Product, Supplier>("[dbo].[GetProductAndSupplier]", (p, s) =>
     {
@@ -226,7 +218,7 @@ END
 ```c#
 Customer cust = null;
 
-_sqlAccess.Sproc()
+_sqlAccess.Query()
     .AddSqlParameter("@FirstName", "Thomas")
     .AddSqlParameter("@LastName", "Hardy")
     .CustomColumnMapping<Order>(x => x.Id, "OrderId")
@@ -266,7 +258,7 @@ GO
 Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
 
 
-_sqlAccess.Sproc()
+_sqlAccess.Query()
     .ExecuteReader<Customer, Order>("dbo.GetAllCustomersAndOrders", (c, o) =>
     {
     	Customer customer;
@@ -290,9 +282,9 @@ _sqlAccess.Sproc()
 -----------------------------
 ## Catch bugs early
 
-SprocMapper validates that all select columns are mapped to a corresponding model property by default. This can be disabled by setting validateSelectColumns to false. 
+Crane validates that all select columns are mapped to a corresponding model property by default. This can be disabled by setting validateSelectColumns to false. 
 The below example sets an alias in stored procedure but because no custom column mapping has been setup, it's not mapped 
-and throws a SprocMapperException. The same exception message is shown if the property does not exist or a custom 
+and throws a CraneException. The same exception message is shown if the property does not exist or a custom 
 column mapping is incorrect. Note that when mapping joins, it's important to have accurate 'partitionOn' arguments to avoid mixed results. 
 
 ```sql
@@ -309,7 +301,7 @@ END
 ```
 ```c#
 
-Customer customer = _sqlAccess.Sproc() 
+Customer customer = _sqlAccess.Query() 
     .AddSqlParameter("@CustomerId", 6)
     .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
     .FirstOrDefault();
@@ -325,8 +317,4 @@ Select column: 'First Name'
 Target model: 'Customer'
 
 ```
------------------------------
-### Performance
-Internally, SprocMapper has a dependency on FastMember for efficient dynamic reading/writing of property member values. Performance is more dependant on how well your SQL is written, indexes, hardware, etc. 
-Please feel free to blog, compare and review.
 

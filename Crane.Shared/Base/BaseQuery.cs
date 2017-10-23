@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using System.Reflection;
 using Crane.CacheProvider;
 using Crane.Model;
+using Crane.Shared.Interface;
 
 // ReSharper disable once CheckNamespace
 namespace Crane
@@ -35,7 +36,7 @@ namespace Crane
         /// <summary>
         /// 
         /// </summary>
-        protected readonly AbstractCraneCacheProvider CacheProvider;
+        protected readonly ICraneCacheProvider CacheProvider;
 
         private const char PartitionSplitOnChar = '|';
 
@@ -44,7 +45,7 @@ namespace Crane
         /// <summary>
         /// Interface for executing a query.
         /// </summary>
-        protected BaseQuery(AbstractCraneCacheProvider cacheProvider) : base()
+        protected BaseQuery(ICraneCacheProvider cacheProvider) : base()
         {
             SprocObjectMapList = new List<ICraneObjectMap>();
             CustomColumnMappings = new Dictionary<Type, Dictionary<string, string>>();

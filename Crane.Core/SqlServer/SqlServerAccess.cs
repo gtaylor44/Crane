@@ -4,6 +4,7 @@ using Crane.CacheProvider;
 using Crane.Core.SqlServer;
 using Crane.Interface;
 using Crane.Shared;
+using Crane.Shared.Interface;
 
 namespace Crane.SqlServer
 {
@@ -16,7 +17,7 @@ namespace Crane.SqlServer
         private readonly string _connectionString;
 
         /// <inheritdoc />
-        public SqlServerAccess(string connectionString, AbstractCraneCacheProvider cacheProvider = null)
+        public SqlServerAccess(string connectionString, ICraneCacheProvider cacheProvider = null)
         {
             _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
             CacheProvider = cacheProvider;

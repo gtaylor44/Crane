@@ -15,7 +15,7 @@ namespace Crane.Base
         /// <summary>
         /// 
         /// </summary>
-        protected AbstractCraneCacheProvider CacheProvider;
+        protected ICraneCacheProvider CacheProvider;
 
         /// <summary>
         /// 

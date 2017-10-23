@@ -33,7 +33,7 @@ namespace IntegrationTest
 
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                using (SqlConnection conn = SqlConnectionFactory.GetSqlConnection())
+                using (SqlConnection conn = new SqlConnection(SqlConnectionFactory.SqlConnectionString))
                 {
                     conn.Open();
                     SqlParameter idParam = new SqlParameter() { ParameterName = "@Id", DbType = DbType.Int32, Direction = ParameterDirection.Output };

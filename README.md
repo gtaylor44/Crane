@@ -1,6 +1,4 @@
-<img src="http://gregnz.com/images/SprocMapper/logo.png" alt="Crane logo"> 
-
-Crane is an ORM for people who know how to write SQL. 
+Crane is an simple to use ORM for people who know how to write SQL.
 
 Some key Features:
  * Support: SQL Server, task based async pattern, .NET >= 4.5.0 and .NET Standard >= 1.3

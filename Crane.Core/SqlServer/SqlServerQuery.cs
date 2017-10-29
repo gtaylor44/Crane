@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Dynamic;
 using System.Threading.Tasks;
-using Crane.CacheProvider;
 using Crane.Shared.Interface;
+using System.Dynamic;
 
 namespace Crane.Core.SqlServer
 {
@@ -65,9 +64,9 @@ namespace Crane.Core.SqlServer
                         {
                             dynamic expando = new ExpandoObject();
 
-                            foreach (var col in dynamicColumnDic)                                                          
+                            foreach (var col in dynamicColumnDic)
                                 ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
-                            
+
                             getObjectDel(expando, result);
                         }
                     }
@@ -125,7 +124,7 @@ namespace Crane.Core.SqlServer
 
                         var dynamicColumnDic = CraneHelper.GetColumnsForDynamicQuery(columnSchema);
 
-                        while (await reader.ReadAsync())
+                        while (reader.Read())
                         {
                             dynamic expando = new ExpandoObject();
 

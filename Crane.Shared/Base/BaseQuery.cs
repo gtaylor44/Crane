@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using FastMember;
 using System.Data.Common;
 using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
-using Crane.CacheProvider;
 using Crane.Model;
 using Crane.Shared.Interface;
 
@@ -91,10 +89,10 @@ namespace Crane
                 customColumnDic = newDic;
             }
 
-            var typeAccessor = TypeAccessor.Create(typeof(T));
+            var typeAccessor = (T)Activator.CreateInstance(typeof(T));
 
             //Get all properties
-            var members = typeAccessor.GetMembers();
+            var members = typeof(T).GetRuntimeProperties();
 
             foreach (var member in members)
             {
@@ -140,7 +138,7 @@ namespace Crane
         /// <param name="saveCacheDe"></param>
         /// <param name="transaction"></param>
         protected abstract IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
-            string command, int? commandTimeout, DbConnection userConn, 
+            string command, int? commandTimeout, DbConnection userConn,
             DbTransaction transaction, string cacheKey, Action saveCacheDe);
 
         /// <summary>
@@ -154,7 +152,7 @@ namespace Crane
         /// <param name="saveCacheDe"></param>
         /// <param name="transaction"></param>
         protected abstract Task<IEnumerable<dynamic>> ExecuteDynamicReaderImplAsync(Action<dynamic, List<dynamic>> getObjectDel,
-            string command, int? commandTimeout, DbConnection userConn, 
+            string command, int? commandTimeout, DbConnection userConn,
             DbTransaction transaction, string cacheKey, Action saveCacheDe);
 
         /// <summary>
@@ -268,7 +266,7 @@ namespace Crane
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="transaction"></param>
-        public IEnumerable<dynamic> ExecuteReader(string command, string cacheKey = null, 
+        public IEnumerable<dynamic> ExecuteReader(string command, string cacheKey = null,
             int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);
@@ -302,7 +300,7 @@ namespace Crane
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="transaction"></param>
-        public IEnumerable<dynamic> ExecuteReader(string command, Action<dynamic> callBack, string cacheKey = null, 
+        public IEnumerable<dynamic> ExecuteReader(string command, Action<dynamic> callBack, string cacheKey = null,
             int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);
@@ -372,7 +370,7 @@ namespace Crane
 
                     if (cacheKey != null)
                     {
-                        cacheList.Add(row);
+                        cacheList.Add((TResult)row);
                     }
 
                 }, command, commandTimeout, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
@@ -449,16 +447,16 @@ namespace Crane
             {
                 return ExecuteDynamicReaderImpl((row, list) =>
                 {
-                    callBack.Invoke(row);
+                    callBack.Invoke((TResult)row);
                     list.Add(row);
 
                     if (cacheKey != null)
                     {
-                        cacheList.Add(row);
+                        cacheList.Add((TResult)row);
                     }
 
                 }, command, commandTimeout, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList)) as dynamic;
-            } 
+            }
 
             if (type.GetTypeInfo().IsValueType || type == typeof(string))
             {
@@ -1117,7 +1115,7 @@ namespace Crane
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="transaction"></param>
-        public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, string cacheKey = null, 
+        public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, string cacheKey = null,
             int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);
@@ -1151,7 +1149,7 @@ namespace Crane
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="transaction"></param>
-        public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, Action<dynamic> callBack, string cacheKey = null, 
+        public async Task<IEnumerable<dynamic>> ExecuteReaderAsync(string command, Action<dynamic> callBack, string cacheKey = null,
             int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);

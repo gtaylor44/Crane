@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FastMember;
+using System.Reflection;
 
 // ReSharper disable once CheckNamespace
 namespace Crane
@@ -25,15 +25,11 @@ namespace Crane
         /// <summary>
         /// 
         /// </summary>
-        Dictionary<string, Member> MemberInfoCache { get; set; }
+        Dictionary<string, PropertyInfo> MemberInfoCache { get; set; }
         /// <summary>
         /// 
         /// </summary>
         Dictionary<string, object> DefaultValueDic { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        TypeAccessor TypeAccessor { get; set; }
         /// <summary>
         /// 
         /// </summary>

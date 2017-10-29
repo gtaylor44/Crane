@@ -138,7 +138,7 @@ namespace Crane.MySql
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<String, object>) expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }
@@ -200,7 +200,7 @@ namespace Crane.MySql
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<String, object>) expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }

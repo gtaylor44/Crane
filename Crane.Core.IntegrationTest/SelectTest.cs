@@ -26,10 +26,10 @@ namespace IntegrationTest
                 .ExecuteReader(" dbo.GetProducts")
                 .ToList()
                 .ConvertAll(x => new Product()
-            {
-                Id = x.ProductId,
-                ProductName = x.ProductName
-            });
+                {
+                    Id = x.ProductId,
+                    ProductName = x.ProductName
+                });
 
             Assert.IsTrue(productList.Any());
         }
@@ -244,7 +244,7 @@ namespace IntegrationTest
 
             var customer = dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
-                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
+                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: false)
                 .FirstOrDefault();
 
             Assert.AreEqual("Hanna", customer?.FirstName);

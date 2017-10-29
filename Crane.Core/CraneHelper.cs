@@ -6,7 +6,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using FastMember;
 using System.Reflection;
 using System.Collections.ObjectModel;
 using System.Data.Common;
@@ -293,7 +292,7 @@ namespace Crane
 
         public static void ValidateColumn(ICraneObjectMap map, string schemaColumn, DbColumn column)
         {
-            Member member;
+            PropertyInfo member;
 
             if (!map.MemberInfoCache.TryGetValue(schemaColumn, out member))
             {
@@ -302,11 +301,13 @@ namespace Crane
 
             var schemaProperty = column.DataType;
 
+            var propType = member.PropertyType;
+
             Type nullableType;
-            if (((nullableType = Nullable.GetUnderlyingType(member.Type)) != null && schemaProperty != nullableType)
-                || schemaProperty != member.Type && nullableType == null)
+            if (((nullableType = Nullable.GetUnderlyingType(propType)) != null && schemaProperty != nullableType)
+                || schemaProperty != propType && nullableType == null)
             {
-                throw new CraneException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{member.Type}'");
+                throw new CraneException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{member.GetType()}'");
             }
         }
 
@@ -330,14 +331,13 @@ namespace Crane
         {
             HashSet<string> columns = new HashSet<string>();
 
-            mapObject.TypeAccessor = TypeAccessor.Create(typeof(TObj));
-
             //Get all properties
-            var members = mapObject.TypeAccessor.GetMembers();
+
+            var members = typeof(TObj).GetRuntimeProperties();
 
             foreach (var member in members)
             {
-                if (CheckForValidDataType(member.Type))
+                if (CheckForValidDataType(member.PropertyType))
                 {
                     columns.Add(member.Name);
                     mapObject.MemberInfoCache.Add(member.Name, member);
@@ -380,7 +380,7 @@ namespace Crane
         /// <returns></returns>
         public static T GetObject<T>(ICraneObjectMap sprocObjectMap, IDataReader reader)
         {
-            var targetObject = (T)sprocObjectMap.TypeAccessor.CreateNew();
+            var targetObject = (T)Activator.CreateInstance(typeof(T));
             var defaultOrNullCounter = 0;
 
             foreach (var column in sprocObjectMap.Columns)
@@ -396,7 +396,7 @@ namespace Crane
                 }
 
 
-                Member member;
+                PropertyInfo member;
                 if (!sprocObjectMap.MemberInfoCache.TryGetValue(column, out member))
                 {
                     throw new KeyNotFoundException($"Could not get property for column {column}");
@@ -405,14 +405,25 @@ namespace Crane
                 object readerObj = reader[ordinal];
 
                 if (readerObj == DBNull.Value)
-                {             
-                    sprocObjectMap.TypeAccessor[targetObject, member.Name] = GetDefaultValue(member, sprocObjectMap.DefaultValueDic);
+                {
+                    //PropertyInfo propertyInfo = targetObject.GetType().GetTypeInfo().GetDeclaredProperty(member.Name);
+                    member.SetValue(targetObject, Convert.ChangeType(GetDefaultValue(member, sprocObjectMap.DefaultValueDic), member.PropertyType), null);
+
                     defaultOrNullCounter++;
                 }
 
                 else
                 {
-                    sprocObjectMap.TypeAccessor[targetObject, member.Name] = readerObj;
+                    //PropertyInfo propertyInfo = targetObject.GetType().GetTypeInfo().GetDeclaredProperty(member.Name);
+
+                    var t = member.PropertyType;
+
+                    if (t.GetTypeInfo().IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                    {
+                        t = Nullable.GetUnderlyingType(t);
+                    }
+
+                    member.SetValue(targetObject, Convert.ChangeType(readerObj, t), null);
                 }
             }
          
@@ -428,16 +439,16 @@ namespace Crane
         /// <param name="member"></param>
         /// <param name="defaultValueDic"></param>
         /// <returns></returns>
-        public static object GetDefaultValue(Member member, Dictionary<string, object> defaultValueDic)
+        public static object GetDefaultValue(PropertyInfo member, Dictionary<string, object> defaultValueDic)
         {
-            if (member.Type.GetTypeInfo().IsValueType)
+            if (member.PropertyType.GetTypeInfo().IsValueType)
             {
                 object obj;
                 if (defaultValueDic.TryGetValue(member.Name, out obj))
                 {
                     return obj;
                 }
-                obj = Activator.CreateInstance(member.Type);
+                obj = Activator.CreateInstance(member.PropertyType);
                 defaultValueDic.Add(member.Name, obj);
                 return obj;
             }            

@@ -69,7 +69,7 @@ namespace Crane.SqlServer
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<string, object>)expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }

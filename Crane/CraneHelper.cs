@@ -296,7 +296,7 @@ namespace Crane
         {
             PropertyInfo member;
 
-            if (!map.MemberInfoCache.TryGetValue(schemaColumn, out member))
+            if (!map.PropertyInfoCache.TryGetValue(schemaColumn, out member))
             {
                 throw new KeyNotFoundException($"Could not get schema property {schemaColumn}");
             }
@@ -342,7 +342,8 @@ namespace Crane
                 if (CheckForValidDataType(member.PropertyType))
                 {
                     columns.Add(member.Name);
-                    mapObject.MemberInfoCache.Add(member.Name, member);
+                    mapObject.PropertyInfoCache.Add(member.Name, member);
+                    mapObject.TypeInfoCache.Add(member.Name, member.PropertyType.GetTypeInfo());
                 }
             }
 
@@ -399,7 +400,7 @@ namespace Crane
 
 
                 PropertyInfo member;
-                if (!sprocObjectMap.MemberInfoCache.TryGetValue(column, out member))
+                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out member))
                 {
                     throw new KeyNotFoundException($"Could not get property for column {column}");
                 }

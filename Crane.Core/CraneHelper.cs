@@ -294,7 +294,7 @@ namespace Crane
         {
             PropertyInfo member;
 
-            if (!map.MemberInfoCache.TryGetValue(schemaColumn, out member))
+            if (!map.PropertyInfoCache.TryGetValue(schemaColumn, out member))
             {
                 throw new KeyNotFoundException($"Could not get schema property {schemaColumn}");
             }
@@ -340,7 +340,8 @@ namespace Crane
                 if (CheckForValidDataType(member.PropertyType))
                 {
                     columns.Add(member.Name);
-                    mapObject.MemberInfoCache.Add(member.Name, member);
+                    mapObject.PropertyInfoCache.Add(member.Name, member);
+                    mapObject.TypeInfoCache.Add(member.Name, member.PropertyType.GetTypeInfo());
                 }
             }
 
@@ -397,7 +398,9 @@ namespace Crane
 
 
                 PropertyInfo member;
-                if (!sprocObjectMap.MemberInfoCache.TryGetValue(column, out member))
+                TypeInfo typeInfo;
+                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out member) 
+                    || !sprocObjectMap.TypeInfoCache.TryGetValue(column, out typeInfo))
                 {
                     throw new KeyNotFoundException($"Could not get property for column {column}");
                 }
@@ -406,19 +409,16 @@ namespace Crane
 
                 if (readerObj == DBNull.Value)
                 {
-                    //PropertyInfo propertyInfo = targetObject.GetType().GetTypeInfo().GetDeclaredProperty(member.Name);
-                    member.SetValue(targetObject, Convert.ChangeType(GetDefaultValue(member, sprocObjectMap.DefaultValueDic), member.PropertyType), null);
+                    member.SetValue(targetObject, Convert.ChangeType(GetDefaultValue(typeInfo, member, sprocObjectMap.DefaultValueDic), member.PropertyType), null);
 
                     defaultOrNullCounter++;
                 }
 
                 else
                 {
-                    //PropertyInfo propertyInfo = targetObject.GetType().GetTypeInfo().GetDeclaredProperty(member.Name);
-
                     var t = member.PropertyType;
 
-                    if (t.GetTypeInfo().IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                    if (typeInfo.IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                     {
                         t = Nullable.GetUnderlyingType(t);
                     }
@@ -439,9 +439,9 @@ namespace Crane
         /// <param name="member"></param>
         /// <param name="defaultValueDic"></param>
         /// <returns></returns>
-        public static object GetDefaultValue(PropertyInfo member, Dictionary<string, object> defaultValueDic)
+        public static object GetDefaultValue(TypeInfo typeInfo, PropertyInfo member, Dictionary<string, object> defaultValueDic)
         {
-            if (member.PropertyType.GetTypeInfo().IsValueType)
+            if (typeInfo.IsValueType)
             {
                 object obj;
                 if (defaultValueDic.TryGetValue(member.Name, out obj))

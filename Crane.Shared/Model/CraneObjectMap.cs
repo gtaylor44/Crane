@@ -8,7 +8,8 @@ namespace Crane
     {
         internal CraneObjectMap()
         {
-            MemberInfoCache = new Dictionary<string, PropertyInfo>();
+            PropertyInfoCache = new Dictionary<string, PropertyInfo>();
+            TypeInfoCache = new Dictionary<string, TypeInfo>();
             CustomColumnMappings = new Dictionary<string, string>();
             ColumnOrdinalDic = new Dictionary<string, int>();
             Columns = new HashSet<string>();
@@ -18,7 +19,8 @@ namespace Crane
         public Type Type { get; set; }
         public HashSet<string> Columns { get; set; }
         public Dictionary<string, string> CustomColumnMappings { get; set; }
-        public Dictionary<string, PropertyInfo> MemberInfoCache { get; set; }
+        public Dictionary<string, PropertyInfo> PropertyInfoCache { get; set; }
+        public Dictionary<string, TypeInfo> TypeInfoCache { get; set; }
         public Dictionary<string, object> DefaultValueDic { get; set; }
         public Dictionary<string, int> ColumnOrdinalDic { get; set; }
     }

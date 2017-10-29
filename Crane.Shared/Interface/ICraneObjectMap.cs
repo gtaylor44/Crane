@@ -25,7 +25,11 @@ namespace Crane
         /// <summary>
         /// 
         /// </summary>
-        Dictionary<string, PropertyInfo> MemberInfoCache { get; set; }
+        Dictionary<string, PropertyInfo> PropertyInfoCache { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        Dictionary<string, TypeInfo> TypeInfoCache { get; set; }
         /// <summary>
         /// 
         /// </summary>

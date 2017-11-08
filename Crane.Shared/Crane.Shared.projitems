@@ -16,7 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCraneCacheProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\CraneCachePolicy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\GenericExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneCacheProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneNullType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneAccess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneObjectMap.cs" />

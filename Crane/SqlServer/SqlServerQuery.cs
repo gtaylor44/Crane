@@ -7,7 +7,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crane.CacheProvider;
-using Crane.Shared.Interface;
 
 namespace Crane.SqlServer
 {
@@ -21,7 +20,7 @@ namespace Crane.SqlServer
 
         /// <inheritdoc />
         public SqlServerQuery(string connectionString, SqlCredential credential,
-            ICraneCacheProvider cacheProvider) : base(cacheProvider)
+            AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
             _credential = credential;

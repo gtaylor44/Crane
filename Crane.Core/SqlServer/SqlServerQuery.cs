@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Crane.Shared.Interface;
 using System.Dynamic;
+using Crane.CacheProvider;
 
 namespace Crane.Core.SqlServer
 {
@@ -16,7 +16,7 @@ namespace Crane.Core.SqlServer
         private readonly string _connectionString;
 
         /// <inheritdoc />
-        public SqlServerQuery(string connectionString, ICraneCacheProvider cacheProvider) : base(cacheProvider)
+        public SqlServerQuery(string connectionString, AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
         }

@@ -98,8 +98,8 @@ END
 
 Crane supports caching for tuning application performance. 
 
-Currently only MemoryCacheProvider (which uses MemoryCache by .NET) is supported. You can easily implement your own cache provider (e.g. Redis) by implementing the 
-ICraneCacheProvider interface. Once a cache provider is registered, you can supply 'cacheKey' as a named parameter to ExecuteReader queries. 
+Currently only MemoryCacheProvider (which uses MemoryCache by .NET) is supported. You can easily implement your own cache provider (e.g. Redis) by extending the 
+AbstractCraneCacheProvider interface. Once a cache provider is registered, you can supply 'cacheKey' as a named parameter to ExecuteReader queries. 
 
 ```c#
 dataAccess

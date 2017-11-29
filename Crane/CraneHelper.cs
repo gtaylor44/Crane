@@ -409,7 +409,6 @@ namespace Crane
 
                 if (readerObj == DBNull.Value)
                 {
-                    //PropertyInfo propertyInfo = targetObject.GetType().GetTypeInfo().GetDeclaredProperty(member.Name);
                     member.SetValue(targetObject, Convert.ChangeType(GetDefaultValue(member, sprocObjectMap.DefaultValueDic), member.PropertyType), null);
                     defaultOrNullCounter++;
                 }

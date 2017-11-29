@@ -1,6 +1,6 @@
 ﻿
+using Crane.CacheProvider;
 using Crane.Shared;
-using Crane.Shared.Interface;
 
 namespace Crane.Interface
 {
@@ -23,7 +23,7 @@ namespace Crane.Interface
         /// Register a cache provider that extends AbstractCacheProvider. 
         /// </summary>
         /// <param name="cacheProvider"></param>
-        void RegisterCacheProvider(ICraneCacheProvider cacheProvider);
+        void RegisterCacheProvider(AbstractCraneCacheProvider cacheProvider);
 
         /// <summary>
         /// 

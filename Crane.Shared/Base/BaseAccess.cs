@@ -1,6 +1,5 @@
 ﻿using System;
 using Crane.CacheProvider;
-using Crane.Shared.Interface;
 
 namespace Crane.Base
 {
@@ -15,7 +14,7 @@ namespace Crane.Base
         /// <summary>
         /// 
         /// </summary>
-        protected ICraneCacheProvider CacheProvider;
+        protected AbstractCraneCacheProvider CacheProvider;
 
         /// <summary>
         /// 
@@ -29,7 +28,7 @@ namespace Crane.Base
         /// 
         /// </summary>
         /// <param name="cacheProvider"></param>
-        public void RegisterCacheProvider(ICraneCacheProvider cacheProvider)
+        public void RegisterCacheProvider(AbstractCraneCacheProvider cacheProvider)
         {
             if (CacheProvider != null)
                 throw new InvalidOperationException(CacheAlreadyRegisteredMsg);
@@ -62,6 +61,35 @@ namespace Crane.Base
             }
 
             CacheProvider.ResetCache();
+        }
+
+        /// <summary>
+        /// Set a custom policy on all cached items.
+        /// </summary>
+        /// <param name="policy">The custom policy.</param>
+        public void AddGlobalPolicy(CraneCachePolicy policy)
+        {
+            if (CacheProvider == null)
+            {
+                throw new InvalidOperationException(NoCacheRegisteredMsg);
+            }
+
+            CacheProvider.AddGlobalPolicy(policy);
+        }
+
+        /// <summary>
+        /// Set a custom policy for a regular expression. If the regular expression matches, this policy will take precedence over the global policy (if one is set) and default policy. 
+        /// </summary>
+        /// <param name="regularExpression">The regular express pattern to match.</param>
+        /// <param name="policy">The custom policy.</param>
+        public void AddPolicy(string regularExpression, CraneCachePolicy policy)
+        {
+            if (CacheProvider == null)
+            {
+                throw new InvalidOperationException(NoCacheRegisteredMsg);
+            }
+
+            CacheProvider.AddPolicy(regularExpression, policy);
         }
     }
 }

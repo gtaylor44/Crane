@@ -1,5 +1,4 @@
-﻿using Crane.Shared.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace Crane.CacheProvider
 {
     /// <inheritdoc />
-    public abstract class AbstractCraneCacheProvider : ICraneCacheProvider
+    public abstract class AbstractCraneCacheProvider
     {
         /// <summary>
         /// 

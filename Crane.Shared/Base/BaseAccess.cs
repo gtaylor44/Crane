@@ -34,7 +34,7 @@ namespace Crane.Base
             if (CacheProvider != null)
                 throw new InvalidOperationException(CacheAlreadyRegisteredMsg);
 
-            CacheProvider = cacheProvider as AbstractCraneCacheProvider;
+            CacheProvider = cacheProvider;
         }
 
         /// <summary>

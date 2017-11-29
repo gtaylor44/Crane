@@ -18,12 +18,12 @@ namespace Crane.CacheProvider
         public bool InfiniteExpiration { get; set; }
 
         /// <summary>
-        /// Set an absolute expiration time
+        /// Set an absolute expiration
         /// </summary>
         public TimeSpan? AbsoluteExpiration { get; set; }
 
         /// <summary>
-        /// 
+        /// Set a sliding expiration
         /// </summary>
         public TimeSpan? SlidingExpiration { get; set; }
     }

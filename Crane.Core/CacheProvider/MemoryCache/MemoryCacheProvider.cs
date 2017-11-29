@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Crane.Shared.Interface;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 
 namespace Crane.CacheProvider.MemoryCache
 {  
     /// <inheritdoc />
-    public class MemoryCacheProvider : AbstractCraneCacheProvider
+    public class MemoryCacheProvider : AbstractCraneCacheProvider, ICraneCacheProvider
     {     
         /// <inheritdoc />
         public override bool TryGet<T>(string key, out IEnumerable<T> items)

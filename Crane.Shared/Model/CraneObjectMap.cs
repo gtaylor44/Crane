@@ -4,8 +4,15 @@ using System.Reflection;
 
 namespace Crane
 {
-    internal class CraneObjectMap<T> : ICraneObjectMap
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class CraneObjectMap<T> : ICraneObjectMap
     {
+        /// <summary>
+        /// 
+        /// </summary>
         internal CraneObjectMap()
         {
             PropertyInfoCache = new Dictionary<string, PropertyInfo>();
@@ -16,12 +23,33 @@ namespace Crane
             DefaultValueDic = new Dictionary<string, object>();
             Type = typeof(T);
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public Type Type { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public HashSet<string> Columns { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<string, string> CustomColumnMappings { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<string, PropertyInfo> PropertyInfoCache { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<string, TypeInfo> TypeInfoCache { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<string, object> DefaultValueDic { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<string, int> ColumnOrdinalDic { get; set; }
     }
 }

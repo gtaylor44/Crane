@@ -19,44 +19,44 @@ namespace IntegrationTest
     public class SelectTest
     {
 
-        //// Returns all products with Id and Product Name only
-        //// Id has an alias of 'Product Id'
-        //[TestMethod]
-        //public void GetProductsDynamic()
-        //{
-        //    ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+        // Returns all products with Id and Product Name only
+        // Id has an alias of 'Product Id'
+        [TestMethod]
+        public void GetProductsDynamic()
+        {
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-        //    var productList = dataAccess.Query().ExecuteReader("dbo.GetProducts")
-        //        .ToList()
-        //        .ConvertAll(x => new Product()
-        //    {
-        //        Id = x.ProductId,
-        //        ProductName = x.ProductName
-        //    });
+            var productList = dataAccess.Query().ExecuteReader("dbo.GetProducts")
+                .ToList()
+                .ConvertAll(x => new Product()
+                {
+                    Id = x.ProductId,
+                    ProductName = x.ProductName
+                });
 
-        //    Assert.IsTrue(productList.Any());
-        //}
+            Assert.IsTrue(productList.Any());
+        }
 
-        //// Returns all products with Id and Product Name only
-        //// Id has an alias of 'Product Id'
-        //[TestMethod]
-        //public void GetProductsDynamicWithCallback()
-        //{
-        //    ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+        // Returns all products with Id and Product Name only
+        // Id has an alias of 'Product Id'
+        [TestMethod]
+        public void GetProductsDynamicWithCallback()
+        {
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
 
-        //    List<Product> productList = new List<Product>();
-        //    dataAccess.Query()
-        //        .ExecuteReader("dbo.GetProducts", (x) =>
-        //        {
-        //            productList.Add(new Product()
-        //            {
-        //                Id = x.ProductId,
-        //                ProductName = x.ProductName
-        //            });
-        //        });
+            List<Product> productList = new List<Product>();
+            dataAccess.Query()
+                .ExecuteReader("dbo.GetProducts", (x) =>
+                {
+                    productList.Add(new Product()
+                    {
+                        Id = x.ProductId,
+                        ProductName = x.ProductName
+                    });
+                });
 
-        //    Assert.IsTrue(productList.Any());
-        //}
+            Assert.IsTrue(productList.Any());
+        }
 
         [TestMethod]
         public void GetAllCustomersAndOrders()

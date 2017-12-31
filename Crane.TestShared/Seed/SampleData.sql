@@ -529,7 +529,7 @@ INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[Is
 INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(53,'Perth Pasties',24,32.80,'48 pieces',1)
 INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(54,'Tourtière',25,7.45,'16 pies',0)
 INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(55,'Pâté chinois',25,24.00,'24 boxes x 2 pies',0)
-INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(56,'Gnocchi di nonna Alice',26,38.00,'24 - 250 g pkgs.',0)
+INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(56,'Gnocchi di nonna Alice',26,NULL,'24 - 250 g pkgs.',0)
 INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(57,'Ravioli Angelo',26,19.50,'24 - 250 g pkgs.',0)
 INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(58,'Escargots de Bourgogne',27,13.25,'24 pieces',0)
 INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(59,'Raclette Courdavault',28,55.00,'5 kg pkg.',0)

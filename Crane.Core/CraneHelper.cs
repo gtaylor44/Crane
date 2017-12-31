@@ -94,11 +94,11 @@ namespace Crane
         {
 
             List<int> result = new List<int>();
-            List<string> matched = new List<string>();           
+            List<string> matched = new List<string>();
 
             if (partitionOnArr.Length != mapCount)
                 throw new CraneException($"Invalid number of arguments entered for partitionOn. Expected {mapCount} arguments but instead saw {partitionOnArr.Length} arguments");
-            
+
             int currPartition = 0;
 
             for (int i = 0; i < columnSchema.Count; i++)
@@ -187,8 +187,8 @@ namespace Crane
             string absentColumnsAsString = string.Join(",\n\n", absentColumnMessageList);
 
             string message = sprocObjectMapList.Count == 1 ? $"The following columns in select statement could not be " +
-                                                             $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n{absentColumnsAsString}\n" : 
-                                                             $"The following columns from select statement have not been mapped to target model. "+
+                                                             $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n{absentColumnsAsString}\n" :
+                                                             $"The following columns from select statement have not been mapped to target model. " +
                                                              $"The target model is determined by the 'partitionOn' parameter. This validation message is dependant on a sound partitionOn argument. \n\n{absentColumnsAsString}\n";
 
             if (absentColumnMessageList.Count > 0)
@@ -197,7 +197,7 @@ namespace Crane
             return true;
         }
 
-        public static string GetActualColumn(string columnName, ICraneObjectMap objectMap) 
+        public static string GetActualColumn(string columnName, ICraneObjectMap objectMap)
         {
             return objectMap.CustomColumnMappings.ContainsKey(columnName)
                 ? objectMap.CustomColumnMappings[columnName]
@@ -350,10 +350,10 @@ namespace Crane
         }
 
         public static Dictionary<int, string> GetColumnsForDynamicQuery(ReadOnlyCollection<DbColumn> columnSchema)
-        {            
+        {
             var dynamicColumnDic = new Dictionary<int, string>();
 
-            foreach(var item in columnSchema)
+            foreach (var item in columnSchema)
             {
                 var strippedColumnName = item.ColumnName.Replace(" ", string.Empty);
 
@@ -399,7 +399,7 @@ namespace Crane
 
                 PropertyInfo member;
                 TypeInfo typeInfo;
-                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out member) 
+                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out member)
                     || !sprocObjectMap.TypeInfoCache.TryGetValue(column, out typeInfo))
                 {
                     throw new KeyNotFoundException($"Could not get property for column {column}");
@@ -409,7 +409,9 @@ namespace Crane
 
                 if (readerObj == DBNull.Value)
                 {
-                    member.SetValue(targetObject, Convert.ChangeType(GetDefaultValue(typeInfo, member, sprocObjectMap.DefaultValueDic), member.PropertyType), null);
+                    var isNullable = Nullable.GetUnderlyingType(member.PropertyType) != null;
+                    if (typeInfo.IsValueType && !isNullable)
+                        member.SetValue(targetObject, Convert.ChangeType(GetDefaultValue(member, sprocObjectMap.DefaultValueDic), member.PropertyType), null);
 
                     defaultOrNullCounter++;
                 }
@@ -426,7 +428,7 @@ namespace Crane
                     member.SetValue(targetObject, Convert.ChangeType(readerObj, t), null);
                 }
             }
-         
+
             if (defaultOrNullCounter == sprocObjectMap.Columns.Count)
                 return default(T); // All columns are null or default
 
@@ -439,21 +441,16 @@ namespace Crane
         /// <param name="member"></param>
         /// <param name="defaultValueDic"></param>
         /// <returns></returns>
-        public static object GetDefaultValue(TypeInfo typeInfo, PropertyInfo member, Dictionary<string, object> defaultValueDic)
+        public static object GetDefaultValue(PropertyInfo member, Dictionary<string, object> defaultValueDic)
         {
-            if (typeInfo.IsValueType)
+            object obj;
+            if (defaultValueDic.TryGetValue(member.Name, out obj))
             {
-                object obj;
-                if (defaultValueDic.TryGetValue(member.Name, out obj))
-                {
-                    return obj;
-                }
-                obj = Activator.CreateInstance(member.PropertyType);
-                defaultValueDic.Add(member.Name, obj);
                 return obj;
-            }            
-
-            return null;
+            }
+            obj = Activator.CreateInstance(member.PropertyType);
+            defaultValueDic.Add(member.Name, obj);
+            return obj;
         }
 
         public static string GetPropertyName(Expression method)

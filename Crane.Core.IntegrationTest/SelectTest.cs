@@ -108,6 +108,20 @@ namespace IntegrationTest
             Assert.IsTrue(products2.Count() > 0);
         }
 
+        // nullable value type test
+        [TestMethod]
+        public void GetProductsTestWithNullDecimal()
+        {
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            var product = dataAccess.Query()
+                .AddSqlParameter("@ProductId", 56)
+                .ExecuteReader<Product>("SELECT * FROM dbo.Product where Id = @ProductId")
+                .SingleOrDefault();
+
+            Assert.IsNull(product.UnitPrice);
+        }
+
         [TestMethod]
         public void GetProductsTextQuery()
         {

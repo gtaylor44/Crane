@@ -30,6 +30,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\TwoJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exception\CraneException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\CraneObjectMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MySql\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MySql\MySqlServerAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MySql\MySqlUserCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MySql\MySqlUserQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SqlServer\Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SqlServer\SqlServerAccess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SqlServer\SqlServerCommand.cs" />

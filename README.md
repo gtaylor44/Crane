@@ -1,4 +1,4 @@
-Crane is an simple to use ORM for people who know how to write SQL.
+Crane is an simple to use ORM to minimise the job of mapping SQL queries to POCO.
 
 Some key Features:
  * Support: SQL Server, task based async pattern, .NET >= 4.5.0 and .NET Standard >= 1.3

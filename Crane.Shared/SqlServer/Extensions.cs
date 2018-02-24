@@ -16,7 +16,8 @@ namespace Crane.SqlServer
         {
 #if NETFRAMEWORK
             return new SqlServerQuery(sqlConnection.ConnectionString, sqlConnection.Credential, null);
-#elif NETCORE
+#endif
+#if NETCORE
             return new SqlServerQuery(sqlConnection.ConnectionString, null);
 #endif
         }

@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCraneCacheProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\CraneCachePolicy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CraneHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\GenericExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneNullType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interface\ICraneAccess.cs" />
@@ -29,6 +30,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\TwoJoin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exception\CraneException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\CraneObjectMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SqlServer\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SqlServer\SqlServerAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SqlServer\SqlServerCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SqlServer\SqlServerQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\CraneCommandType.cs" />
   </ItemGroup>
   <ItemGroup>

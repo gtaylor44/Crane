@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 using System.Dynamic;
+using System.Linq;
+using System.Threading.Tasks;
 using Crane.CacheProvider;
 
-namespace Crane.Core.SqlServer
+namespace Crane.SqlServer
 {
     /// <inheritdoc />
     public class SqlServerQuery : BaseQuery
@@ -15,12 +17,26 @@ namespace Crane.Core.SqlServer
 
         private readonly string _connectionString;
 
+#if NETFRAMEWORK
+        private readonly SqlCredential _credential;
+#endif
+
+
+#if NETFRAMEWORK
+        /// <inheritdoc />
+        public SqlServerQuery(string connectionString, SqlCredential credential,
+            AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
+        {
+            _connectionString = connectionString;
+            _credential = credential;
+        }
+#elif NETCORE
         /// <inheritdoc />
         public SqlServerQuery(string connectionString, AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
         {
             _connectionString = connectionString;
         }
-
+#endif
         /// <inheritdoc />
         protected override IEnumerable<dynamic> ExecuteDynamicReaderImpl(Action<dynamic, List<dynamic>> getObjectDel,
             string query, int? commandTimeout, DbConnection userConn, DbTransaction transaction, string cacheKey, Action saveCacheDel)
@@ -33,11 +49,7 @@ namespace Crane.Core.SqlServer
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
+                _conn = GetSqlConnection(userConn, userProvidedConnection);
 
                 OpenConn(_conn);
 
@@ -53,12 +65,9 @@ namespace Crane.Core.SqlServer
                         if (!reader.HasRows)
                             return new List<dynamic>();
 
-                        if (!reader.CanGetColumnSchema())
-                            throw new CraneException("Could not get column schema for table");
+                        var schema = reader.GetSchemaTable();
 
-                        var columnSchema = reader.GetColumnSchema();
-
-                        var dynamicColumnDic = CraneHelper.GetColumnsForDynamicQuery(columnSchema);
+                        var dynamicColumnDic = CraneHelper.GetColumnsForDynamicQuery(schema);
 
                         while (reader.Read())
                         {
@@ -97,11 +106,7 @@ namespace Crane.Core.SqlServer
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
+                _conn = GetSqlConnection(userConn, userProvidedConnection);
 
                 await OpenConnAsync(_conn);
 
@@ -117,19 +122,15 @@ namespace Crane.Core.SqlServer
                         if (!reader.HasRows)
                             return new List<dynamic>();
 
-                        if (!reader.CanGetColumnSchema())
-                            throw new CraneException("Could not get column schema for table");
+                        var schema = reader.GetSchemaTable();
+                        var dynamicColumnDic = CraneHelper.GetColumnsForDynamicQuery(schema);
 
-                        var columnSchema = reader.GetColumnSchema();
-
-                        var dynamicColumnDic = CraneHelper.GetColumnsForDynamicQuery(columnSchema);
-
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             dynamic expando = new ExpandoObject();
 
                             foreach (var col in dynamicColumnDic)
-                                ((IDictionary<String, object>)expando)[col.Value] = reader[col.Key];
+                                ((IDictionary<string, object>)expando)[col.Value] = reader[col.Key];
 
                             getObjectDel(expando, result);
                         }
@@ -151,8 +152,7 @@ namespace Crane.Core.SqlServer
 
         /// <inheritdoc />
         protected override IEnumerable<TResult> ExecuteReaderImpl<TResult>(Action<DbDataReader, List<TResult>> getObjectDel,
-            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns,
-            DbConnection userConn, DbTransaction trans,
+            string query, int? commandTimeout, string[] partitionOnArr, bool validateSelectColumns, DbConnection userConn, DbTransaction transaction,
             string cacheKey, Action saveCacheDel, bool valueOrStringType = false)
         {
             var userProvidedConnection = false;
@@ -163,19 +163,15 @@ namespace Crane.Core.SqlServer
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
+                _conn = GetSqlConnection(userConn, userProvidedConnection);
 
                 OpenConn(_conn);
 
                 var result = new List<TResult>();
-                using (var cmd = new SqlCommand(query, _conn))
+                using (SqlCommand cmd = new SqlCommand(query, _conn))
                 {
                     // Set common SqlCommand properties
-                    SetCommandProps(cmd, trans, commandTimeout, query);
+                    SetCommandProps(cmd, transaction, commandTimeout, query);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -184,23 +180,22 @@ namespace Crane.Core.SqlServer
 
                         if (!valueOrStringType)
                         {
-                            if (!reader.CanGetColumnSchema())
-                                throw new CraneException("Could not get column schema for table");
-
-                            var columnSchema = reader.GetColumnSchema();
+                            var schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
                             int[] partitionOnOrdinal = null;
 
                             if (partitionOnArr != null)
                                 partitionOnOrdinal =
-                                    CraneHelper.GetOrdinalPartition(columnSchema, partitionOnArr, SprocObjectMapList.Count);
+                                    CraneHelper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
-                            CraneHelper.SetOrdinal(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            CraneHelper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
                             if (validateSelectColumns)
-                                CraneHelper.ValidateSelectColumns(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                                CraneHelper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    query);
 
-                            CraneHelper.ValidateSchema(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            CraneHelper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
 
                         while (reader.Read())
@@ -236,11 +231,7 @@ namespace Crane.Core.SqlServer
                 userProvidedConnection = userConn != null;
 
                 // Try open connection if not already open.
-                if (!userProvidedConnection)
-                    _conn = new SqlConnection(_connectionString);
-
-                else
-                    _conn = userConn as SqlConnection;
+                _conn = GetSqlConnection(userConn, userProvidedConnection);
 
                 await OpenConnAsync(_conn);
 
@@ -258,23 +249,22 @@ namespace Crane.Core.SqlServer
 
                         if (!valueOrStringType)
                         {
-                            if (!reader.CanGetColumnSchema())
-                                throw new CraneException("Could not get column schema for table");
-
-                            var columnSchema = reader.GetColumnSchema();
+                            var schema = reader.GetSchemaTable();
+                            var rowList = schema?.Rows.Cast<DataRow>().ToList();
 
                             int[] partitionOnOrdinal = null;
 
                             if (partitionOnArr != null)
                                 partitionOnOrdinal =
-                                    CraneHelper.GetOrdinalPartition(columnSchema, partitionOnArr, SprocObjectMapList.Count);
+                                    CraneHelper.GetOrdinalPartition(rowList, partitionOnArr, SprocObjectMapList.Count);
 
-                            CraneHelper.SetOrdinal(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            CraneHelper.SetOrdinal(rowList, SprocObjectMapList, partitionOnOrdinal);
 
                             if (validateSelectColumns)
-                                CraneHelper.ValidateSelectColumns(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                                CraneHelper.ValidateSelectColumns(rowList, SprocObjectMapList, partitionOnOrdinal,
+                                    query);
 
-                            CraneHelper.ValidateSchema(columnSchema, SprocObjectMapList, partitionOnOrdinal);
+                            CraneHelper.ValidateSchema(schema, SprocObjectMapList, partitionOnOrdinal);
                         }
 
                         while (await reader.ReadAsync())
@@ -314,7 +304,7 @@ namespace Crane.Core.SqlServer
 
                 OpenConn(_conn);
 
-                using (SqlCommand cmd = new SqlCommand(query, _conn))
+                using (var cmd = new SqlCommand(query, _conn))
                 {
                     SetCommandProps(cmd, transaction, commandTimeout, query);
                     obj = (T)cmd.ExecuteScalar();
@@ -347,7 +337,7 @@ namespace Crane.Core.SqlServer
 
                 await OpenConnAsync(_conn);
 
-                using (SqlCommand cmd = new SqlCommand(query, _conn))
+                using (var cmd = new SqlCommand(query, _conn))
                 {
                     SetCommandProps(cmd, transaction, commandTimeout, query);
                     obj = (T)await cmd.ExecuteScalarAsync();
@@ -362,6 +352,25 @@ namespace Crane.Core.SqlServer
                     _conn.Dispose();
             }
 
+        }
+
+        private SqlConnection GetSqlConnection(DbConnection userConn, bool userProvidedConnection)
+        {
+
+            SqlConnection conn;
+#if NETFRAMEWORK
+                if (!userProvidedConnection)
+                    conn = _credential == null ? new SqlConnection(_connectionString)
+                        : new SqlConnection(_connectionString, _credential);
+                else
+                    conn = userConn as SqlConnection;
+#elif NETCORE
+            if (!userProvidedConnection)
+                conn = new SqlConnection(_connectionString);
+            else
+                conn = userConn as SqlConnection;
+#endif
+            return conn;
         }
     }
 }

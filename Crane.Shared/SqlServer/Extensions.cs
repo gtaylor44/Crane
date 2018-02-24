@@ -1,7 +1,6 @@
 ﻿using System.Data.SqlClient;
-using Crane.SqlServer;
 
-namespace Crane.Core.SqlServer
+namespace Crane.SqlServer
 {
     /// <summary>
     /// 
@@ -15,7 +14,11 @@ namespace Crane.Core.SqlServer
         /// <returns></returns>
         public static SqlServerQuery Query(this SqlConnection sqlConnection)
         {
+#if NETFRAMEWORK
+            return new SqlServerQuery(sqlConnection.ConnectionString, sqlConnection.Credential, null);
+#elif NETCORE
             return new SqlServerQuery(sqlConnection.ConnectionString, null);
+#endif
         }
 
         /// <summary>

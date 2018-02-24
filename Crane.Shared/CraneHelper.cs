@@ -6,9 +6,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+#if NETFRAMEWORK
+using Microsoft.SqlServer.Types;
+#endif
 using System.Reflection;
-using System.Collections.ObjectModel;
-using System.Data.Common;
 
 [assembly: InternalsVisibleTo("UnitTest")]
 [assembly: InternalsVisibleTo("IntegrationTest")]
@@ -16,8 +17,11 @@ namespace Crane
 {
     internal static class CraneHelper
     {
-        public static void SetOrdinal(ReadOnlyCollection<DbColumn> columnSchema, List<ICraneObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
+        public static void SetOrdinal(List<DataRow> rowList, List<ICraneObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
+            if (rowList == null)
+                throw new CraneException("Could not get schema for stored procedure");
+
             int currMap = 0;
 
             foreach (var map in sprocObjectMapList)
@@ -36,13 +40,13 @@ namespace Crane
                     int? pos;
                     if (partitionOnOrdinal != null)
                     {
-                        pos = currMap == sprocObjectMapList.Count - 1 ? GetOrdinalPosition(columnSchema, actualColumn, partitionOnOrdinal[currMap],
-                                null) : GetOrdinalPosition(columnSchema, actualColumn, partitionOnOrdinal[currMap],
+                        pos = currMap == sprocObjectMapList.Count - 1 ? GetOrdinalPosition(rowList, actualColumn, partitionOnOrdinal[currMap],
+                                null) : GetOrdinalPosition(rowList, actualColumn, partitionOnOrdinal[currMap],
                                 partitionOnOrdinal[currMap + 1]);
                     }
                     else
                     {
-                        pos = GetOrdinalPosition(columnSchema, actualColumn, 0, null);
+                        pos = GetOrdinalPosition(rowList, actualColumn, 0, null);
                     }
 
                     if (pos.HasValue)
@@ -55,25 +59,22 @@ namespace Crane
             }
         }
 
-        public static int? GetOrdinalPosition(ReadOnlyCollection<DbColumn> columnSchema, string columnName, int minRange, int? maxRange)
+        public static int? GetOrdinalPosition(List<DataRow> dataRowList, string columnName, int minRange, int? maxRange)
         {
-            foreach (var col in columnSchema)
+            foreach (var dataRow in dataRowList)
             {
-                if (!col.ColumnOrdinal.HasValue)
-                    throw new CraneException($"Could not get ordinal for column: {col.ColumnName}");
-
-                int ordinalAsInt = col.ColumnOrdinal.Value;
+                int ordinalAsInt = int.Parse(dataRow["ColumnOrdinal"].ToString());
 
                 if (maxRange.HasValue)
                 {
-                    if (col.ColumnName.Equals(columnName, StringComparison.OrdinalIgnoreCase)
+                    if (dataRow["ColumnName"].ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase)
                         && ordinalAsInt >= minRange
                         && ordinalAsInt < maxRange)
                     {
                         return ordinalAsInt;
                     }
                 }
-                else if (col.ColumnName.Equals(columnName, StringComparison.OrdinalIgnoreCase)
+                else if (dataRow["ColumnName"].ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase)
                          && ordinalAsInt >= minRange)
                 {
                     return ordinalAsInt;
@@ -86,11 +87,11 @@ namespace Crane
         /// <summary>
         /// Gets the ordinal as a start index for each column in partitionOn string. 
         /// </summary>
-        /// <param name="columnSchema"></param>
+        /// <param name="rows"></param>
         /// <param name="partitionOnArr"></param>
         /// <param name="mapCount"></param>
         /// <returns></returns>
-        public static int[] GetOrdinalPartition(ReadOnlyCollection<DbColumn> columnSchema, string[] partitionOnArr, int mapCount)
+        public static int[] GetOrdinalPartition(List<DataRow> rows, string[] partitionOnArr, int mapCount)
         {
 
             List<int> result = new List<int>();
@@ -101,9 +102,9 @@ namespace Crane
 
             int currPartition = 0;
 
-            for (int i = 0; i < columnSchema.Count; i++)
+            for (int i = 0; i < rows.Count; i++)
             {
-                string selectParam = columnSchema[i].ColumnName;
+                string selectParam = rows[i]["ColumnName"].ToString();
 
                 if (i == 0 && !string.Equals(selectParam, partitionOnArr[currPartition], StringComparison.OrdinalIgnoreCase))
                 {
@@ -112,10 +113,7 @@ namespace Crane
 
                 if (string.Equals(selectParam, partitionOnArr[currPartition], StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!columnSchema[i].ColumnOrdinal.HasValue)
-                        throw new CraneException($"Could not get ordinal for column: {columnSchema[i].ColumnName}");
-
-                    result.Add(columnSchema[i].ColumnOrdinal.Value);
+                    result.Add(int.Parse(rows[i]["ColumnOrdinal"].ToString()));
                     matched.Add(selectParam);
                     currPartition++;
                 }
@@ -145,17 +143,17 @@ namespace Crane
                 throw new CraneException("partitionOn pattern is incorrect. Must be letters or digits and separated by a pipe. E.g. 'OrderId|ProductId'");
         }
 
-        public static bool ValidateSelectColumns(ReadOnlyCollection<DbColumn> columnSchema, List<ICraneObjectMap> sprocObjectMapList,
-            int[] partitionOnOrdinal)
+        public static bool ValidateSelectColumns(List<DataRow> rows, List<ICraneObjectMap> sprocObjectMapList,
+            int[] partitionOnOrdinal, string storedProcedure)
         {
             List<string> absentColumnMessageList = new List<string>();
 
             if (sprocObjectMapList.Count == 1)
             {
                 ICraneObjectMap objectMap = sprocObjectMapList.ElementAt(0);
-                foreach (var col in columnSchema)
+                foreach (var row in rows)
                 {
-                    string currColumn = col.ColumnName;
+                    string currColumn = row["ColumnName"].ToString();
 
                     if (!objectMap.ColumnOrdinalDic.ContainsKey(currColumn))
                         absentColumnMessageList.Add(
@@ -170,11 +168,11 @@ namespace Crane
                 foreach (var map in sprocObjectMapList)
                 {
                     int minRange = partitionOnOrdinal[currMap];
-                    int maxRange = (sprocObjectMapList.Count - 1) == currMap ? columnSchema.Count : partitionOnOrdinal[currMap + 1];
+                    int maxRange = (sprocObjectMapList.Count - 1) == currMap ? rows.Count : partitionOnOrdinal[currMap + 1];
 
                     for (int i = minRange; i < maxRange; i++)
                     {
-                        string currColumn = columnSchema[i].ColumnName;
+                        string currColumn = rows[i]["ColumnName"].ToString();
                         if (!map.ColumnOrdinalDic.ContainsKey(currColumn))
                             absentColumnMessageList.Add($"Select column: '{currColumn}'\nTarget model: '{map.Type.Name}'");
 
@@ -186,8 +184,8 @@ namespace Crane
 
             string absentColumnsAsString = string.Join(",\n\n", absentColumnMessageList);
 
-            string message = sprocObjectMapList.Count == 1 ? $"The following columns in select statement could not be " +
-                                                             $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n{absentColumnsAsString}\n" :
+            string message = sprocObjectMapList.Count == 1 ? $"The following columns from the select statement in '{storedProcedure}' have not been " +
+                                                             $"mapped to target model '{sprocObjectMapList.ElementAt(0).Type.Name}'.\n\n{absentColumnsAsString}\n" :
                                                              $"The following columns from select statement have not been mapped to target model. " +
                                                              $"The target model is determined by the 'partitionOn' parameter. This validation message is dependant on a sound partitionOn argument. \n\n{absentColumnsAsString}\n";
 
@@ -224,28 +222,34 @@ namespace Crane
             return true;
         }
 
-        public static void ValidateSchema(ReadOnlyCollection<DbColumn> columnSchema, List<ICraneObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
+        public static void ValidateSchema(DataTable schema, List<ICraneObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
+            var rows = schema?.Rows.Cast<DataRow>().ToList();
+
+            if (rows == null)
+                return;
 
             if (sprocObjectMapList.Count == 1)
             {
                 ICraneObjectMap map = sprocObjectMapList.ElementAt(0);
-                foreach (var col in columnSchema)
+                foreach (var row in rows)
                 {
+                    string currColumn = row["ColumnName"].ToString();
+
                     map.Columns.ToList().ForEach(x =>
                     {
                         if (map.CustomColumnMappings.ContainsKey(x))
                         {
-                            if (map.CustomColumnMappings[x].Equals(col.ColumnName,
+                            if (map.CustomColumnMappings[x].Equals(currColumn,
                                 StringComparison.Ordinal))
                             {
-                                ValidateColumn(map, x, col);
+                                ValidateColumn(map, x, row);
                             }
                         }
-                        else if (x.Equals(col.ColumnName,
+                        else if (x.Equals(currColumn,
                             StringComparison.Ordinal))
                         {
-                            ValidateColumn(map, x, col);
+                            ValidateColumn(map, x, row);
 
                         }
                     });
@@ -259,11 +263,11 @@ namespace Crane
                 foreach (var map in sprocObjectMapList)
                 {
                     int minRange = partitionOnOrdinal[currMap];
-                    int maxRange = (sprocObjectMapList.Count - 1) == currMap ? columnSchema.Count : partitionOnOrdinal[currMap + 1];
+                    int maxRange = (sprocObjectMapList.Count - 1) == currMap ? rows.Count : partitionOnOrdinal[currMap + 1];
 
                     for (int i = minRange; i < maxRange; i++)
                     {
-                        string currColumn = columnSchema[i].ColumnName;
+                        string currColumn = rows[i]["ColumnName"].ToString();
 
                         map.Columns.ToList().ForEach(x =>
                         {
@@ -272,13 +276,13 @@ namespace Crane
                                 if (map.CustomColumnMappings[x].Equals(currColumn,
                                     StringComparison.Ordinal))
                                 {
-                                    ValidateColumn(map, x, columnSchema[i]);
+                                    ValidateColumn(map, x, rows[i]);
                                 }
                             }
                             else if (x.Equals(currColumn,
                                 StringComparison.Ordinal))
                             {
-                                ValidateColumn(map, x, columnSchema[i]);
+                                ValidateColumn(map, x, rows[i]);
 
                             }
                         });
@@ -290,7 +294,7 @@ namespace Crane
             }
         }
 
-        public static void ValidateColumn(ICraneObjectMap map, string schemaColumn, DbColumn column)
+        public static void ValidateColumn(ICraneObjectMap map, string schemaColumn, DataRow occurence)
         {
             PropertyInfo member;
 
@@ -299,20 +303,19 @@ namespace Crane
                 throw new KeyNotFoundException($"Could not get schema property {schemaColumn}");
             }
 
-            var schemaProperty = column.DataType;
+            var schemaProperty = (Type)occurence["DataType"];
 
-            var propType = member.PropertyType;
+            var type = member.PropertyType;
 
-
-            if (member.PropertyType.IsEnum
+            if (member.PropertyType.BaseType == typeof(Enum) 
                 && (schemaProperty == typeof(int) || schemaProperty == typeof(long)))
                 return;
 
             Type nullableType;
-            if (((nullableType = Nullable.GetUnderlyingType(propType)) != null && schemaProperty != nullableType)
-                || schemaProperty != propType && nullableType == null)
+            if (((nullableType = Nullable.GetUnderlyingType(type)) != null && schemaProperty != nullableType)
+                || schemaProperty != type && nullableType == null)
             {
-                throw new CraneException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{member.GetType()}'");
+                throw new CraneException($"Type mismatch for column '{member.Name}'. Expected type of '{schemaProperty}' but instead saw type '{type}'");
             }
         }
 
@@ -354,25 +357,25 @@ namespace Crane
 
         }
 
-        public static Dictionary<int, string> GetColumnsForDynamicQuery(ReadOnlyCollection<DbColumn> columnSchema)
+        public static Dictionary<int, string> GetColumnsForDynamicQuery(DataTable schema)
         {
-            var dynamicColumnDic = new Dictionary<int, string>();
+            var rowList = schema?.Rows.Cast<DataRow>().ToList();
+            Dictionary<int, string> dynamicColumnDic = new Dictionary<int, string>();
 
-            foreach (var item in columnSchema)
-            {
-                var strippedColumnName = item.ColumnName.Replace(" ", string.Empty);
+            if (rowList != null)
+                foreach (DataRow dr in rowList)
+                {
+                    int ordinalAsInt = int.Parse(dr["ColumnOrdinal"].ToString());
+                    string strippedColumnName = dr["ColumnName"]?.ToString().Replace(" ", string.Empty);
 
-                if (strippedColumnName == null)
-                    throw new CraneException("There was a probelm retrieving column.");
+                    if (strippedColumnName == null)
+                        throw new CraneException("There was a probelm retrieving column.");
 
-                if (dynamicColumnDic.ContainsValue(strippedColumnName))
-                    throw new CraneException($"Duplicate column name in stored procedure detected: {strippedColumnName}");
+                    if (dynamicColumnDic.ContainsValue(strippedColumnName))
+                        throw new CraneException($"Duplicate column name in stored procedure detected: {strippedColumnName}");
 
-                if (!item.ColumnOrdinal.HasValue)
-                    throw new CraneException($"Could not determine column ordinal for columnn: {strippedColumnName}");
-
-                dynamicColumnDic.Add(item.ColumnOrdinal.Value, strippedColumnName);
-            }
+                    dynamicColumnDic.Add(ordinalAsInt, strippedColumnName);
+                }
 
             return dynamicColumnDic;
         }
@@ -387,7 +390,7 @@ namespace Crane
         public static T GetObject<T>(ICraneObjectMap sprocObjectMap, IDataReader reader)
         {
             var targetObject = (T)Activator.CreateInstance(typeof(T));
-            var defaultOrNullCounter = 0;
+            int defaultOrNullCounter = 0;
 
             foreach (var column in sprocObjectMap.Columns)
             {
@@ -403,9 +406,7 @@ namespace Crane
 
 
                 PropertyInfo member;
-                TypeInfo typeInfo;
-                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out member)
-                    || !sprocObjectMap.TypeInfoCache.TryGetValue(column, out typeInfo))
+                if (!sprocObjectMap.PropertyInfoCache.TryGetValue(column, out member))
                 {
                     throw new KeyNotFoundException($"Could not get property for column {column}");
                 }
@@ -415,7 +416,8 @@ namespace Crane
                 if (readerObj == DBNull.Value)
                 {
                     var isNullable = Nullable.GetUnderlyingType(member.PropertyType) != null;
-                    if (typeInfo.IsValueType && !isNullable)
+
+                    if (member.PropertyType.IsValueType && !isNullable)
                         member.SetValue(targetObject, Convert.ChangeType(GetDefaultValue(member, sprocObjectMap.DefaultValueDic), member.PropertyType), null);
 
                     defaultOrNullCounter++;
@@ -425,20 +427,20 @@ namespace Crane
                 {
                     var t = member.PropertyType;
 
-                    if (typeInfo.IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                    if (t.IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                     {
                         t = Nullable.GetUnderlyingType(t);
                     }
 
-                    if (t.IsEnum)
+                    if (t.BaseType == typeof(Enum))
                     {
                         member.SetValue(targetObject, (int)readerObj, null);
                     }
+
                     else
                     {
                         member.SetValue(targetObject, Convert.ChangeType(readerObj, t), null);
                     }
-
                     
                 }
             }
@@ -493,11 +495,17 @@ namespace Crane
 
         public static bool CheckForValidDataType(Type type)
         {
-            if (type.GetTypeInfo().IsValueType ||
+            if (type.IsValueType ||
                 type == typeof(string) ||
                 type == typeof(byte[]) ||
                 type == typeof(char[]) ||
-                type == typeof(SqlXml))
+                type == typeof(SqlXml)
+#if NETFRAMEWORK
+                ||
+                type == typeof(SqlGeography) ||
+                type == typeof(SqlGeometry)
+#endif
+                )
                 return true;
 
             return false;

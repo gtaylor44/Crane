@@ -303,6 +303,11 @@ namespace Crane
 
             var propType = member.PropertyType;
 
+
+            if (member.PropertyType.IsEnum
+                && (schemaProperty == typeof(int) || schemaProperty == typeof(long)))
+                return;
+
             Type nullableType;
             if (((nullableType = Nullable.GetUnderlyingType(propType)) != null && schemaProperty != nullableType)
                 || schemaProperty != propType && nullableType == null)
@@ -425,7 +430,16 @@ namespace Crane
                         t = Nullable.GetUnderlyingType(t);
                     }
 
-                    member.SetValue(targetObject, Convert.ChangeType(readerObj, t), null);
+                    if (t.IsEnum)
+                    {
+                        member.SetValue(targetObject, (int)readerObj, null);
+                    }
+                    else
+                    {
+                        member.SetValue(targetObject, Convert.ChangeType(readerObj, t), null);
+                    }
+
+                    
                 }
             }
 

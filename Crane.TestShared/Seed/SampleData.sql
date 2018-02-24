@@ -218,6 +218,7 @@ create table "Order" (
    OrderNumber          nvarchar(10)         null,
    CustomerId           int                  not null,
    TotalAmount          decimal(12,2)        null default 0,
+   OrderType			int					 null
    constraint PK_ORDER primary key (Id)
 )
 go
@@ -554,9 +555,9 @@ INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[Is
 INSERT INTO [Product] ([Id],[ProductName],[SupplierId],[UnitPrice],[Package],[IsDiscontinued])VALUES(78,'Stroopwafels',22,9.75,'24 pieces',0)
 SET IDENTITY_INSERT Product OFF
 SET IDENTITY_INSERT [Order] ON
-INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber])VALUES(1,'Jul  4 2012 12:00:00:000AM',85,440.00,'542378')
-INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber])VALUES(2,'Jul  5 2012 12:00:00:000AM',79,1863.40,'542379')
-INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber])VALUES(3,'Jul  8 2012 12:00:00:000AM',34,1813.00,'542380')
+INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber],[OrderType])VALUES(1,'Jul  4 2012 12:00:00:000AM',85,440.00,'542378', 1)
+INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber],[OrderType])VALUES(2,'Jul  5 2012 12:00:00:000AM',79,1863.40,'542379', 2)
+INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber],[OrderType])VALUES(3,'Jul  8 2012 12:00:00:000AM',34,1813.00,'542380', 3)
 INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber])VALUES(4,'Jul  8 2012 12:00:00:000AM',84,670.80,'542381')
 INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber])VALUES(5,'Jul  9 2012 12:00:00:000AM',76,3730.00,'542382')
 INSERT INTO [Order] ([Id],[OrderDate],[CustomerId],[TotalAmount],[OrderNumber])VALUES(6,'Jul 10 2012 12:00:00:000AM',34,1444.80,'542383')

@@ -59,6 +59,20 @@ namespace IntegrationTest
         }
 
         [TestMethod]
+        public void GetAllOrders()
+        {
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
+
+            Dictionary<int, Customer> customerDic = new Dictionary<int, Customer>();
+
+            var result = dataAccess
+                .Query()
+                .ExecuteReader<Order>("select * from [dbo].[order]");
+
+            Assert.IsTrue(result.Any());
+        }
+
+        [TestMethod]
         public void GetAllCustomersAndOrders()
         {
             ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);

@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\TestDataType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MyExpectedException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SqlConnectionFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Type\OrderType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Seed\SampleData.sql" />

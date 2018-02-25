@@ -1,4 +1,4 @@
-﻿USE [SprocMapperTest]
+﻿USE [Crane]
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
@@ -3544,7 +3544,7 @@ INSERT INTO [OrderItem] ([Id],[OrderId],[ProductId],[UnitPrice],[Quantity])VALUE
 INSERT INTO [OrderItem] ([Id],[OrderId],[ProductId],[UnitPrice],[Quantity])VALUES(2155,830,77,13.00,2)
 SET IDENTITY_INSERT [OrderItem] OFF
 
-USE [SprocMapperTest]
+USE [Crane]
 
 IF EXISTS(SELECT *
           FROM   INFORMATION_SCHEMA.ROUTINES
@@ -3812,7 +3812,7 @@ BEGIN
 END
 GO
 
-USE [SprocMapperTest]
+USE [Crane]
 GO
 /****** Object:  StoredProcedure [dbo].[SaveCustomer]    Script Date: 16/02/2017 12:09:36 PM ******/
 SET ANSI_NULLS ON

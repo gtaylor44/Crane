@@ -29,7 +29,12 @@ namespace Crane
         /// <summary>
         /// 
         /// </summary>
+
+#if DEBUG
         protected const bool ValidateSelectColumnsDefault = true;
+#else
+        protected const bool ValidateSelectColumnsDefault = false;
+#endif
 
         /// <summary>
         /// 

@@ -1,6 +1,5 @@
 ﻿using System;
 using Crane.CacheProvider;
-using Crane.Shared.Base;
 
 namespace Crane.Base
 {

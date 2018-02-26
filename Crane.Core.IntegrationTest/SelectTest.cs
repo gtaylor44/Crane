@@ -8,7 +8,7 @@ using Crane.SqlServer;
 using Crane.TestCommon;
 using Crane.TestCommon.Model;
 using Crane.CacheProvider;
-using Crane.Shared.Base;
+using Crane;
 
 namespace IntegrationTest
 {

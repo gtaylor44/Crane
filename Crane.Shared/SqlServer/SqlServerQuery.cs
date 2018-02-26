@@ -6,8 +6,6 @@ using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using Crane.CacheProvider;
-using Crane.Shared.Base;
 
 namespace Crane.SqlServer
 {

@@ -1,6 +1,9 @@
 ﻿using Crane.CacheProvider;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Crane.Shared.Base
+namespace Crane
 {
     /// <summary>
     /// 
@@ -14,6 +17,6 @@ namespace Crane.Shared.Base
         /// <summary>
         /// 
         /// </summary>
-        public bool ValidateSelectColumns { get; set; } = false;      
+        public bool ValidateSelectColumns { get; set; } = false;
     }
 }

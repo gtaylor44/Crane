@@ -9,7 +9,6 @@ using System.Data.SqlClient;
 using System.Reflection;
 using Crane.CacheProvider;
 using Crane.Model;
-using Crane.Shared.Base;
 
 // ReSharper disable once CheckNamespace
 namespace Crane

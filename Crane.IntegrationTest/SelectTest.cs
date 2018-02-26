@@ -11,7 +11,6 @@ using Crane.TestCommon.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlBulkTools;
 using Crane.CacheProvider;
-using Crane.Shared.Base;
 
 namespace IntegrationTest
 {
@@ -113,7 +112,8 @@ namespace IntegrationTest
 
             var options = new QueryOptions
             {
-                CacheProvider = cacheProvider
+                CacheProvider = cacheProvider,
+                ValidateSelectColumns = true
             };
 
             ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, options);

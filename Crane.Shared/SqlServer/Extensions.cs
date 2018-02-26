@@ -1,4 +1,4 @@
-﻿using Crane.Shared.Base;
+﻿
 using System.Data.SqlClient;
 
 namespace Crane.SqlServer

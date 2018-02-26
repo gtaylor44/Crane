@@ -1,5 +1,4 @@
-﻿using Crane.Shared.Base;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 
 namespace Crane.MySql
 {

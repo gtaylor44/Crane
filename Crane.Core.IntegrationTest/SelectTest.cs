@@ -8,6 +8,7 @@ using Crane.SqlServer;
 using Crane.TestCommon;
 using Crane.TestCommon.Model;
 using Crane.CacheProvider;
+using Crane.Shared.Base;
 
 namespace IntegrationTest
 {
@@ -94,7 +95,12 @@ namespace IntegrationTest
                 SlidingExpiration = TimeSpan.FromSeconds(15)
             });
 
-            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);
+            var options = new QueryOptions
+            {
+                CacheProvider = cacheProvider
+            };
+
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, options);
 
 
             var products = dataAccess.Query()
@@ -258,7 +264,7 @@ namespace IntegrationTest
 
             var customer = dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
-                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: false)
+                .ExecuteReader<Customer>("dbo.GetCustomer")
                 .FirstOrDefault();
 
             Assert.AreEqual("Hanna", customer?.FirstName);

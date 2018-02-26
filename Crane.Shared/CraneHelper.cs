@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Crane.Shared.Base;
 #if NETFRAMEWORK
 using Microsoft.SqlServer.Types;
 #endif
@@ -17,6 +18,14 @@ namespace Crane
 {
     internal static class CraneHelper
     {
+        public static QueryOptions GetDefaultQueryOptions()
+        {
+            return new QueryOptions
+            {
+                CacheProvider = null,
+                ValidateSelectColumns = false
+            };
+        }
         public static void SetOrdinal(List<DataRow> rowList, List<ICraneObjectMap> sprocObjectMapList, int[] partitionOnOrdinal)
         {
             if (rowList == null)

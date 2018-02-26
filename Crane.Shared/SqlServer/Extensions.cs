@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using Crane.Shared.Base;
+using System.Data.SqlClient;
 
 namespace Crane.SqlServer
 {
@@ -14,11 +15,16 @@ namespace Crane.SqlServer
         /// <returns></returns>
         public static SqlServerQuery Query(this SqlConnection sqlConnection)
         {
+            var defaultOptions = new QueryOptions
+            {
+                ValidateSelectColumns = false
+            };
+
 #if NETFRAMEWORK
-            return new SqlServerQuery(sqlConnection.ConnectionString, sqlConnection.Credential, null);
+            return new SqlServerQuery(sqlConnection.ConnectionString, sqlConnection.Credential, defaultOptions);
 #endif
 #if NETCORE
-            return new SqlServerQuery(sqlConnection.ConnectionString, null);
+            return new SqlServerQuery(sqlConnection.ConnectionString, defaultOptions);
 #endif
         }
 

@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseInitialiser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\BaseQuery.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\QueryOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\AbstractCraneCacheProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CacheProvider\CraneCachePolicy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CraneHelper.cs" />

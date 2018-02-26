@@ -6,6 +6,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crane.CacheProvider;
+using Crane.Shared.Base;
 using MySql.Data.MySqlClient;
 
 namespace Crane.MySql
@@ -17,7 +18,7 @@ namespace Crane.MySql
         private readonly string _connectionString;
 
         /// <inheritdoc />
-        public MySqlUserQuery(string connectionString, AbstractCraneCacheProvider cacheProvider) : base(cacheProvider)
+        public MySqlUserQuery(string connectionString, QueryOptions queryOptions) : base(queryOptions)
         {
             _connectionString = connectionString;
         }

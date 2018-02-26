@@ -3,6 +3,7 @@ using Crane.Base;
 using Crane.CacheProvider;
 using Crane.Interface;
 using Crane.Shared;
+using Crane.Shared.Base;
 
 namespace Crane.MySql
 {
@@ -14,13 +15,12 @@ namespace Crane.MySql
         private const string InvalidConnMsg = "Please ensure that valid MySQL credentials have been passed in.";
 
         /// <inheritdoc />
-        public MySqlServerAccess(string connectionString, AbstractCraneCacheProvider cacheProvider = null)
+        public MySqlServerAccess(string connectionString, QueryOptions options = null) : base(options)
         {
             if (connectionString == null)
                 throw new ArgumentException(InvalidConnMsg);
 
             _connectionString = connectionString;
-            CacheProvider = cacheProvider;
         }
 
         /// <inheritdoc />
@@ -32,7 +32,7 @@ namespace Crane.MySql
         /// <inheritdoc />
         public BaseQuery Query()
         {
-            return new MySqlUserQuery(_connectionString, CacheProvider);
+            return new MySqlUserQuery(_connectionString, QueryOptions);
         }
     }
 }

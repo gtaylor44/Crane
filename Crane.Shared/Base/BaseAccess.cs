@@ -1,5 +1,6 @@
 ﻿using System;
 using Crane.CacheProvider;
+using Crane.Shared.Base;
 
 namespace Crane.Base
 {
@@ -14,14 +15,15 @@ namespace Crane.Base
         /// <summary>
         /// 
         /// </summary>
-        protected AbstractCraneCacheProvider CacheProvider;
+        protected QueryOptions QueryOptions;
 
         /// <summary>
         /// 
         /// </summary>
-        protected BaseAccess()
+        /// <param name="options"></param>
+        public BaseAccess(QueryOptions options)
         {
-            CacheProvider = null;
+            QueryOptions = options ?? CraneHelper.GetDefaultQueryOptions();
         }
 
         /// <summary>
@@ -30,10 +32,10 @@ namespace Crane.Base
         /// <param name="cacheProvider"></param>
         public void RegisterCacheProvider(AbstractCraneCacheProvider cacheProvider)
         {
-            if (CacheProvider != null)
+            if (QueryOptions.CacheProvider != null)
                 throw new InvalidOperationException(CacheAlreadyRegisteredMsg);
 
-            CacheProvider = cacheProvider;
+            QueryOptions.CacheProvider = cacheProvider;
         }
 
         /// <summary>
@@ -43,10 +45,10 @@ namespace Crane.Base
         /// <exception cref="InvalidOperationException"></exception>
         public void RemoveKeyFromCache(string key)
         {
-            if (CacheProvider == null)            
+            if (QueryOptions.CacheProvider == null)            
                 throw new InvalidOperationException(NoCacheRegisteredMsg);
-            
-            CacheProvider.Remove(key);
+
+            QueryOptions.CacheProvider.Remove(key);
         }
 
         /// <summary>
@@ -55,12 +57,12 @@ namespace Crane.Base
         /// <exception cref="InvalidOperationException"></exception>
         public void ResetCache()
         {
-            if (CacheProvider == null)
+            if (QueryOptions.CacheProvider == null)
             {
                 throw new InvalidOperationException(NoCacheRegisteredMsg);
             }
 
-            CacheProvider.ResetCache();
+            QueryOptions.CacheProvider.ResetCache();
         }
 
         /// <summary>
@@ -69,12 +71,12 @@ namespace Crane.Base
         /// <param name="policy">The custom policy.</param>
         public void AddGlobalPolicy(CraneCachePolicy policy)
         {
-            if (CacheProvider == null)
+            if (QueryOptions.CacheProvider == null)
             {
                 throw new InvalidOperationException(NoCacheRegisteredMsg);
             }
 
-            CacheProvider.AddGlobalPolicy(policy);
+            QueryOptions.CacheProvider.AddGlobalPolicy(policy);
         }
 
         /// <summary>
@@ -84,12 +86,12 @@ namespace Crane.Base
         /// <param name="policy">The custom policy.</param>
         public void AddPolicy(string regularExpression, CraneCachePolicy policy)
         {
-            if (CacheProvider == null)
+            if (QueryOptions.CacheProvider == null)
             {
                 throw new InvalidOperationException(NoCacheRegisteredMsg);
             }
 
-            CacheProvider.AddPolicy(regularExpression, policy);
+            QueryOptions.CacheProvider.AddPolicy(regularExpression, policy);
         }
     }
 }

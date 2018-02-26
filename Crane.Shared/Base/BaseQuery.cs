@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.Reflection;
 using Crane.CacheProvider;
 using Crane.Model;
+using Crane.Shared.Base;
 
 // ReSharper disable once CheckNamespace
 namespace Crane
@@ -30,11 +31,7 @@ namespace Crane
         /// 
         /// </summary>
 
-#if DEBUG
-        protected const bool ValidateSelectColumnsDefault = true;
-#else
-        protected const bool ValidateSelectColumnsDefault = false;
-#endif
+        protected bool ValidateSelectColumns;
 
         /// <summary>
         /// 
@@ -48,11 +45,12 @@ namespace Crane
         /// <summary>
         /// Interface for executing a query.
         /// </summary>
-        protected BaseQuery(AbstractCraneCacheProvider cacheProvider) : base()
+        protected BaseQuery(QueryOptions queryOptions) : base()
         {
             SprocObjectMapList = new List<ICraneObjectMap>();
             CustomColumnMappings = new Dictionary<Type, Dictionary<string, string>>();
-            CacheProvider = cacheProvider;
+            CacheProvider = queryOptions.CacheProvider;
+            ValidateSelectColumns = queryOptions.ValidateSelectColumns;
         }
 
         /// <summary>
@@ -345,14 +343,13 @@ namespace Crane
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string command, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, 
+            int? commandTimeout = null, 
             DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);
@@ -393,7 +390,7 @@ namespace Crane
                         cacheList.Add(obj1);
                     }
 
-                }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
@@ -408,7 +405,7 @@ namespace Crane
                     cacheList.Add(obj1);
                 }
 
-            }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -417,14 +414,13 @@ namespace Crane
         /// <typeparam name="TResult"></typeparam>
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack"></param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult>(string command, Action<TResult> callBack, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, 
+            int? commandTimeout = null, 
             DbConnection dbConnection = null, DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);
@@ -477,7 +473,7 @@ namespace Crane
 
                     callBack.Invoke(obj1);
 
-                }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
@@ -494,7 +490,7 @@ namespace Crane
 
                 callBack.Invoke(obj1);
 
-            }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -505,7 +501,6 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
@@ -513,7 +508,6 @@ namespace Crane
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1>(string command, Action<TResult, TJoin1> callBack,
             string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, 
             int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -557,7 +551,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -569,14 +563,13 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2>(string command, Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -623,7 +616,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -636,15 +629,17 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3>(string command, Action<TResult, TJoin1, TJoin2, TJoin3> callBack, 
-            string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -693,7 +688,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -707,7 +702,6 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
@@ -715,7 +709,9 @@ namespace Crane
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string command, Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, 
             string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -768,7 +764,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -783,15 +779,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -847,7 +846,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -863,15 +862,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -929,7 +931,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -946,15 +948,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1017,7 +1022,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1035,15 +1040,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public IEnumerable<TResult> ExecuteReader<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string command,
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1109,7 +1117,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1193,16 +1201,17 @@ namespace Crane
         /// Perform a select statement against a single type.
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, 
-            DbConnection dbConnection = null, DbTransaction transaction = null)
+        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -1226,7 +1235,7 @@ namespace Crane
                         cacheList.Add(obj1);
                     }
 
-                }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings);
@@ -1241,7 +1250,7 @@ namespace Crane
                     cacheList.Add(obj1);
                 }
 
-            }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1249,15 +1258,18 @@ namespace Crane
         /// </summary>
         /// <param name="command"></param>
         /// <param name="callBack"></param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, Action<TResult> callBack, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault, int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult>(string command, 
+            Action<TResult> callBack, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
         {
             ValidateCacheKey(cacheKey);
             IEnumerable<TResult> cachedResult;
@@ -1292,7 +1304,7 @@ namespace Crane
 
                     callBack.Invoke(obj1);
 
-                }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
+                }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList), valueOrStringType: true);
             }
 
             MapObject<TResult, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType, ICraneNullType>(SprocObjectMapList, CustomColumnMappings); 
@@ -1309,7 +1321,7 @@ namespace Crane
 
                 callBack.Invoke(obj1);
 
-            }, command, commandTimeout, null, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, null, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1320,14 +1332,14 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1>(string command, Action<TResult, TJoin1> callBack,
-            string partitionOn, string cacheKey = null, bool validateSelectColumns = ValidateSelectColumnsDefault,
+        public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1>(string command, 
+            Action<TResult, TJoin1> callBack,
+            string partitionOn, string cacheKey = null, 
             int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
@@ -1372,7 +1384,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1384,16 +1396,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2>(string command,
-            Action<TResult, TJoin1, TJoin2> callBack, string partitionOn, string cacheKey = null, 
-            bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2> callBack, 
+            string partitionOn, 
+            string cacheKey = null, 
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1440,7 +1454,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1453,16 +1467,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1512,7 +1528,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1526,16 +1542,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1589,7 +1607,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1604,16 +1622,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1669,7 +1689,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1685,16 +1705,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1753,7 +1775,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1770,16 +1792,18 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7>(string command, 
-            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, string partitionOn, string cacheKey = null,
-            bool validateSelectColumns = ValidateSelectColumnsDefault,
-            int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+            Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7> callBack, 
+            string partitionOn, 
+            string cacheKey = null,
+            int? commandTimeout = null, 
+            DbConnection dbConnection = null, 
+            DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1842,7 +1866,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         /// <summary>
@@ -1860,7 +1884,6 @@ namespace Crane
         /// <param name="command">The name of your stored procedure (with schema name if applicable).</param>
         /// <param name="callBack">A delegate that is invoked for every row that is processed.</param>
         /// <param name="partitionOn">"A pipe delimited list that separates the table according to the start of each entity e.g. "Id|Id|Id|Id|Id|Id|Id|Id"</param>
-        /// <param name="validateSelectColumns"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="dbConnection"></param>
         /// <param name="cacheKey"></param>
@@ -1869,9 +1892,11 @@ namespace Crane
         public async Task<IEnumerable<TResult>> ExecuteReaderAsync
             <TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8>(string command,
                 Action<TResult, TJoin1, TJoin2, TJoin3, TJoin4, TJoin5, TJoin6, TJoin7, TJoin8> callBack,
-                string partitionOn, string cacheKey = null,
-                bool validateSelectColumns = ValidateSelectColumnsDefault,
-                int? commandTimeout = null, DbConnection dbConnection = null, DbTransaction transaction = null)
+                string partitionOn, 
+                string cacheKey = null,
+                int? commandTimeout = null, 
+                DbConnection dbConnection = null, 
+                DbTransaction transaction = null)
             where TResult : class, new()
             where TJoin1 : class, new()
             where TJoin2 : class, new()
@@ -1937,7 +1962,7 @@ namespace Crane
 
                 callBack.Invoke(obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9);
 
-            }, command, commandTimeout, partitionOnArr, validateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
+            }, command, commandTimeout, partitionOnArr, ValidateSelectColumns, dbConnection, transaction, cacheKey, () => CacheProvider.Add(cacheKey, cacheList));
         }
 
         private void MapObject<T, T1, T2, T3, T4, T5, T6, T7, T8>(List<ICraneObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)

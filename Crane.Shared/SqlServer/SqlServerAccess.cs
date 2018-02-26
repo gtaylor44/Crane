@@ -4,6 +4,7 @@ using Crane.Base;
 using Crane.CacheProvider;
 using Crane.Interface;
 using Crane.Shared;
+using Crane.Shared.Base;
 
 namespace Crane.SqlServer
 {
@@ -21,25 +22,25 @@ namespace Crane.SqlServer
 #endif
 
         /// <inheritdoc />
-        public SqlServerAccess(string connectionString, AbstractCraneCacheProvider cacheProvider = null)
+        public SqlServerAccess(string connectionString, QueryOptions options = null) : base(options)
         {
             _connectionString = connectionString ?? throw new ArgumentException(InvalidConnMsg);
 #if NETFRAMEWORK
             _credential = null;
 #endif
-            CacheProvider = cacheProvider;
         }
 
 #if NETFRAMEWORK 
         /// <inheritdoc />
-        public SqlServerAccess(string connectionString, SqlCredential credential, AbstractCraneCacheProvider cacheProvider = null)
+        public SqlServerAccess(string connectionString, SqlCredential credential, QueryOptions options = null) : base(options)
         {
             if (connectionString == null || credential == null)
                 throw new ArgumentException(InvalidConnMsg);
 
             _connectionString = connectionString;
             _credential = credential;
-            CacheProvider = cacheProvider;
+
+            QueryOptions = options ?? CraneHelper.GetDefaultQueryOptions();
         }
 #endif
 
@@ -53,9 +54,9 @@ namespace Crane.SqlServer
         public BaseQuery Query()
         {
 #if NETFRAMEWORK
-            return new SqlServerQuery(_connectionString, _credential, CacheProvider);
+            return new SqlServerQuery(_connectionString, _credential, QueryOptions);
 #elif NETCORE
-            return new SqlServerQuery(_connectionString, CacheProvider);
+            return new SqlServerQuery(_connectionString, QueryOptions);
 #endif
         }
     }

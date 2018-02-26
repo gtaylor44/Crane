@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Crane;
@@ -12,6 +11,7 @@ using Crane.TestCommon.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlBulkTools;
 using Crane.CacheProvider;
+using Crane.Shared.Base;
 
 namespace IntegrationTest
 {
@@ -108,13 +108,15 @@ namespace IntegrationTest
 
             cacheProvider.AddPolicy("GetProducts", new CraneCachePolicy()
             {
-                InfiniteExpiration = true
-                
-                
+                InfiniteExpiration = true            
             });
 
-            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, cacheProvider);
+            var options = new QueryOptions
+            {
+                CacheProvider = cacheProvider
+            };
 
+            ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString, options);
 
             var products = dataAccess.Query()
                 .CustomColumnMapping<Product>(x => x.Id, "Product Id")
@@ -265,7 +267,7 @@ namespace IntegrationTest
 
             var customer = dataAccess.Query()
                 .AddSqlParameter("@CustomerId", 6)
-                .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
+                .ExecuteReader<Customer>("dbo.GetCustomer")
                 .FirstOrDefault();
 
             Assert.AreEqual("Hanna", customer?.FirstName);
@@ -279,7 +281,6 @@ namespace IntegrationTest
         public void GetSupplierByName()
         {
             ICraneAccess dataAccess = new SqlServerAccess(SqlConnectionFactory.SqlConnectionString);
-
 
             var supplier = dataAccess.Query()
                 .AddSqlParameter("@SupplierName", "Bigfoot Breweries")

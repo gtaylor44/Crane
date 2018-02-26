@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Crane.Shared.Base;
+using MySql.Data.MySqlClient;
 
 namespace Crane.MySql
 {
@@ -14,7 +15,13 @@ namespace Crane.MySql
         /// <returns></returns>
         public static MySqlUserQuery Query(this MySqlConnection sqlConnection)
         {
-            return new MySqlUserQuery(sqlConnection.ConnectionString, null);
+            var defaultOptions = new QueryOptions
+            {
+                CacheProvider = null,
+                ValidateSelectColumns = false
+            };
+
+            return new MySqlUserQuery(sqlConnection.ConnectionString, defaultOptions);
         }
 
         /// <summary>

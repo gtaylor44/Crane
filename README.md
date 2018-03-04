@@ -1,9 +1,8 @@
 Crane is an simple to use ORM to minimise the job of mapping SQL queries to POCO.
 
 Some key Features:
- * Support: SQL Server, task based async pattern, .NET >= 4.5.0 and .NET Standard >= 1.3
+ * Support: SQL Server, task based async pattern, .NET >= 4.5.0 and Core >= 2.0
  * Cache queries in memory or a custom provider of your choice. 
- * Minimise the risk of common mistakes that occur when mapping manually. Be alerted when a column included in select statement does not have a corrosponding model property. 
  * Add custom mappings for column aliases so your stored procedures dont have to suffer readability issues.  
  
 # Getting started
@@ -102,9 +101,8 @@ Currently only MemoryCacheProvider (which uses MemoryCache by .NET) is supported
 AbstractCraneCacheProvider interface. Once a cache provider is registered, you can supply 'cacheKey' as a named parameter to ExecuteReader queries. 
 
 ```c#
-dataAccess
-		.Query()
-		.ExecuteReader<Product>("dbo.GetProducts", cacheKey: "customer_x_products");
+dataAccess.Query()
+.ExecuteReader<Product>("dbo.GetProducts", cacheKey: "customer_x_products");
 ```
 
 If you want to force refresh the cache so a fresh copy is retrieved next call, you can use the RemoveFromCache method.
@@ -275,44 +273,6 @@ _sqlAccess.Query()
     }
 
     Assert.IsTrue(customerDic.Count > 0);
-
-```
------------------------------
-## Catch bugs early
-
-Crane validates that all select columns are mapped to a corresponding model property by default. This can be disabled by setting validateSelectColumns to false. 
-The below example sets an alias in stored procedure but because no custom column mapping has been setup, it's not mapped 
-and throws a CraneException. The same exception message is shown if the property does not exist or a custom 
-column mapping is incorrect. Note that when mapping joins, it's important to have accurate 'partitionOn' arguments to avoid mixed results. 
-
-```sql
-CREATE PROCEDURE [dbo].[GetCustomer]
-	@CustomerId int
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT c.FirstName as [First Name], c.LastName, c.City, c.Country, c.Phone 
-    FROM Customer c 
-    WHERE Id = @CustomerId
-END
-```
-```c#
-
-Customer customer = _sqlAccess.Query() 
-    .AddSqlParameter("@CustomerId", 6)
-    .ExecuteReader<Customer>("dbo.GetCustomer", validateSelectColumns: true)
-    .FirstOrDefault();
-
-```
-#### Exception message:
-```
-'validateSelectColumns' flag is set to TRUE
-
-The following columns from the select statement in 'dbo.GetCustomer' have not been mapped to target model 'Customer'.
-
-Select column: 'First Name'
-Target model: 'Customer'
 
 ```
 

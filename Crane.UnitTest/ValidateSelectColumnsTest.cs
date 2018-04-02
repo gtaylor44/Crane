@@ -18,7 +18,7 @@ namespace UnitTest
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentSchema()?.Rows.Cast<DataRow>().ToList();
             List<ICraneObjectMap> list = new List<ICraneObjectMap>();
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
             list.ElementAt(0).ColumnOrdinalDic = GetValidPresidentOrdinalDic();
 
@@ -38,7 +38,7 @@ namespace UnitTest
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentSchema()?.Rows.Cast<DataRow>().ToList();
             List<ICraneObjectMap> list = new List<ICraneObjectMap>();
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
             list.ElementAt(0).ColumnOrdinalDic = GetValidPresidentOrdinalDic();
             list.ElementAt(0).ColumnOrdinalDic.Remove("FirstName");
@@ -56,9 +56,9 @@ namespace UnitTest
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentAndAssistantSchema()?.Rows.Cast<DataRow>().ToList();
             List<ICraneObjectMap> list = new List<ICraneObjectMap>();
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
-            CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
             list.ElementAt(0).ColumnOrdinalDic = GetValidPresidentOrdinalDic();
             list.ElementAt(1).ColumnOrdinalDic = GetValidPresidentAssistantOrdinalDic();
@@ -76,9 +76,9 @@ namespace UnitTest
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentAndAssistantSchema()?.Rows.Cast<DataRow>().ToList();
             List<ICraneObjectMap> list = new List<ICraneObjectMap>();
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
-            CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
             list.ElementAt(0).ColumnOrdinalDic = GetValidPresidentOrdinalDic();
             list.ElementAt(1).ColumnOrdinalDic = GetValidPresidentAssistantOrdinalDic();
@@ -98,9 +98,9 @@ namespace UnitTest
             // Arrange
             var schemaTable = DataTableFactory.GetPresidentAndAssistantSchema()?.Rows.Cast<DataRow>().ToList();
             List<ICraneObjectMap> list = new List<ICraneObjectMap>();
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
-            CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<PresidentAssistant>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
             list.ElementAt(0).ColumnOrdinalDic = GetValidPresidentOrdinalDic();
             list.ElementAt(1).ColumnOrdinalDic = GetValidPresidentAssistantOrdinalDic();

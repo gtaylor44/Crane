@@ -18,7 +18,7 @@ namespace UnitTest
         {
             // Arrange
             List<ICraneObjectMap> list = new List<ICraneObjectMap>();
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
             var dataTable = DataTableFactory.GetTestDataTable()?.Rows.Cast<DataRow>().ToList();
 
             var moq = new Mock<IDataReader>();

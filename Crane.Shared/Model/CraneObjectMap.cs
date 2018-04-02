@@ -21,6 +21,7 @@ namespace Crane
             ColumnOrdinalDic = new Dictionary<string, int>();
             Columns = new HashSet<string>();
             DefaultValueDic = new Dictionary<string, object>();
+            IgnoredColumns = new HashSet<string>();
             Type = typeof(T);
         }
         /// <summary>
@@ -51,5 +52,9 @@ namespace Crane
         /// 
         /// </summary>
         public Dictionary<string, int> ColumnOrdinalDic { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public HashSet<string> IgnoredColumns { get; set; }
     }
 }

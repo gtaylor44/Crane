@@ -163,7 +163,7 @@ namespace Crane
                 {
                     string currColumn = row["ColumnName"].ToString();
 
-                    if (!objectMap.ColumnOrdinalDic.ContainsKey(currColumn))
+                    if (!objectMap.ColumnOrdinalDic.ContainsKey(currColumn) && !objectMap.IgnoredColumns.Contains(currColumn))
                         absentColumnMessageList.Add(
                             $"Select column: '{currColumn}'\nTarget model: '{objectMap.Type.Name}'");
                 }
@@ -181,7 +181,7 @@ namespace Crane
                     for (int i = minRange; i < maxRange; i++)
                     {
                         string currColumn = rows[i]["ColumnName"].ToString();
-                        if (!map.ColumnOrdinalDic.ContainsKey(currColumn))
+                        if (!map.ColumnOrdinalDic.ContainsKey(currColumn) && !map.IgnoredColumns.Contains(currColumn))
                             absentColumnMessageList.Add($"Select column: '{currColumn}'\nTarget model: '{map.Type.Name}'");
 
                     }
@@ -327,11 +327,12 @@ namespace Crane
             }
         }
 
-        public static void MapObject<T>(List<ICraneObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings)
+        public static void MapObject<T>(List<ICraneObjectMap> sprocObjectMapList, Dictionary<Type, Dictionary<string, string>> customColumnMappings, HashSet<string> ignoredColumns)
         {
             CraneObjectMap<T> objectMap = new CraneObjectMap<T>();
 
             objectMap.Columns = GetAllValueTypeAndStringColumns(objectMap);
+            objectMap.IgnoredColumns = ignoredColumns;
 
             Dictionary<string, string> customColumnDic;
 
@@ -402,8 +403,14 @@ namespace Crane
 
             foreach (var column in sprocObjectMap.Columns)
             {
+               
                 var actualColumn = sprocObjectMap.CustomColumnMappings.ContainsKey(column)
                     ? sprocObjectMap.CustomColumnMappings[column] : column;
+
+                if (sprocObjectMap.IgnoredColumns.Contains(actualColumn))
+                {
+                    continue;
+                }
 
                 int ordinal;
                 if (!sprocObjectMap.ColumnOrdinalDic.TryGetValue(actualColumn, out ordinal))
@@ -453,7 +460,7 @@ namespace Crane
                 }
             }
 
-            if (defaultOrNullCounter == sprocObjectMap.Columns.Count)
+            if (defaultOrNullCounter == (sprocObjectMap.Columns.Count - sprocObjectMap.IgnoredColumns.Count))
                 return default(T); // All columns are null or default
 
             return targetObject;

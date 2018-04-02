@@ -18,7 +18,7 @@ namespace UnitTest
             // Arrange
             var schemaTable = DataTableFactory.GetTestDataTable()?.Rows.Cast<DataRow>().ToList();
             List<ICraneObjectMap> list = new List<ICraneObjectMap>();
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
 
             // Act
             CraneHelper.SetOrdinal(schemaTable, list, null);
@@ -36,8 +36,8 @@ namespace UnitTest
             Dictionary<Type, Dictionary<string, string>> customColumnMappingDic = new Dictionary<Type, Dictionary<string, string>>();
             Dictionary<string, string> customColumnMapping = new Dictionary<string, string>() { { "LastName", "Assistant Last Name" }, {"FirstName", "Assistant First Name"} };
             customColumnMappingDic.Add(typeof(PresidentAssistant), customColumnMapping);
-            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>());
-            CraneHelper.MapObject<PresidentAssistant>(list, customColumnMappingDic);
+            CraneHelper.MapObject<President>(list, new Dictionary<Type, Dictionary<string, string>>(), new HashSet<string>());
+            CraneHelper.MapObject<PresidentAssistant>(list, customColumnMappingDic, new HashSet<string>());
             int[] partitionOnOrdinal = {0, 6};
 
             // Act

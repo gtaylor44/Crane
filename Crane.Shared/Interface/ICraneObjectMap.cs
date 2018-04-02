@@ -38,5 +38,10 @@ namespace Crane
         /// 
         /// </summary>
         Dictionary<string, int> ColumnOrdinalDic { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        HashSet<string> IgnoredColumns { get; set; }
     }
 }
